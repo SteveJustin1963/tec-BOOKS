@@ -1,0 +1,375 @@
+                             -*- Text -*-
+
+     $Id: books.txt,v 1.14 1995/08/07 11:49:48 bevan Exp $
+
+This section of the Forth FAQ describes various books that are either
+about Forth or that use Forth.  If you know of a book that isn't
+mentioned or if you don't agree with some of the comments in the
+capsule reviews, then send in the relevant information!
+
+Recent Changes:
+
+  1994-01-06 bevan  Added Strain's comments on "FORTH: a text and referenece"
+  1994-01-06 bevan  Added Springer's comments on "FORTH"
+  1994-02-03 bevan  Added an entry for Tim Hendtlass' book.
+  1994-02-22 bevan  Updated entry for Tim Hendtlass' book to include PostScript
+  1994-04-13 bevan  Added Paul Frenger's comments on Payne's 8051 book
+  1994-05-02 bevan  Noted Julian Noble's review of his book in SIGForth.
+  1994-08-16 bevan  Added my review of Loeliger's book.
+  1995-04-04 bevan  Added FIG to the list of book vendors.
+  1995-07-21 bevan  Updated Dick Miller's review of "Thinking Forth"
+  1995-07-21 bevan  Now indicates that Loeliger's is definitely out of print
+  1995-08-07 bevan  Added "Designing and Programming Personal Expert Systems"
+
+Thanks to the following for contributing :- Stephen J. Bevan
+<bevan@cs.man.ac.uk>,  M. Edward Borasky <znmeb@plaza.ds.adp.com>,
+Gene Lefave (G.LEFAVE on GEnie), Ong Hian Leong
+<scornd4@solomon.technet.sg>, Dick Miller <dmiller@im.lcs.mit.edu>,
+Julian V. Noble <jvn@fermi.clas.Virginia.EDU> and Norman E. Smith
+<smithn@orvb.saic.com>.
+
+
+"Starting FORTH: an introduction to the FORTH language and operating
+system for beginners and professionals" Leo Brodie, Prentice Hall 1981
+(2nd Ed., 1987)
+
+  An introduction, from first principles, to Forth.
+
+  Dick Miller <dmiller@im.lcs.mit.edu> writes:
+  Not as intensive as "Thinking Forth", but an extremely popular 
+  introductory textbook, lightened with pleasant and appropriate 
+  illustrations.
+
+  A Springer, Computing Reviews, Feb 1982 writes:
+  This is an excellent book [ there is actually much more than that,
+  but that about sums up the review - bevan ]
+
+
+
+"Thinking FORTH" Leo Brodie, Prentice Hall 1984
+ISBM: 0-13-917576-8 and 0-13-917568-7 (pbk.)
+
+  Dick Miller <dmiller@im.lcs.mit.edu> writes:
+  It is a top-notch book on strategy, and always was our [MMS] top
+  recommendation for the SECOND book, after you bought a textbook to
+  learn the Forth words.  This one teaches you which ones to select
+  when, how to hone your habits for better Forth (and other)
+  programming, etc.  It's been unavailable for a year or two, and has 
+  been reprinted at last!  MMS has worked to reduce its price from a 
+  proposed $40 (in paperback), and is pleased to offer it at $19.95.
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  The book isn't about programming in Forth in particular, rather it
+  describes a particular development method that has been influenced
+  by problem solving in Forth.  In Brodie's words ``Thinking FORTH is
+  meant for anyone interesting in writing software to solve problems.
+  It focuses on design and implementation: deciding what you want to
+  accomplish, designing the components of the system, and finally
+  building the program'' and ``Although most of the principles
+  described here can be applied to any language, I've presented them
+  in the context of FORTH''.  The book is full of good tips than
+  can be applied to any program, but especially one written in Forth.
+  These tips include good ways to layout code, document it, avoiding
+  complicated logic ... etc.  One of the best computer related books
+  I've read.  BTW I -liked- the illustrations.
+
+
+
+"Forth: The Next Step" Ron Geere, Addison-Wesley, 1986
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  As the title might suggest, this is not for the complete beginner.
+  It is aimed at those who have mastered the idea of reverse polish
+  ... etc. and now want to do something a bit more complicated.
+  Covers areas like: using double length numbers, formatting,
+  reading/writing values from/to a port and ``infinite'' precision integers.
+
+
+
+"Forth on the BBC Microcomputer" Richard De Grandis-Harrison, Acornsoft 1983
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  Although obviously aimed at a particular Forth implementation, it
+  contains quite a general introduction to Forth.
+
+
+
+"Real Time Forth" Tim Hendtlass <tim@brain.physics.swin.oz.au>
+
+  This 250 page book is available by ftp, the URLs are 
+
+    file://brain.physics.swin.oz.au/pub/forth/rtfppcl.zip
+    file://brain.physics.swin.oz.au/pub/forth/rtfpps.zip
+
+  Where the first is a PCL file that will print on a HP LaserJet 2 (or
+  higher) and the second is a PostScript file.  Both are zipped (using
+  PKZIP1) and former unpacks to 3.25Mb and latter to somewhat less.
+  If you want an overview of what the book contains without having
+  download the whole book, have a look at :-
+
+    file://brain.physics.swin.oz.au/pub/forth/readme.txt
+
+  which also contains the contents page.
+
+  If you can't or don't want to print a copy yourself, printed copies
+  will be available at nominal cost from a number of sources in time.
+  At the time writing [1994/02], Mountain View Press Box 429, Route 2,
+  La Honda, CA 94020 USA is the only known one.  It is hoped other
+  sources, especially outside the USA, will also appear.
+
+  The book is shareware but the copyright belongs to Tim Hendtlass.
+  You are welcome to use it for your own use (see note in the book
+  about voluntary donations to Tim's sanity restoration fund if you
+  like it and what to do if you want to print off class copies).  Tim
+  has teaching materials to go with the book that he would be glad to
+  supply to other educators teaching Forth, just contact him.
+
+
+
+"Discover FORTH: learning and programming in the FORTH language"
+Thom Hogan, Osborne/McGraw-Hill, 1982
+
+  A Springer, Computing Reviews, August 1982 writes:
+  [The review closes with the following - bevan ]
+  Discover FORTH contains less than half the number of pages of
+  Starting FORTH, and yet the two books are nearly the same price.
+  Most potential readers are likely to prefer Starting FORTH, but some
+  may prefer the style of presentation of Discover FORTH.  If the
+  reader only wants a quick introduction to the language and already
+  has a programming background, Discover FORTH might suit his taste,
+  especially if he does not plan to go further in the study of the
+  language.
+
+
+
+"Invitation to FORTH" Harry Katzan Jr. Petrocelli Books Inc. New York 1981
+
+ A Springer, Computing Reviews, Feb 1982 writes:
+ There are three reasons why this book is not worth anyone's
+ attention or money: the quality of its production is terrible, it
+ does not go deeply enough into the FORTH language, and there is a
+ vastly better book available at a comparable price [ Starting FORTH -
+ bevan ]
+
+
+
+"Forth: a text and reference" Mahlon G. Kelly and N. Spies, Prentice Hall 1986
+
+  Dick Miller <dmiller@im.lcs.mit.edu> writes:
+  Very readable, covers beginner level through relatively advanced,
+  including Assembler and 8087 math coprocessor details, particularly
+  appropriate to IBM PC and MMSFORTH, but very strong for general use
+  as well.  The only college-level Forth textbook, complete with exercises
+  and answers. 
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  As someone who doesn't think of himself as either a beginner or
+  relatively advanced at Forth (i.e. somewhere in between), I found
+  the book rather dull and obvious.  It does seem to be better than
+  some of the other books that are aimed at beginners though (I'll try
+  and name names when I can remember the titles).  So if you are a
+  complete novice, it is probably worth a look, but if not, I'd give
+  it a miss and try something that aims a bit higher.
+
+  Mike Strain, Computing Reviews 8706-0447 writes:
+  This book sets a new standard in FORTH literature.  The authors have
+  done a good job of providing a text ad a reference book. ... As a
+  reference, this book contains valuable information for both the
+  novice and the experienced programmer. ... In conclusion, the book
+  is well orgainzed, informative, easy to use, and does a good job of
+  presenting the FORTH language.
+
+
+
+"Stack Computers: The New Wave" Phillip Koopman, Ellis Horwood 1989
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  This isn't a book about Forth, rather it is about computers that
+  potentially execute Forth very efficiently.  The book contains a
+  detailed overview of a number of Forth chips as well as a potted
+  history of what seems to be every stack based computer ever
+  designed.
+
+  Paul Frenger, SIGFORTH, 1(3):28-29, 1989 writes:
+  [ 1 1/2 pages of review, culminating with the following - bevan ]
+  Overall, I highly recommend this book to anyone who programs in
+  Forth or any other high level language of whatever variety, or who
+  is interested in the hardware details of Forth engines or the
+  pitfalls of conventional CPU design.
+
+  E. Y. S. Lee, Computing Reviews 9006-0438 writes:
+  ... The books is well organized, and the preface gives a good
+  concise summary of the book's nine chapters and four appendices.
+  The references are fairly extensive and the index is adequate.
+  [ overview of each of the chapters and appendices elided - bevan ]
+  In summary, this book is a good reference for both designers of
+  stack machines and members of the general computer science audience
+  who want to learn more about stack computers and their languages and
+  applications.
+
+
+
+"Threaded Interpretive Languages"  R. G. Loeliger
+Byte Books, 1981, ISBN: 0-07-038360-X
+
+  This book is out of print but sometimes it is available from
+  booksellers or used book stores.
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  Before I read the book I thought that, based on the title, it was
+  going to examine languages which are associated with threaded
+  interpretive implementations and also cover different threading
+  techniques.  I was disappointed to find that it only covers (FIG)
+  Forth and indirect threading, in fact a more accurate title for the
+  book would be "How to write an indirect threaded FIG Forth for the
+  Z80".  That said, the book is easy to read and detailed enough for
+  someone to implement a Forth from scratch on a Z80.  The bulk of the
+  book is taken up with Z80 code for the various words which make up
+  the Forth.  It is not a just listing though, each section is
+  carefully explained with all inputs/outputs, registers,
+  ... etc. documented.  There are also introductory sections which
+  explain the concepts being used along with flowcharts (!) for some
+  routines.  Towards the end of the book around 30 pages are devoted
+  to an implementation of a Z80 Forth assembler.  Block-based VM,
+  editors and cross compilation are briefly discussed.
+
+
+"Scientific FORTH: a modern language for scientific computing" Julian V. Noble
+ISBN: 0-9632775-0-2
+
+  The book is available from FIG and MMS in the USA as well as
+  directly from the publisher: Mechum Banks Publishing, P.O. Box 335,
+  Ivy, Virginia 22945, USA. for $49.95 + $3.00 s/h (continental USA).
+  In Europe it may be purchased from MPE.
+
+  Julian V. Noble <jvn@fermi.clas.Virginia.EDU> writes:
+  While not intended for the Forth novice, Scientific FORTH contains a
+  good many serious examples of Forth programming style, useful programs,
+  as well as innovations intended to simplify number crunching in Forth.
+  It can now be found in the libraries of several major universities (e.g.
+  Yale, U. of Chicago and Rockefeller U.) and government and industrial
+  laboratories (e.g. Fermilab and Motorola).  It comes with a disk containing
+  all the programs discussed in the book.  An update file has recently
+  been posted to GEnie/FIG. 
+
+  You can also find a personal review of the book by Julian V. Noble
+  in SIGFORTH, 4(1):31-32, 1990
+  
+
+
+"Embedded Controller FORTH for the 8051 family" William H. Payne
+Academic Press, 1990.  ISBN: 0125475705  511pp
+
+  J. Fulcher, Computing Reviews, 9105-0316 writes:
+  ... This hobbyist-style book goes into considerable detail regarding
+  the implementation of FORTH on the i8051 family of microcontrollers
+  (down to circuit diagrams, PCB layouts, and wire-wrap board
+  schematics) ... Almost two-thirds of this book is devoted to
+  appendices -- 19 in all.  These primarily contain code listings ... 
+
+  Paul Frenger, SIGFORTH, 2(4):31-32, 1990 reviews the book and gives
+  it 10/10.  Notes that the book contains everything you need: all the
+  source is there as well as all the circuit diagrams.  There are 19
+  appendices, which make up half of the book, and contain things like:
+  the source to the 8086 Forth, 8051 Forth, full screen editor code,
+  8051 disassembler code, Nautilus metacompiler, 8086/8051
+  meta-assemblers, Forth decompilers and much more.
+
+
+
+"Object-oriented Forth - Implementation of Data Structures" Dick Pountain
+Academic Press 1987
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  This book is not for beginners, it assumes you are already happy with
+  CREATE/DOES>.  If you aren't, don't even attempt reading this, you'll
+  only get mightily confused.  The book discusses various ways of
+  introducing abstract data types and object oriented programming into
+  Forth.  In the majority of the cases, code is given which implements
+  the desired feature, but beware, it assumes a certain linked
+  structure for the dictionary, so you might not be able to get the
+  code to work right away with your system.  I recommend it.
+
+
+
+"FORTH" W. P. Salman, O. Tisserand and B. Toulout, Springer Verlag 1986
+
+  A. Springer, Computing Reviews 8706-0448 writes:
+  This book is seriously flawed in several ways.  Each class of flaws
+  makes the book useless for a different set of potential readers.
+  ... There are too many technical terms used without definition, or
+  with definitions appearing many pages after the point where they would
+  have been needed. ... Is the book useful for those who already know
+  FORTH?  It is certainly not very useful for the advanced FORTH
+  programmer; it does not go into the workings of FORTH deeply enough.
+  ... this book might be useful as an intermediate text if the
+  typographical errors and the nonstandard technical English to not
+  distract too much [ it is translated from French - bevan ].
+  Nevertheless, I would recommend that a search be made for other books
+  that could serve as intermediate texts [ Starting FORTH - bevan ].
+  ... In summary, this is some potential for this book to be a useful
+  intermediate text on how FORTH works.  However, it will need
+  considerable rewriting, editing, and proofreading before that
+  potential can be reached.
+
+
+
+"Write Your Own Programming Language Using C++" - Norman Smith
+Wordware Publishing, Plano, Texas.  ISBN: 1-55622-264-5
+price: $15
+
+  Norman E. Smith <smithn@orvb.saic.com> writes:
+  This book presents a minimal Forth implementation called Until, for
+  UNconventional Threaded Interpretive Language.  Until is designed
+  to be used as a macro language embedded in other applications.  It
+  can both call and be called by other C functions.
+
+
+
+"The Complete FORTH" - A.F.T Winfield, Wiley Books, 1983
+
+  Stephen J. Bevan <bevan@cs.man.ac.uk> writes:
+  Another introductory book.
+
+
+
+"Forth: The New Model - A Programmer's Handbook" - Jack Woehr
+M&T Publishing 1992  ISBN: 0-13-036328-6
+
+  Some blurb that comes with it states that the audience for the book is :-
+  "+ An experienced Forth programmer who wishes to become
+    familiar with the draft-proposed standard for Forth
+  + A Forth programmer who needs to know how to convert
+    existing programs to the new proposed standard
+  + A programmer, experienced in other languages, who is
+    using Forth for an embedded control project
+  + A beginning Forth programmer who wishes to learn the
+    language"
+
+  Ong Hian Leong <scornd4@solomon.technet.sg> writes:
+  The author is (as at time of print) VP of Forth Interest Group and
+  member of X3J14, so he presumably knows what he's talking about. 8-)
+  I haven't really gone through the book, but judging from the year of
+  publication, I'd read this side-by-side with dpANS6...
+  
+
+
+Designing and Programming Personal Expert Systems -- Carl Townsend and
+Dennis Feucht, Tab Books, Inc., Blue Ridge Summit, Pa., 1986, 
+ISBN 0-8306-2692-1.
+
+  M. Edward Borasky <znmeb@plaza.ds.adp.com> writes: 
+  This book shows how to do expert systems in Forth, an application
+  usually thought to require LISP or Prolog.  The book is very well 
+  written.  All of the code is in Forth-83 and was available on disk from
+  the publisher, although I haven't checked recently to see if this is
+  still the case.  I had the disk and lost it :-(.  It also contained a
+  PC Forth interpreter, an early version of the Laxen-Perry F83.  An Apple
+  II version was also available.
+
+
+
+Unless otherwise stated, most books should be available at all good
+bookstores.  A number of Forth vendors, for example FIG, MMS and MPE,
+also sell books, sometimes at a cheaper rate than bookstores.  Check
+the FAQ on implementations for vendor addresses.
