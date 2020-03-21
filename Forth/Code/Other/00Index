@@ -1,0 +1,39 @@
+Last update 11/6/97
+
+00Index     - Index file for ftp://ftp.taygeta.com/pub/Forth/Applications
+
+01234th.f   - Contains beginners' programs in ANS Forth
+
+4th-31d.zip - Basic framework for creating application specific scripting 
+              languages. (compiler, interpreter, decompiler, loader and saver)
+
+4th-32e.zip - Newest version of file above 
+
+99bottles.f - 99 Bottles of Beer in Froth resulted from a comp.lang.forth
+              thread.   Needless to say (?), it is not serious code.
+	  
+atlast-1.0.tgz - Autodesk Threaded Language Application System Toolkit, 
+                 embedded toolkit for open, programmable applications.
+
+bdm32.zip   - LMI 80386 UR/FORTH ICD Cable Interface Code
+
+editb.zip   - This is the source code for a simple screen-oriented block
+              editor, in a block file
+
+f83tetr.zip - Tetris for Laxen & Perry's F83 (I'ts known to run on the MSDOS
+              version and the CP/M version)
+	      
+fosm1v1.zip - Forth String Matcher for ANS and F-PC Forth, pattern matching
+              suite with examples of use in validation and translation
+	      
+holon4th.zip - Interactive integrated cross-development and debugging 
+               environment (IIDE) for Forth programs.
+	      
+kandinski-0.tgz - Program which generates a picture file from a MIDI file based 
+		  on cycluphonic method of correlating color to musical pitches
+		  
+sokoban.zip - Game written in Pygmy Forth
+
+winkh.zip   - DOS word processor for writing
+
+winkk.zip   - faster formatting and searching than previous versions of Wink

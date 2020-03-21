@@ -1,0 +1,357 @@
+                                                Maksimov M. O.
+
+        NET of VIRTUAL FORTH-MACHINES.
+
+        The idea of virtual networks consists in a volume,
+to present a network of a COMPUTER in a kind of uniform computing
+environment and in accordance with need to extract from it computing
+resources.
+        For maintenance of a opportunity to use resources of 
+a COMPUTER, belonging to other user (BOU), it is necessary
+to decide following problems:
+        - to organize transfer of the messages on a computer BOU;
+        - on a computer BOU to create object of which 
+          (not interfering the owner of a machine) will accept
+          a sending work up it and
+          result to send to the given addressee;
+        - to organize a reception of results from a computer
+          BOU.
+          For realization
+this problem it is necessary to use following elements:
+        - a real computer;
+        - of a means of transfer of data;
+        - VFM ( virtual FORTH-machine );
+        - virtual channels connecting VFM.
+        The problem, assigned on virtual network, consists
+        of granting of resources one computer other computer
+Thus to lower idle times and to expand a opportunity. It is
+reached by granting at disposal of the user of virtual machines 
+(VFM) located on other real, accessible by means Networks.
+VFM connected by virtual channels will form a virtual network
+of which is based on a real network of a computer.
+        The application VFM permits to grant all free resources
+and to set any restrictions to the other user, even if the real
+machine does not provide a protected mode.
+Traditionally the networks are used for transfer of data, with its
+help it is possible to exchange given from a remote computer.
+
+
+
+
+
+
+
+VFM is granted completely. For management it on a channel transmits
+commands.
+        The system of virtual networks presents from self a set 
+of means on creation of virtual machines, management by them and
+linkage by their virtual channels. The system provides independence
+of means of communication and from a physical arrangement 
+of carriers VFM.
+        Virtual machines of the same type can is on real machines
+of a different type. VFM can be replaced by real devices, thus,
+the system can be accepted as the standard of intermachine dialogue.
+        With the help of a system it is possible to organize sale
+of resources submitted in a kind VFM.
+        VFM presents from self process, performing program
+"interpreter of commands", which causes functions, attached to VFM.
+Among functions there are ports of input/output. Among source ports
+is main, from which interpreter of commands consistently extracts
+a next command for fulfilment.
+The interrogation of the other ports is made by functions,
+by a excited by interpreter of code-commands pursuant to received
+command. These functions can interrogate and main port, thus
+through main port it is possible to transmit the information,
+if it follows at a appropriate code-command.
+ The ports are divided into two types: inside machine -
+transmitting information within the framework of a real machine,
+using for transfer RAM cells;
+And using means of intermachine communication. The ports,
+interacting with transmitting environment, will form virtual
+channels.
+The functions attached to process are defined by type VFM.
+A several VFM can divide a common set of functions.
+        Structure VFM.
+The structure VFM presents from self totality of following
+data sets:
+
+1 area attached to VFM of the service information
+2 stack of datas
+3 stack of returns
+4 areas program accessible datas
+5 of addresses of points of a entrance in program - function
+  5.1 main a set a determining type of a machine 
+      can be shared several VFM
+  5.2 sets for under loading
+  5.3 sets for under loading of common access
+
+        VFM it is possible to program, a new code-command and
+function appropriate to it are thus created. It is reached by
+transfer VFM in a mode of compilation at which flow of code-commands is
+not executed and compiled, forming new function, the reference
+to this function is recorded in a area for under loading.
+It permits gets rid of transfer frequently met sequences of codes.
+Under loading the function can be common access i.s.
+To be caused other VFM within the framework of one computer.
+Through these function it is possible to execute access to given
+programmed VFM a channel of communication between VFM is thus
+organized.
+        The virtual machines can be distribution on different real
+thus a real network of a computer for the transfer of code-commands
+should be used. A virtual machine it is possible to use as
+a multiplexer of virtual channels, then the code-commands such
+VFM act in a role of virtual channels, and function to them
+appropriate in a role of drivers, operands of a code-command
+( i.s. The information following by them ) is given
+transmitted on a channel.
+Use of a multiplexer of virtual channels results in decomposition
+of a real channel on a several virtual, that permits on one
+channel to operate several VFM.
+        The virtual network permits to organize distributed data
+processing. At distributed processing hierarchy of subtasks will
+be formed.
+        VFM can produce commands for other VFM.
+Hierarchy VFM is thus received. The feedback is executed through
+VFM located on 1 real and possessing common of the area of memory.
+        Desequencing of processes on different real
+computers consists in initialization of area client
+of a computer with the help server.
+
+
+        Desequencing of a problem
+
+
+                 ÄÄÄÄÄÄ¿               ÚÄÄÄÄÄÄÄ
+          client       ³               ³    server
+                       ³               ³
+                 ÚÄÄ¿  ³               ³
+             ÚÄÄÄ´  Ã<ÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄ¿
+             ³   ÀÄÄÙ  ³               ³     ³
+         <ÄÄÄÙ         ³               ³   ÚÄÁÄ¿
+                       ³               ³   ³   ³
+         >ÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄ>´   ³
+                       ³               ³   ÀÄÄÄÙ
+                       ³               ³
+                  ÄÄÄÄÄÙ               ÀÄÄÄÄÄÄÄÄ
+
+        Thus following actions occur:
+Client of a computer for a area a tag of readiless
+and establishs sends the task to server, it will produce data
+and will send them client, there them will accept VFM which
+will load a area and will establish a tag of its readiness.
+        The intensity of transfer of code-commands should not
+surpass intensity of their fulfilment. For regulation of intensity
+of transfer a channel with acknowledgement is used. If intensity
+of transfer and the fulfilments change, but on the average this
+condition is executed, it is possible will be limited to buffering.
+
+There are following kinds of area of the references on function:
+        - the base area, is accessible several VFM for use in a mode of
+         execution
+        - a base area, is accessible several VFM for use in
+          a mode of compilation
+        - area for under loading, is given one of VFM, as
+          for record so, and for use
+        - area for under loading of common access,
+          is accessible on record 1 of VFM, and for use several,
+        - others additional.
+
+        Use of files of common access permits to economize memory,
+besides through function of common access it is conveniently to
+execute communication between VFM.
+        Areas as data as references to function can be much
+more thus there should be functions access possessing to it.
+Thus can be substituteable area i.e. with which just by a area
+is executed to interact depends on a established mode.
+
+        The structure of a code of a command has a kind:
+
+1) Mode of execution
+
+        ÉÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍÍËÍ     ÍËÍÍÍÍÍÍÍÍÍÍ»
+        º Code   º operand1 º . . . º operandN º
+        ÈÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍÍÊÍ     ÍÊÍÍÍÍÍÍÍÍÍÍ¼
+
+2) Mode of compilation
+
+        ÉÍÑÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍÍËÍ     ÍËÍÍÍÍÍÍÍÍÍÍ»
+        º ³ code º operand1 º . . . º operandN º
+        ÈÑÏÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍÍÊÍ     ÍÊÍÍÍÍÍÍÍÍÍÍ¼
+         ³
+         ÀÄÄÄÄ  Attribute of immediate execution
+
+ The operands are had with those codes, the functions of which
+interrogate main port. In a mode of compilation it there can be
+only codes, the attribute of immediate execution of which is
+equal 1, thus the sample of function will occur from other array,
+specialized for execution during compilation. Thus the codes
+possessing in the 7th category 1 ( i.e. code > $7f) can not
+be compilated. The access to the other area of the references
+on function occurs on means of functions from base.
+ The offered system of commands is individual case, it
+can be replaced on other, main that it was acceptable appropriate
+to it to a interpreter. The new interpreter can be started 
+from given thus there should be a appropriate command.
+ At occurrence of a emergency VFM sends on a feedback a code
+of emergency completion and goes in a mode of expectation
+of a command restart. On reception of this command VFM it executes,
+and all previous are ignored.
+   Any objects such as: the files, windows, devices drivers and etc.
+can be presented as VFM.
+
+ Programm realization.
+        The given variant of a virtual network is submitted
+in a kind of following files of the initial text:
+ The containing program of loading server VFM.
+   Pauk40.f
+   paukc1.f
+   paukc4.f
+ the containing program of loading   client VFM.
+   Paukc5.f
+For interaction VFM following words are used:
+Out_u - to transmit a code.
+In_u - to accept a code.
+Which are adapters to means of communication, are located in
+separate file(s).
+  Inout0.f - for interaction through RAM
+  IN-C.f - for a reception through a file 
+  out-c.f - for transfer through a file
+These words are adapters between VFM and means of transfer of data,
+till this their realization depends on these means.
+In all other independence of means of transfer of data is supplied.
+On the command out_u the code is not at once transmitted, and is
+previously recorded in a target buffer, where a block of codes
+for transfer on the command ok_0 is accumulated or at filling of
+a buffer.
+        The text àauká5.f contains in 1 set of functions
+on development of codes for management auxiliary VFM, in 2nd VFM
+on a reception and processing of results received from auxiliary
+VFM.
+        Main problem at organization of interaction between VFM
+this installation of conformity between functions, producing by
+a command of main VFM and function, executed by auxiliary VFM.
+This conformity is established by the sequence order in the
+initial text. In the text àauká5.f a determining word >>_0
+certain to them a word is described will send to a auxiliary
+machine a code the containing number of a call of a word >>_0,
+which corresponds to displacement in a area of the references
+on executed functions. A fragment of text:
+ 
+        >>_0 name1 >>_0 name2
+Designates definition of 2 words at fulfilment of which a
+code the auxiliary machine and will be sent, if 
+name1 will send a code containing displacement in
+ a area of references  n
+Name2    - " -          n + 1.
+Thus the order including of functions in a area of the references
+at programming server VFM should correspond to the order
+of definition of causing functions at programming client VFM.
+The words y>_0 b>_0 work similarly >>_0, at exception:
+Y>_0 -    At start of a word certain(determined) to them(him) a code the
+          ensuring access to a file for under loading loading
+B>_0 -    The words defined by to these word establish a tag
+          "is not ready" to a errey in which data from server
+          VFM will act(arrive).
+For under loading VFM a word :_0 is used
+                in a kind:
+                :_0 name...;_0 
+        Creates in 2nd VFM function with the "name" name
+        Definition of which has a kind:
+
+        : :_0  (:)_0 >>_0 ;
+
+Word (:)_0 sends a command server VFM to execute following actions:
+        To generate heading of function
+        Pass in a mode of compilation
+        to bring in the area ãã_u the reference to created function
+
+        VFM can grant cells given other VFM through function of
+        access with the help of words:
+
+! >_u ( n1 | n --- ) compile  a code in a kind [ %@>_u ] [ a ]
+        N is chosen from a source flow and will be transformed to address and
+
+@>_u( | n --- n1 ) compile  the code in a kind [ %! >_u ] [ a ] n
+        is chosen from a source flow and will be transformed to address and
+
+At compilation the displacement chosen from source flow in file given VFM is
+transformed into absolute address and is compiled as a operand for codes:
+
+%@>_u ( --- n1 ) to put on a stack significance of operand-address
+
+%! >_u ( n1 --- ) return(converse) %@>_u
+
+        The base set of functions managing auxiliary VFM is submitted by
+following words:
+
+       In_0 out_0 quit_0 drop_0 dup_0
+
+     Over_0 swap_0 rot_0 !_0 @_0
+     Exec_0 c!_0 c@_0
+        +_0        -_0        *_0         /_0         '_0
+        ._0 Mes_0 ins_0! >_0 @>_0
+
+       In many cases their action similarly to the same words of a
+ FORTH-system  without the termination "_0", except that the fulfilment
+occurs on VFM. Server VFM can return result through subordinated to it
+VFM located on client to a machine.
+        Procedure difinitions through ":", the word including in self
+the managers VFM is macroexpansion.
+
+ It is planned in future:
+
+    Internal currency (IC).
+  IC is a legal tender within the framework of a virtual network and
+presents from self significance, attached to given at the order to the
+VFM of remote user.
+At start of remote function, automatically with the account of the
+user certain significance is removed. By a call of function of
+other user transfer to the account of this user occurs. Thus the users are
+interested in granting of functions to the one another. At occurrence of
+fear, that the action of called function does not correspond to the
+declaration, it is possible to use two stage account, with the help of the
+intermediate account. The intermediate account the this account, which hangs
+between two subjects, which can transfer from it one another,
+but can not take to self.
+With a beginning the charge is made on the intermediate account, at themes
+function is executed, if the consumer is satisfied, executes transfer
+further, if is not present, requires to return back.
+
+    Exchange IC.
+  The problem exchange IC results from occurrence of several systems VFM.
+To organize exchange IC can the owner of a system VFM simultaneously being
+by the user in other a system(s) VFM. Exchange IC  action of
+which is executed by start of paid function, consists charge IC of other
+system VFM.
+
+    Work with databases.
+
+  Work with a database can execute:
+  1. Universal VFM, incorporating function of the inquiry to base.
+  2. Specialized VFM the managers by several bases.
+  3. Specialized VFM connected with particular base.
+  In connection that the set of functions VFM is a means of
+adaptation by environment on which it is based, it is possible
+to supply independence of representation of data.
+  The  idle simple the way of realization, if not to use variant with
+ under loading , this spelling VFM in language of management of databases.
+Thus VFM presents from self is simple a elementary interpreter. For variant
+with  under loading  more expedient to use a FORTH-system thus VFM on FORTH
+can transmit commands VFM written in language of management of databases.
+  The system permits to minimize volume of the inquiry and time of its
+processing, but the specific significance of these sizes  is  neglectly
+small by work with large files. On this with greater efficiency it is
+possible to use a given system for organization of access to relatively small
+files. In first it can be beginnest small databases. In the second subset of
+a large database, possessing the heaviest demand ( increase of specialization
+).
+In the third use of distributed databases.
+
+  Creation specialized Ž‘.
+
+  At divided access there is a problem of efficiency.
+  If to present a computer as VFM it is possible all its
+  resources to grant for the decision of one problem.
+
+                                       Maksimom Mishail Olegovich
+					mak@INFORMIX.rtc.neva.ru

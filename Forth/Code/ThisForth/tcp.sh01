@@ -1,0 +1,1130 @@
+---- Cut Here and unpack ----
+#!/bin/sh
+# shar:	Shell Archiver  (v1.22)
+#
+#                                                                          
+#                                                                          
+#
+#	Run the following text with /bin/sh to create:
+#	  readme.io
+#	  filehdl.m4
+#	  sopen.c
+#	  sopen.h
+#	  fcntl.fo
+#	  client.fo
+#	  server.fo
+#
+if test -r s2_seq_.tmp
+then echo "Must unpack archives in sequence!"
+     next=`cat s2_seq_.tmp`; echo "Please unpack part $next next"
+     exit 1; fi
+echo "x - extracting readme.io (Text)"
+sed 's/^X//' << 'SHAR_EOF' > readme.io &&
+X
+X	Documentation for Low-Level I/O and TCP/IP I/O V1.5 for ThisForth.
+X
+X
+X	The low level I/O functions OPEN, OPEN-CREATE, CLOSE, READ, WRITE and
+X	LSEEK	are implemented in the file 'filehdl.m4'.  If TCP/IP sockets
+X	are also wanted, then the macro OPTIONS in the Makefile must
+X	include -DTCP, this will add the words SOPEN, LISTEN, and SOCKET-ACCEPT.
+X	The Forth interface to these is also in 'filehdl.m4', the C implementation
+X	is partially in the file 'sopen.c'.
+X
+X	If you want to compile these into your version of Forth, then
+X	you need to add the following line to 'custom.m4',
+X
+Xifdef(`FILEHDL',`include(`filehdl.m4')')
+X
+X
+X	And append -DFILEHDL and -DTCP (for TCP/IP) to the OPTIONS line in
+X	the Makefile, eg.  change,
+X
+XOPTIONS = -DFLOAT
+X
+X	to,
+X
+XOPTIONS = -DFLOAT -DFILEHDL -DTCP
+X
+X	If you want to use TCP/IP then append 'sopen.o' to CUSTOM, e.g.,
+X
+XCUSTOM = sopen.o
+X
+X
+X	In the Makefile where, rth.m4 is built,
+X
+Xrth.m4:	fo rth save-4th
+X	fo rth $(ELECTIVES) $(EXTRA) save-4th
+X	rm -f hi.tmp
+X
+X
+X	Add 'fcntl.fo' to the list of files, or put it in the definition of
+X	EXTRA.  So for example one way to do it is,
+X
+X	fo rth $(ELECTIVES) $(EXTRA) fcntl.fo save-4th
+X
+X
+X
+X	Check that the values of the constants used in 'fcntl.fo' correspond
+X	to what is used on your system; change them as necessary.
+X
+X
+X	Then build Forth as usual.
+X
+X
+X
+X
+X
+X	The glossary for the additional words.
+X
+X
+X	OPEN ( str_addr count flag_int -- handle )
+X
+X	This word implements the system function open().
+X	Opens the named file according to the INTEGER value of the
+X	mode.  The flag value is usually defined in fcntl.h according
+X	to the following (the values given here are typical, but not
+X	necessarily universal).
+X
+X
+X     0		O_RDONLY            open for reading only
+X
+X     1		O_WRONLY            open for writing only
+X
+X     2		O_RDWR              open for reading and writing
+X
+X     4		O_NDELAY            do not block on open
+X
+X     010	O_APPEND            append on each write
+X
+X     00400	O_CREAT             create file if it does not exist
+X
+X     01000	O_TRUNC             truncate size to 0
+X
+X     02000	O_EXCL              error if create and file exists
+X
+X
+X	These values are defined in the file 'fcntl.fo'.
+X
+X
+X	On return OPEN leaves the integer file descriptor on the
+X	stack.  This value is negative if the open failed.
+X
+X
+X
+X	OPEN-CREATE ( str_addr count flag_int mode_int -- handle )
+X
+X	Does the same as OPEN with the flag set to O_CREAT, but provides
+X	for an additional parameter to set the file permissions. Using
+X        O_CREAT as part of the flag value is harmlessly redundant.
+X
+X
+X
+X
+X
+X	CLOSE ( handle -- status )
+X
+X	This word implements the system function close().
+X	Closes a file referenced by the file descriptor.  The
+X	status flag is zero if successful, and -1 if it failed.
+X
+X
+X
+X	WRITE ( addr nbytes handle -- status )
+X
+X	This word implements the system function write().
+X	Writes to a file referenced by the file descriptor, 'handle'.
+X	The start of the data to write is at 'addr' and there are
+X	'nbytes' bytes to write.  On return 'status' is the number
+X	of bytes successfuly written, or a -1 on failure.
+X
+X
+X	READ ( addr nbytes handle -- status )
+X
+X	This word implements the system function read().
+X	Reads from a file referenced by the file descriptor, 'handle'.
+X	The start of the data to destination is at 'addr' and there are
+X	'nbytes' bytes to read.  On return 'status' is the number
+X	of bytes successfuly read.  If the status value is zero, then
+X	end-of-file has been reached.  If the status is negative, then
+X	an error occurred.
+X
+X
+X
+X        LSEEK ( offset whence handle -- status )
+X
+X	This word implements the system function lseek().
+X	Sets the file pointer to 'offset' bytes according to the value
+X	of 'whence' according to:
+X
+X
+X          If whence is L_SET, the pointer is set to offset bytes.
+X
+X          If whence is L_INCR, the pointer is set to its current
+X          location plus offset.
+X
+X          If whence is L_XTND, the pointer is set to the size of
+X          the file plus offset.
+X
+X	The typical (but not universal) values of the whence constants
+X	are,
+X
+X        0   L_SET             ( also known as   SEEK_SET )
+X        1   L_INCR            ( also known as   SEEK_CUR )
+X        2   L_XTND            ( also known as   SEEK_END )
+X
+X
+X	These values are also defined in 'fnctl.fo'
+X
+X
+X	LSEEK returns the pointer location in bytes from the beginning
+X	of the file if it succeeds.  On a failure the status value is -1
+X	(in which case the file pointer is unchanged).  NOTE: offset and
+X	status are 'off_t' data types, it is presumed that this data type
+X	will fit into a single cell.
+X
+X
+X	The following words are part of the TCP/IP interface
+X
+X	
+X
+X	SOPEN ( str_addr count socket type -- handle )
+X
+X	This word encapsulates calls to several system functions in
+X	order to set up a TCP/IP connection as either a client or
+X	a server.  It was written so that opening a TCP/IP socket is
+X	just about as simple as opening a file.
+X
+X
+X	As a client 'str_addr' and 'count' represent the counted
+X	string that has the name of the server that the client wishes
+X	to contact.  'socket' is the TCP/IP socket that the server
+X	is using.  For clients, 'type' is just the number 0.
+X
+X	As a server 'str_addr' and 'count' are 0 values.  The value
+X	of 'socket' is the TCP/IP socket number that this server will
+X	use to service requests.  For servers, 'type' is the number 1.
+X
+X
+X	In either case, the returned value on the stack is -1 if an
+X	error occurred.  If the stack value is > 0, then it is used
+X	exactly like a file handle for READ, WRITE and CLOSE.
+X
+X
+X
+X
+X	LISTEN ( backlog socket -- status )
+X
+X	The server process needs to let the operating system know that
+X	it is willing to accept connections to its socket, and the
+X	queue limit for incoming connections.  The word LISTEN does
+X	this.  The value of 'socket' is the value returned by a
+X	previous successful call to SOPEN.  The value of 'backlog'
+X	is the queue limit (a value of 5 is usually used, other values
+X	may not be supported by your system).  On return a 0 status
+X	indicates success, a -1 indicates an error.  CLIENT PROCESSES
+X	DO NOT USE THIS WORD.
+X
+X
+X
+X	SOCKET-ACCEPT ( sockaddr len socket -- nsock )
+X
+X        For servers, this where the process actually waits until
+X        a connection is present.  SOCKET-ACCEPT is called after
+X        LISTEN.  The value of 'socket' is the value returned by a
+X        previous successful call to SOPEN.  'sockaddr' is the address
+X        of the data space for information on the connecting entity, it
+X        is filled in by SOCKET-ADDR.  The user generally won't need to
+X        be concerned with its internals.  CHECK WITH YOUR SYSTEM MANUALS
+X        ON THE SIZE OF THIS REGION, typically it is 16 bytes, the size of
+X        the region is the parameter 'len'.  On return the value 'nsock' is
+X        negative if SOCKET-ACCEPT failed, if it is positive, then this value
+X        is used as a file descriptor for use in READ, WRITE and CLOSE for
+X        this instance of the connection.   CLIENT PROCESSES DO NOT USE THIS WORD.
+X
+X
+X
+X
+X Everett (Skip) Carter        Phone:  408-656-3318 FAX: 408-656-2712
+X Naval Postgraduate School    INTERNET: skip@taygeta.oc.nps.navy.mil
+X Dept. of Oceanography, Code OC/CR  UUCP:     ...!uunet!taygeta!skip
+X Monterey, CA. 93943
+X                  WWW: http://taygeta.oc.nps.navy.mil/skips_home.html
+X
+X
+SHAR_EOF
+chmod 0644 readme.io || echo "restore of readme.io fails"
+echo "x - extracting filehdl.m4 (Text)"
+sed 's/^X//' << 'SHAR_EOF' > filehdl.m4 &&
+X/* filehdl.m4       Code for open, close, write, read  which access the
+X                    low level system I/O
+X
+X	This file also implements interfaces to the following for TCP/IP
+X	I/O, if the token TCP_IP is defined
+X
+X
+X		LISTEN, ACCEPT (defined as SOCKET-ACCEPT to avoid
+X		a confict with Forth's ACCEPT) and my TCP/IP socket
+X		open routine SOPEN
+X
+X
+X                      (c) Copyright 1994, Everett F. Carter Jr.
+X                      Permission is granted by the author to use
+X		      this software for any application provided this
+X		      copyright notice is preserved.
+X
+X
+X*/
+X
+Xstatic char rcsid1[] = "@(#)filehdl.m4	1.6 12:14:52 3/2/95   EFC";
+X
+X
+X
+X
+X#include <stdio.h>
+X#include <ctype.h>
+X#include <errno.h>
+X
+Xifdef(`TCP',`
+X#include <sys/types.h>
+X#include <sys/socket.h>
+X#include <netinet/in.h>
+X#include <netdb.h>
+X')
+X
+X/* Usage:	s" fname" int_mode open, returns fh on success -1 on failure */
+XExecution(`OPEN')
+X{	/* Standard C Library */
+X	int flags;
+X
+X	/* Make NUL-terminated string at &data[pocket+1] from S[-1],S */
+X	move(&data[pocket + 1], &data[S[-1]], *S),
+X		data[pocket + *S + 1] = EOS,
+X			data[pocket] = *S;
+X
+X	flags = top;
+X
+X	S -= 2;
+X	top = (cell) open((char *)&data[pocket + 1], flags);
+X}
+XDone
+X
+XExecution(`OPEN-CREATE')
+X{	/* Standard C Library */
+X	int flags, mode;
+X
+X	/* Make NUL-terminated string at &data[pocket+1] from S[-2],S[-1] */
+X	move(&data[pocket + 1], &data[S[-2]], S[-1]),
+X		data[pocket + S[-1] +1 ] = EOS,
+X			data[pocket] = S[-1];
+X
+X	mode = top;
+X	flags = *S | O_CREAT;
+X
+X	S -= 3;
+X	top = (cell) open((char *)&data[pocket + 1], flags, mode);
+X}
+XDone
+X
+X
+XExecution(`CLOSE')
+X	top = (cell) close( top );
+XDone
+X
+XExecution(`WRITE')
+X{
+X	int size, fh;
+X	char* ptr;
+X
+X	fh = top;
+X	size = *S;
+X	ptr = (char *)&data[ S[-1] ];
+X
+X	S -= 2;
+X	top = (cell)write( fh, ptr, size );
+X}
+XDone
+X
+XExecution(`READ')
+X{
+X	int size, fh;
+X	char* ptr;
+X
+X	fh = top;
+X	size = *S;
+X	ptr = (char *)&data[ S[-1] ];
+X
+X	S -= 2;
+X	top = (cell)read( fh, ptr, size );
+X}
+XDone
+X
+X#ifdef __SC__
+Xtypedef long off_t;
+X#endif
+X
+XExecution(`LSEEK')
+X{
+X        off_t offset;
+X        int   fh, whence;
+X        
+X        fh = top;
+X	whence = *S;
+X	offset = (off_t) S[-1];        /* NOTE: ASSUMES off_t FITS IN ONE CELL!! */
+X
+X	S -= 2;
+X	top = (off_t)lseek( fh, offset, whence );
+X
+X}
+XDone
+X
+Xifdef(`TCP',`
+X
+X#include "sopen.h"
+X
+XExecution(`SOPEN')
+X{
+X	int kind, port;
+X
+X	/* Make NUL-terminated string at &data[pocket+1] from S[-2],S[-1] */
+X	if ( S[-1] > 0 )
+X		move(&data[pocket + 1], &data[S[-2]], S[-1]),
+X			data[pocket + S[-1] + 1] = EOS,
+X			data[pocket] = S[-1];
+X	else
+X		data[pocket] = 0;
+X
+X	port = *S;
+X	kind = top;
+X
+X	S -= 3;
+X
+X	/*
+X	fprintf(stderr,"host: <%s>, port = %d, kind = %d\n", &data[pocket + 1],
+X							    port, kind);
+X	*/
+X
+X	if ( data[pocket] > 0 )
+X	top = (cell)tcp_open( (char *)&data[pocket + 1], port, (char *)NULL, kind );
+X	else
+X	top = (cell)tcp_open( (char *)NULL, port, (char *)NULL, kind );
+X}
+XDone
+X
+X
+XExecution(`LISTEN')
+X{
+X	int backlog, fh;
+X
+X	backlog = *S;
+X	fh   = top;
+X
+X	S -= 1;
+X	top = (cell)listen( fh, backlog );
+X}
+XDone
+X
+XExecution(`SOCKET-ACCEPT')
+X{
+X	int fh, alen;
+X	struct sockaddr *addr;
+X
+X	fh = top;
+X	alen = *S;
+X	addr = (struct sockaddr *)&data[ S[-1] ];
+X
+X	S -= 2;
+X	top = (cell)accept( fh, addr, &alen );
+X	/* *S = alen; */
+X}
+XDone
+X
+X
+X')
+X
+X
+X
+X
+X
+SHAR_EOF
+chmod 0444 filehdl.m4 || echo "restore of filehdl.m4 fails"
+echo "x - extracting sopen.c (Text)"
+sed 's/^X//' << 'SHAR_EOF' > sopen.c &&
+X/* sopen.c	         tcp_open(), udp_open() and resolve_name()
+X
+X	does all the dirty work in opening a socket on a (possibly) remote
+X	system.
+X
+X
+X	tcp_open()           For TCP connections
+X
+X	three input parameters:
+X		hostname	-- the name (or inet addr) of the remote end
+X		                       of the socket
+X		port		-- the remote port socket number
+X	                           if >= 0, use port# of service
+X                                   if < 0,  bind a local reserved port
+X                                   if > 0,  this is the port# (host byte order)
+X				            of server
+X		service         -- the service to connect to, can be NULL
+X                                   if port > 0
+X		kind		-- = 0 for clients, = 1 for servers
+X		                     clients call connect()
+X				     servers call bind()
+X
+X	returns:
+X		< 0		if an error
+X		fd ( > 0)	the file discriptor for a successful open
+X
+X
+X
+X       udp_open()             For UDP connections
+X
+X         host          name of other system to communicate with
+X	 port          if >= 0, use port# of service
+X                       if > 0,  this is the port# (host byte order) of server
+X         service       name of service being requested, can be NULL iff port > 0
+X	 dontconn      if == 0, call connect(), else don't
+X
+X
+X	returns:
+X		< 0		if an error
+X		fd ( > 0)	the file discriptor for a successful open
+X
+X
+X
+X
+X           This code is partly based upon code in:
+X
+X
+X           W. Richard Stevens, 1990; Unix Network Programming,
+X           Prentice-Hall, Englewood Cliffs, N.J., 772 pages
+X
+X
+X*/
+X
+Xstatic char rcsid[] = "@(#)sopen.c	1.6 17:17:29 2/15/93   EFC";
+X
+X#include <stdio.h>
+X#include <ctype.h>
+X#include <sys/types.h>
+X#include <sys/socket.h>
+X#include <netinet/in.h>
+X#include <errno.h>
+X#include <netdb.h>
+X
+X
+X#include "sopen.h"
+X
+X
+X#define CLIENT		0
+X#define SERVER		1
+X
+X/* define SILENT to be either 0 or 1 */
+X
+X#define SILENT          0
+X
+Xextern int errno, h_errno;
+X
+X
+Xstruct sockaddr_in sinhim = { AF_INET };
+X
+Xstruct sockaddr_in       udp_srv_addr;
+Xstruct sockaddr_in       udp_cli_addr;
+X
+X
+X#ifdef NO_PROTO
+Xint tcp_open(hostname,port,service,kind)
+Xchar *hostname, *service;
+Xint port, kind;
+X#else
+Xint tcp_open(char* hostname, int port,char* service, int kind)
+X#endif
+X{
+X	struct hostent *hp;
+X	struct servent *sp;
+X	int resvport;
+X	int fd = 0;
+X
+X        bzero( (char *)&sinhim, sizeof(sinhim));
+X        sinhim.sin_family = AF_INET;
+X
+X        if ( service != NULL )
+X        {
+X             if ( (sp = getservbyname( service, "tcp" )) == NULL )
+X             {
+X#if  (SILENT == 0)
+X                        perror( "tcp_open: unknown service");
+X#endif
+X                        return -1;
+X             }
+X
+X
+X             if ( port > 0 )
+X                    sinhim.sin_port = htons( port );  /* callers value */
+X             else
+X                    sinhim.sin_port = sp->s_port;     /* services value */
+X
+X        }
+X        else
+X        {
+X             if ( port <= 0 )
+X             {
+X#if (SILENT == 0)
+X                   perror( "tcp_open: must specify either service or port" );
+X#endif
+X                   return -2;
+X             }
+X             sinhim.sin_port = htons( port );
+X        }
+X
+X
+X	if (hostname != NULL)
+X	{
+X		if ( resolve_name( hostname, &hp, SILENT ) )
+X			return -3;
+X
+X	     bcopy ( hp->h_addr, &sinhim.sin_addr, sizeof (sinhim.sin_addr) );
+X
+X             /* some systems need to do it this way, not sure what ones though */
+X     /*
+X	     bcopy (&(hp->h_addr), &sinhim.sin_addr,sizeof( sinhim.sin_addr) );
+X     */
+X
+X	}
+X
+X
+X
+X	if (port >= 0 )
+X	{
+X	    if ( (fd = socket( AF_INET, SOCK_STREAM, 0)) < 0)
+X	    {
+X#if (SILENT == 0)
+X		perror("tcp_open: socket");
+X#endif
+X		return -4;
+X	    }
+X         }
+X         else if ( port < 0 )
+X         {
+X              resvport = IPPORT_RESERVED - 1;
+X              if ( (fd = rresvport(&resvport)) < 0 )
+X              {
+X#if (SILENT == 0)
+X                  perror("tcp_open: can't get a reserved TCP port" );
+X#endif
+X                  return -7;
+X              }
+X         }
+X
+X
+X
+X	if (kind == CLIENT)
+X	{
+X		if (connect(fd, &sinhim, sizeof(sinhim)) < 0)
+X		{
+X#if (SILENT == 0)
+X			perror("tcp_open: connect");
+X#endif
+X			return -5;
+X		}
+X	}
+X	else 	/* assume kind == SERVER */
+X	{
+X		if ( bind(fd, &sinhim, sizeof(sinhim) ) < 0)
+X		{
+X#if (SILENT == 0 )
+X			perror("tcp_open: bind");
+X#endif
+X			return -6;
+X		}
+X
+X
+X	}
+X
+X
+X	return fd;
+X}
+X
+X
+X
+X#ifdef NO_PROTO
+Xint udp_open(hostname, port, service, dontconn)
+Xchar *hostname;
+Xint port;
+Xchar *service;
+Xint dontconn;
+X#else
+Xint udp_open(char *hostname, int port, char* service, int dontconn)
+X#endif
+X{
+X       int fd;
+X       unsigned long inaddr;
+X       struct servent *sp;
+X       struct hostent *hp;
+X
+X        bzero( (char *)&udp_srv_addr, sizeof(udp_srv_addr));
+X        udp_srv_addr.sin_family = AF_INET;
+X
+X
+X        if ( service != NULL )
+X        {
+X             if ( (sp = getservbyname( service, "udp" )) == NULL )
+X             {
+X#if  (SILENT == 0)
+X                        perror( "udp_open: unknown service");
+X#endif
+X                        return -1;
+X             }
+X
+X
+X             if ( port > 0 )
+X                    udp_srv_addr.sin_port = htons( port );  /* callers value */
+X             else
+X                    udp_srv_addr.sin_port = sp->s_port;     /* services value */
+X
+X        }
+X        else
+X        {
+X             if ( port <= 0 )
+X             {
+X#if (SILENT == 0)
+X                   perror( "udp_open: must specify either service or port" );
+X#endif
+X                   return -2;
+X             }
+X             udp_srv_addr.sin_port = htons( port );
+X        }
+X
+X
+X	if (hostname != NULL)
+X	{
+X		if ( resolve_name( hostname, &hp, SILENT ) )
+X			return -3;
+X
+X	     bcopy ( hp->h_addr, &udp_srv_addr.sin_addr, sizeof (udp_srv_addr.sin_addr) );
+X
+X             /* some systems need to do it this way, not sure what ones though */
+X     /*
+X	     bcopy (&(hp->h_addr), &udp_srv_addr.sin_addr,sizeof( udp_srv_addr.sin_addr) );
+X     */
+X
+X	}
+X
+X
+X
+X       if ( port < 0 )
+X       {
+X#if (SILENT == 0)
+X	 perror( "udp_open: reserved ports not implemented yet." );
+X#endif
+X	 return -7;
+X        }
+X
+X
+X        if ( (fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+X        {
+X#if (SILENT == 0)
+X                 perror("udp_open: can't create UDP socket" );
+X#endif
+X                 return -4;
+X        }
+X
+X
+X       if ( hostname != NULL )     /* presumably this means that this is a client */
+X       {
+X	 /* bind any local address */
+X	 bzero( (char *)&udp_cli_addr, sizeof(udp_cli_addr));
+X	 udp_cli_addr.sin_family = AF_INET;
+X	 udp_cli_addr.sin_addr.s_addr = htonl( INADDR_ANY );
+X	 udp_cli_addr.sin_port = htons( 0 );
+X
+X
+X
+X       if ( bind( fd, (struct sockaddr *)&udp_cli_addr, sizeof(udp_cli_addr)) < 0)
+X       {
+X	          close( fd );
+X#if (SILENT == 0)
+X	          perror( "udp_open: bind error" );
+X#endif
+X		  return -6;
+X       }
+X
+X       }
+X       else                /* this must be a server */
+X       {
+X
+X	 /* bind server address */
+X
+X       if ( bind( fd, (struct sockaddr *)&udp_srv_addr, sizeof(udp_srv_addr)) < 0)
+X       {
+X	          close( fd );
+X#if (SILENT == 0)
+X	          perror( "udp_open: bind error" );
+X#endif
+X		  return -8;
+X       }
+X
+X
+X       }
+X
+X
+X       /* This is usually used by most callers since the peer
+X          usually won't change.  By calling connect() the caller can use send()
+X          and recv(), otherwise sendto() and recvfrom() are necessary.
+X       */
+X
+X       if ( dontconn == 0 )
+X       {
+X	   if ( connect(fd, &udp_srv_addr, sizeof( udp_srv_addr )) < 0 )
+X	   {
+X#if (SILENT == 0 )
+X	                perror( "udp_open: connect error" );
+X#endif
+X			return -5;
+X	    }
+X
+X       }
+X
+X       return( fd );
+X
+X
+X}
+X
+X
+X
+X
+X#ifdef NO_PROTO
+Xint resolve_name(hname, ph, silent)
+Xchar* hname;
+Xstruct hostent **ph;
+Xint silent;
+X#else
+Xint resolve_name(char* hname, struct hostent **ph, int silent)
+X#endif
+X{
+X    long addr;
+X
+X        if (isdigit(hname[0]))
+X        {
+X            addr = inet_addr(hname);
+X            *ph = gethostbyaddr(&addr, 4, AF_INET);
+X        }
+X        else
+X            *ph = gethostbyname(hname);
+X
+X        if (*ph == (struct hostent *)NULL)
+X        {
+X
+X	  if ( silent == 0 )
+X	    {
+X#ifdef BSD42
+X            fprintf(stderr,"host %s not found\n", hname);
+X#else
+X            switch (h_errno) {
+X                case HOST_NOT_FOUND: fprintf(stderr,"host %s not found\n", hname);
+X                                     break;
+X                case TRY_AGAIN: fprintf(stderr,"Try again later\n");
+X                                break;
+X                case NO_RECOVERY: fprintf(stderr,"No recovery possible\n");
+X                                  break;
+X                case NO_ADDRESS: fprintf(stderr,"No IP address\n");
+X                                 break;
+X                default: fprintf(stderr,"Unknown error: %d\n", h_errno);
+X                         break;
+X            }
+X#endif
+X	  }
+X
+X            return 1;
+X        }
+X
+X        (*ph)->h_addr[ (*ph)->h_length ] = NULL;
+X
+X        return 0;
+X}
+X
+X
+X
+X
+X
+SHAR_EOF
+chmod 0444 sopen.c || echo "restore of sopen.c fails"
+echo "x - extracting sopen.h (Text)"
+sed 's/^X//' << 'SHAR_EOF' > sopen.h &&
+X/* sopen.h         prototypes for TCP and UDP socket open calls
+X
+X           This code is partly based upon code in:
+X
+X
+X           W. Richard Stevens, 1990; Unix Network Programming,
+X           Prentice-Hall, Englewood Cliffs, N.J., 772 pages
+X
+X
+Xrcsid: @(#)sopen.h	1.1 00:36:18 2/8/94   EFC
+X
+X*/
+X
+X#ifndef SOPEN_H_
+X#define SOPEN_H_ 1.1
+X
+X#include <sys/types.h>
+X#include <sys/socket.h>
+X#include <netinet/in.h>
+X
+X
+Xextern struct sockaddr_in       udp_srv_addr;
+Xextern struct sockaddr_in       udp_cli_addr;
+X
+X#ifdef __cplusplus
+Xextern "C" {
+X#endif
+X
+X#ifdef NO_PROTO
+Xint tcp_open();
+Xint udp_open();
+Xint resolve_name();
+X#else
+Xint tcp_open(char* hostname, int port, char* service, int kind);
+Xint udp_open(char *hostname, int port, char* service, int dontconn);
+Xint resolve_name(char* hname, struct hostent **ph, int silent);
+X#endif
+X
+X#ifdef __cplusplus
+X}
+X#endif
+X
+X#endif
+SHAR_EOF
+chmod 0444 sopen.h || echo "restore of sopen.h fails"
+echo "x - extracting fcntl.fo (Text)"
+sed 's/^X//' << 'SHAR_EOF' > fcntl.fo &&
+X( FCNTL.FO V1.0         The constants used for the low level file I/O words )
+X
+X( WARNING: These values are what is used on the MIPS Workstation,
+X           they may have to be modified for other platforms )
+X
+X
+X( constants used by OPEN )
+X
+X   0 CONSTANT O_RDONLY       \ open for reading only
+X   1 CONSTANT O_WRONLY       \ open for writing only
+X   2 CONSTANT O_RDWR         \ open for reading and writing
+X   4 CONSTANT O_NDELAY       \ do not block on open
+X   8 CONSTANT O_APPEND       \ append on each write
+X 256 CONSTANT O_CREAT        \ create file if it does not exist
+X 512 CONSTANT O_TRUNC        \ truncate size to 0
+X1024 CONSTANT O_EXCL         \ error if create and file exists
+X
+X
+X( constants used by LSEEK )
+X
+X   0 CONSTANT L_SET          \ absolute offset, set file pointer directly
+X   1 CONSTANT L_INCR         \ relative offset, increment file pointer
+X   2 CONSTANT L_XTND         \ relative to end of file,
+X			     \ ( set file pointer to specified distance beyond EOF )
+X
+X( common alternative names to the above 3 )
+X
+X   L_SET  CONSTANT SEEK_SET
+X   L_INCR CONSTANT SEEK_CUR
+X   L_XTND CONSTANT SEEK_END
+X
+X
+SHAR_EOF
+chmod 0644 fcntl.fo || echo "restore of fcntl.fo fails"
+echo "x - extracting client.fo (Text)"
+sed 's/^X//' << 'SHAR_EOF' > client.fo &&
+X( Example client code, just get message from the server
+X                       then write some data to the server and
+X                       get its response.
+X
+X                      Copyright 1994, Everett F. Carter Jr.
+X                      Permission is granted by the author to use
+X		      this software for any application provided this
+X		      copyright notice is preserved.
+X
+X
+X
+X	s" taygeta.oc.nps.navy.mil" 3145 client
+X
+X)
+X
+X\        @(#)client.fo	1.3 12:18:39 11/17/94   EFC
+X
+XVARIABLE sock
+X
+XVARIABLE data
+X5 CONSTANT numdat
+X
+X: client ( port -- )
+X
+X
+X       0 sopen
+X
+X       DUP sock !
+X       
+X       0< ABORT" unable to open socket as client"
+X
+X      ( read the welcome message from the server )
+X      data 1 CELLS sock @ read   DROP
+X
+X      PAD data @ sock @ read     DROP
+X
+X      PAD data @ TYPE CR         ( echo it to the screen )
+X
+X
+X
+X     ( now just send some data back and forth )
+X            
+X      numdat data !
+X
+X
+X       ( tell the server how much data we are going to send )
+X       data 1 CELLS sock @ write
+X       
+X      ." (wrote " . ." bytes) " CR
+X
+X
+X      ( now send the data, one at a time, and print the returned data )
+X      numdat 0 DO
+X           I 1+ data !
+X           data 1 CELLS sock @ write
+X
+X           ." (wrote " . ." bytes) " I 1+ . CR
+X
+X	   data 1 cells sock @ read
+X
+X           ." (read " . ." bytes)   value: "  data ?  CR
+X
+X      LOOP
+X
+X      sock @ close   DROP
+X
+X;
+X
+X
+X
+X
+SHAR_EOF
+chmod 0444 client.fo || echo "restore of client.fo fails"
+echo "x - extracting server.fo (Text)"
+sed 's/^X//' << 'SHAR_EOF' > server.fo &&
+X( Example server code,
+X                  just accept some data and echo it back with the
+X		  sign changed
+X
+X                      Copyright 1994, Everett F. Carter Jr.
+X                      Permission is granted by the author to use
+X		      this software for any application provided this
+X		      copyright notice is preserved.
+X
+X
+X
+X	example usage:    3145 server
+X
+X)
+X
+X\        @(#)server.fo	1.3 12:18:54 11/17/94   EFC
+X
+XVARIABLE sock
+XVARIABLE local
+XVARIABLE from  16 ALLOT           \ MAKE SURE THIS IS BIG ENOUGH FOR YOUR SYSTEM !!
+X                                  \ (see documentation on SOCKET-ACCEPT)
+X
+XVARIABLE data
+X
+XVARIABLE verbose         0 verbose !     \ turn this on if you want server
+X                                         \ write to standard output
+X
+X: server ( port -- )
+X
+X       0 0 ROT 1 sopen
+X
+X       DUP sock !
+X       
+X       0< ABORT" unable to open socket as server "
+X
+X      
+X       5 sock @  listen
+X
+X       0< ABORT" listen failed "
+X
+X       verbose @ IF
+X       			." sock = "  sock @ . CR
+X		 THEN
+X
+X       ( now we wait for the client to connect )
+X       from 16 sock @ socket-accept
+X
+X       DUP local !
+X
+X       0< ABORT" accept failed "
+X
+X
+X       verbose @ IF  
+X       			." local = "  local @ . CR
+X		 THEN
+X
+X
+X      sock @ close DROP   ( not going to listen for more connections )
+X
+X
+X
+X      ( send a welcome message to the client )
+X      s" Welcome to Internetworking with Forth !"
+X      DUP data !
+X      data 1 CELLS local @ write DROP    ( first write the string length )
+X      local @ write                      ( now write the string )
+X
+X      verbose @ IF
+X      			." (wrote " . ." bytes of message) " CR
+X                ELSE
+X                        DROP
+X		THEN
+X
+X
+X      ( read the number of points the remote is going to send )
+X      data 1 CELLS local @ read
+X
+X      verbose @ IF
+X      			." (read " . ." bytes)   value: "  data ? CR
+X                ELSE
+X                        DROP
+X		THEN
+X
+X
+X      ( read the data from the remote, change it sign and send it back )
+X      data @ 0 DO
+X
+X      			data 1 CELLS local @ read
+X			verbose @ IF
+X      				." (read " . ." bytes)   value: "  data ? CR
+X                                  ELSE
+X                                     DROP
+X			          THEN
+X
+X      			data @ -1 * data !
+X
+X      			data 1 CELLS local @ write
+X
+X			verbose @ IF
+X      				    ." (wrote " . ." bytes) " CR
+X                                  ELSE
+X                                    DROP
+X			          THEN
+X		LOOP
+X
+X
+X
+X	local @ close  DROP
+X
+X
+X	( This demonstration code, just services one request
+X          and then exits )
+X
+X;
+X
+SHAR_EOF
+chmod 0444 server.fo || echo "restore of server.fo fails"
+exit 0

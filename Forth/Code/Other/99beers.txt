@@ -1,0 +1,8 @@
+99 Bottles of Beer in Froth resulted from a comp.lang.forth thread.
+
+Needless to say (?), it is not serious code.
+
+Leo Wong
+hello@albany.net
+http://www.albany.net/~hello/
+

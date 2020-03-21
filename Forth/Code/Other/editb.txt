@@ -1,0 +1,17 @@
+                EDITB  a simple standard block editor
+                        J E Thomas
+
+This is the source code for a simple screen-oriented block editor,
+in a block file.
+
+It is ANS Standard Forth, with some environmental dependencies that
+are explained in detail.
+
+If you have any questions about it, do not contact Skip Carter,
+instead contact me:
+
+jethomas@ix.netcom.com
+
+If my address is no longer current, someone on comp.lang.forth will
+know how to reach me.
+

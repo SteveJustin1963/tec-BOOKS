@@ -1,0 +1,56 @@
+( Floating Point Load 			94-08-23 )
+
+( The Floating Point foundation for This Forth has been extended. )
+
+( FLITERAL was missing although the primitive behavior for it
+( occurred twice.  This is a cogent reason for the following: )
+
+( Low Level Forth Floating Point has been centralized in `float.m4'. )
+( Put your LLF FP primitives there. )
+
+( `[CHAR]' has been commented out of `rth' and placed in `custom.m4'
+( so it can participate in continued optimization. )
+
+( `float.fo' has been assigned for high level Forth definitions in
+( the floating point word sets. )
+
+( If you want Floating Point you probably also want Double.)
+
+--> double
+
+--> float
+
+( For FSL you want search. )
+
+--> search
+
+\ --> condcomp	\ Do we need this?
+
+\ --> fsl-util	( Forth Scientific Library Utilities )
+
+END-OF-FILE
+
+To build the steps are:
+
+# Step 1.	Clean up.
+rm -f fo.c
+# Step 2.	Make fo.c with floating point.
+
+M4 -DFLOAT fo.m4 > fo.c
+
+# Step 3.	Make fo with floating point.
+
+CC fo.c kernel.c      -o fo
+
+# Step 4.	Make rth.m4 with floating point.
+
+fo rth path unix fp-load save-4th
+
+# Step 5.	Make aforth.c with floating point
+
+rm -f aforth.c
+M4 -DFLOAT -DEXTENDED fo.m4 > aforth.c
+
+# Step 6.	Make aforth with floating point.
+
+CC aforth.c kernel.c	-o aforth

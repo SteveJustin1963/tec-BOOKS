@@ -1,0 +1,6 @@
+01234th.f contains beginners' programs in ANS Forth.
+
+Leo Wong
+hello@albany.net
+http://www.albany.net/~hello/
+

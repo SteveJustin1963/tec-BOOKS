@@ -1,0 +1,8 @@
+		TCP/IP for WIN32FOR
+
+fload_s.f     transfer of text by TCP/IP 
+sinclude.fo a reception and interpret  of the received text
+
+Mihail Maksimov                   e-mail   mak@rtk.neva.ru
+				   (812) 105-92-03
+				   (812) 552-47-64

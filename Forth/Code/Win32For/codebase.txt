@@ -1,0 +1,16 @@
+   This is a collection of forth words written by John Whitt
+that allow one to access DBaseIV type database files. It uses a library contained in
+a dll named c4dll.dll. This is a commercial library written by Sequiter Software Inc.
+that has no licensing restrictions as long as the source code is not distributed.
+
+   To use this program unzip into the win32for directory. Place the c4cll.dll
+some place where NT or Windows 95 can find in when the codebase.f program loads.
+
+   Follow the direction on the screen and at the bottom of the Codebase.f
+file.
+
+   There are many more functions available for use in the Codebase library
+but there are too many to be included in this demo.
+
+   If there is any interest in this program or any helpful comments please
+email me at whitt@ibm.net

@@ -1,0 +1,469 @@
+                        EXTENDED DATA OBJECTS IN FORTH
+
+                               by G. T. Hawkins
+
+
+1.  OVERVIEW:
+
+
+    Forth offers a minimal, yet complete, set of words for defining data
+objects.
+
+    As an example, arrays (i.e., 2-dimensional objects) are not provided for,
+per se.  Yet the plasticity of Forth allows one to define words for
+manipulating arrays or of using defining words (through CREATE DOES>) -
+Anderson & Tracy (1984); Kelly & Spies (1986).
+
+    The problem here is that the wheel must often be reinvented every time a
+new, significantly different data object is needed; and there is no
+consistently standard way of providing definitions/ declarations/ usage for
+data objects other than simple scalars.
+
+    The package provided herein is a step in this direction.  It offers a
+consistent, complete method of defining, declaring, and using data objects of
+higher type.  It's primary advantages are that:
+
+    -   it offers machine independence;
+
+    -   it is very simple, yet complete;
+
+    -   it allows objects of the structure (or record) type;
+
+    -   it allows vector/array objects;
+
+    -   it allows the nesting of previously declared objects to any level
+        of abstraction (e.g., n-dimensional objects, arrays of structures,
+        etc.).
+
+
+2.  MACHINE INDEPENDENCE:
+
+
+    A number of words are provided to allow for machine independence in
+this implementation.  Specifically they are: 1BYTE, BYTE*, 1WORD, WORD+,
+and WORD*.  These words are used in defining the size of a data object,
+and their effect is as follows:
+
+    WORD    ACTION                      EXAMPLE
+
+    1BYTE   Returns size of 1 byte      This word is provided only for
+            in bytes (i.e., 1)          consistency across definitions.
+
+    BYTE*   Multiplies by size of 1     Again, provided only for
+            byte in bytes (i.e., does   consistency (see later examples
+            nothing)                    of object/data definitions).
+
+    1WORD   Returns size of machine
+            word in bytes.
+
+    WORD+   Increments TOS by machine   3 BYTE* WORD+ (gives size, in
+            word size.                  bytes, of 3 bytes + one machine
+                                        word).
+
+    WORD*   Multiplies by size of       7 WORD* (gives size, in bytes, of
+            machine word in bytes.      7 machine words).
+
+
+    These words should help code readability as well as provide machine
+independence.  The user may, of course, provide additional words of this
+kind if needed (e.g., WORD-, WORD/, 1FLOAT, etc.).
+
+
+3.  OBJECT DEFINITION:
+
+
+    In order to later declare/create a data object, it must first be
+defined.  This, in effect, tells Forth how big the data object is.
+
+    Since Forth does not "type" its data (i.e., the operators/words are
+typed instead), the only information that can be provided in a data object
+definition is its size (in bytes).  This is in contrast to other procedural
+languages where a data definition/declaration provides both size and type
+information.
+
+    It is important to distinguish here between the use of the words
+"definition" and "declaration".  The definition of a data object merely
+defines the abstract data object to Forth, it does not actually establish any
+data objects.  The point of the definition, however, is so that - later - any
+number of actual data objects may be declared/created using the prior
+definition of the object.  Since the English meaning of definition and
+declaration is similar, we will drop the use of the word "declaration"
+hereafter and use "create" instead.  (This is also closer to the Forth
+terminology where a data object is CREATEd.)
+
+    The definition of a data object corresponds to that of a "typedef" in
+C (Harbison & Steele, 1984, pp. 119-120) or the "type definition" in
+Pascal (Jensen & Wirth, 1985, pp. 24).
+
+
+3.1     SCALAR:
+
+
+3.1.1   SCALAR DEFINITION:
+
+
+    The word used to define scalar data objects is DEF which requires a
+size specifier (in bytes) on TOS and the name of the data object following
+in the input stream.  An example of its usage is:
+
+    EXAMPLE                 MEANING
+
+    3 WORD* DEF A-OBJ       Defines a data object (called "A-OBJ') which
+                            is 3 machine words in size.
+
+    The DEF word should only be applied to scalars and is provided primarily
+for 1) code readability, 2) code maintainability, and 3) consistency with the
+definition of non-scalar types (e.g., structures, vectors, etc.).  An example
+of a scalar object which could be larger than one word would be a string.  (It
+is a scalar in the sense that it is not recognized as a structure or vector
+and has a unique size.)
+
+
+3.1.2   SCALAR CREATION:
+
+
+    A scalar object is merely CREATEd using the previously defined object
+type.  For example:
+
+            3 WORD* DEF A-OBJ
+
+    defines a data object called A-OBJ (as previously shown) and to create
+    two data objects of this kind, you might code:
+
+            CREATE A1 A-OBJ ALLOT
+            CREATE A2 A-OBJ ALLOT
+
+    Note that one could avoid the definition of the object and merely code:
+
+            CREATE A1 3 WORD* ALLOT
+            CREATE A2 3 WORD* ALLOT
+
+    However, it is hoped the reader will see the advantage in readabillity
+and maintainability of not doing this.
+
+
+3.1.3   SCALAR REFERENCE:
+
+
+    Referencing a scalar consists merely of using the scalar name CREATEd
+in the code.  A reference (whether for a scalar, structure, etc.) always
+leaves an address/pointer on TOS.
+
+
+3.2     STRUCTURE/RECORD:
+
+
+3.2.1   STRUCTURE DEFINITION:
+
+
+    The ability to define an object which consists of an ordered collection of
+other arbitrary objects is provided.  This is the "record" type of or Pascal
+(Jensen & Wirth, 1985, pp. 65-69) or the "structure" type of C (Harbison &
+Steele, 1984, pp. 104-106).
+
+    Three words are used to define Forth structures; they are: S{, ::, and
+}S.
+
+    The S{ word initiates a structure definition.  For each element/
+component of the structure, the set of words:
+
+        <DEFINED-OBJECT> :: <COMPONENT-NAME>
+
+    should be used, where:
+
+        <DEFINED-OBJECT>     =  A previously defined data object type
+                                (which may be a scalar, structure,
+                                vector object, etc.);
+
+        ::                   =  The structure component defining word
+                                provided with this package; and
+
+        <COMPONENT-NAME>     =   The name of the structure component.
+
+
+    Finally, the structure definition is terminated with the }S word
+followed by the name of the defined structure object in the input stream.
+
+    As an example, if I wished to define the data object type DATE-OBJ which
+is a structure consisting of a month (1 byte), a day (1 byte), and a year
+(1WORD); then the following code accomplishes this end:
+
+        1BYTE DEF MONTH-OBJ
+        1BYTE DEF DAY-OBJ
+        1WORD DEF YEAR-OBJ
+
+        S{
+            MONTH-OBJ :: MONTH
+            DAY-OBJ   :: DAY
+            YEAR-OBJ  :: YEAR
+        }S DATE-OBJ
+
+    The <COMPONENT-NAME> (which follows the ::) must be unique.  That is,
+one cannot have two structures each with a component named (say) MONTH.
+This restriction was necessary in order to keep this package as simple as
+possible.
+
+
+3.2.2   STRUCTURE CREATION:
+
+
+    A structure object is also created/declared by CREATEing it and ALLOTing
+the number of bytes needed as defined by the object definition. For example,
+in section 3.2.1, the structure object DATE-OBJ was defined. To now
+create/declare two unique dates, one might code:
+
+            CREATE DATE1 DATE-OBJ ALLOT
+            CREATE DATE2 DATE-OBJ ALLOT
+
+
+3.2.3   STRUCTURE REFERENCE:
+
+
+    The reference to a structure is simply:
+
+            <STRUCTURE-NAME> <COMPONENT-NAME>
+
+    Using the previous example of DATE1 and DATE2, to reference the month
+for DATE1, one codes:
+
+            DATE1 MONTH
+
+    or to reference the year for DATE2, one codes:
+
+            DATE2 YEAR
+
+    Note that a reference only leaves the appropriate address upon TOS. The
+user is responsible for determining the appropriate fetch/store type (e.g., C!
+and C@ for months and days; and ! and @ for the year).
+
+
+3.3     VECTOR:
+
+
+3.3.1   VECTOR DEFINITION:
+
+
+    One may also define vectors (or as they are generally called in
+programming languages, arrays).  A vector is a collection of homogeneous,
+index addressable elements.  The word used to define a vector object is [],
+and the syntax is:
+
+
+        <DEFINED-OBJECT> <#-OF-ELTS> [] <DEFINED-VECTOR> <VECTOR-OPERATOR>
+
+    where:
+
+        <DEFINED-OBJECT>    =   The data object name of the elements of
+                                the vector (which may also be vectors, or
+                                structures, or any other defined object);
+
+        <#-OF-ELTS>         =   The number of elements of <DEFINED-OBJECT>
+                                things needed in the vector;
+
+        []                 =   The vector defining word provided with this
+                               package;
+
+        <DEFINED-VECTOR>   =   The vector object definition word; and
+
+        <VECTOR-OPERATOR>  =   The name of the operator to be used with
+                               this particular vector object.
+
+
+    Using the previously declared DATE-OBJ which is a structure (section
+3.2.1), one could define a vector 20 of DATE-OBJ structures as:
+
+            DATE-OBJ 20 [] DATE[]-OBJ DATE-NDX
+
+    This would define the vector object DATE[]-OBJ as consisting of 20
+elements of type DATE-OBJ (which is a structure).
+
+
+3.3.2   VECTOR CREATION:
+
+
+    Finally, creating objects of the vector type is analogous to the above
+cases.  That is, simply CREATE the object and provide the object definition
+as the number of bytes to be allocated.
+
+    In order to create a given date vector of 20 date objects, one might
+code:
+
+            CREATE DATE[] DATE[]-OBJ ALLOT
+
+
+3.3.3   VECTOR REFERENCE:
+
+
+    A vector object is referenced as:
+
+            <VECTOR-NAME> <NDX-#> <VECTOR-OPERATOR>
+
+    This will leave the address of the beginning of the vector element which
+is stored at the index given by <NDX-#>.  Vector indices always start at zero.
+
+    Using the previous example of a vector of dates, in order to reference the
+year for the third element (i.e., index 2) of DATE[] one codes:
+
+        DATE[] 2 DATE-NDX YEAR
+
+    Note that "DATE[] 2 DATE-NDX" fetches the address of the appropriate
+structure within the vector DATE[], and that "YEAR" then fetches the
+appropriate component of the structure needed.
+
+
+3.4     NESTED OBJECT:
+
+
+    Since both structure and vector definitions use arbitrary data object
+types (i.e., any previously defined object may be used as a component/
+element), then one may define vectors of structures, structures of vectors,
+vectors of vectors, vectors of structures of vectors ..., etc. to any level
+desired.
+
+    A nested object, once defined, is declared just as is any other object.
+That is, CREATE it and then ALLOT the number of bytes as specified by the name
+of its object definition.
+
+    Since both structure and array references return the address of the next
+lower component, references may be nested to any level.
+
+    The next section (BNF LISTING) shows exactly how the pieces fit together.
+
+
+4.  BNF LISTING:
+
+    In the following Backus-Naur Form (BNF) syntax description of the
+definition, creation, and reference of extended data objects, the following
+symbols are used:
+
+
+    SYMBOL          MEANING
+
+    -->             The string/object to the left of the "-->" is replaced
+                    by the string(s)/object(s) to the right
+
+    |               Indicates alternate selection/choice.
+
+    <words>         The enclosing "<" and ">" indicate some type of string
+                    and the "words" indicate the meaning of the string.
+
+    Any other symbols used (which are in capital letters) are read "as is".
+
+
+    <scalar-definition>             -->
+        <constant-expression> DEF <defined-scalar>
+
+
+    <structure-definition>          -->
+        S{ <structure-components> }S <defined-structure>
+
+
+    <structure-components>          -->
+        <single-structure-component> <structure-components>  |
+        <single-structure-component>
+
+
+    <single-structure-component>    -->
+        <component-definition> :: <structure-component-name>
+
+    <vector-definition>             -->
+<element-definition> <number-of-elts> [] <defined-vector> <vector-operator>
+
+    <component-definition>          -->
+        <defined-scalar>        |
+        <defined-structure>     |
+        <defined-vector>        |
+
+    <element-definition>            -->
+        <defined-scalar>        |
+        <defined-structure>     |
+        <defined-vector>        |
+
+    <number-of-elts>                -->
+        <constant-expression>
+
+    <constant-expression>           -->
+        <any-calculation-resulting-in-single-number>
+
+    <scalar-creation>               -->
+        CREATE <scalar-name> <defined-scalar> ALLOT
+
+    <structure-creation>            -->
+        CREATE <structure-name> <defined-structure> ALLOT
+
+    <vector-creation>               -->
+        CREATE <vector-name> <defined-vector> ALLOT
+
+    <scalar-reference>              -->
+        <scalar-name>
+
+    <structure-reference>           -->
+        <structure-name> <structure-component-name>
+
+    <vector-reference>              -->
+        <vector-name> <elt-number> <vector-operator>
+
+    <elt-number>                    -->
+        <constant-expression>
+
+    <non-scalar-reference>          -->
+        <structure-reference>   |
+        <vector-reference>      |
+
+    <general-reference>             -->
+        <non-scalar-reference>  |
+        <scalar-reference>      |
+
+    <nested-reference>              -->
+        <non-scalar-reference> <nested-reference>   |
+        <general-reference>
+
+
+5.  FILES PROVIDED:
+
+
+5.1     FORTH SOURCE FILE:
+
+
+    The words needed for implementing extended data objects in Forth, as
+described in this file, are found in Forth file EDO.SCR.
+
+
+5.2     FORTH EXAMPLES FILE:
+
+
+    The Forth source file EDODMO.SCR provides some code examples using the
+data objects discussed herein and should give some idea as to the appropriate
+usage thereof.  The EDO.SCR file must be loaded prior to loading the
+EDODMO.SCR file.
+
+
+6.  A NOTE OF THANKS:
+
+    The initial idea for (and implementation of) the usage of non-scalar data
+objects employing a consistent, high-level definition syntax (as far as I am
+aware) comes from R. J. Brown (as underlying utility functions within his
+BALLS package posted on the ECFB).  I have hopefully add a little more
+generality to his initial definitions, but the basic idea was his.
+
+
+
+-----------------------------------------------------------------------------
+
+
+                                REFERENCES:
+
+
+
+    Anderson, A. & Tracy, M.  Mastering Forth.  Bowie, MD.: Brady
+Communications Company, Inc., 1984, pp. 67-71.
+
+    Harbison, S. P., & Steele, G. L., Jr.,  C a Reference Manual.
+Englewood Cliffs, N.J.:  Prentice-Hall, 1984.
+
+    Jensen, K. & Wirth, N.  Pascal User Manual and Report: Third Edition,
+ISO Pascal Standard.  New York: Springer-Verlag New York, Inc., 1985.
+
+    Kelly, M. G. & Spies N.  Forth: A Text and Reference.  Englewood
+Cliffs, N.J.:  Prentice-Hall, 1986, pp. 238-240.
+

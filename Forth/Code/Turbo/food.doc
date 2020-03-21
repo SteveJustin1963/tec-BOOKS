@@ -1,0 +1,129 @@
+L'EXTENSION FOOD (Forth Objetc Oriented Dialect)
+
+
+Cette extension a pour but d'offrir un environnement de programmation
+capable d'exploiter des donn‚es plus structur‚es.
+
+Le contenu de cette disquette est utilisable … partir de TURBO-Forth par la
+commande suivante:
+
+  INCLUDE FOOD    \ … taper aprŠs lancement de TURBO-Forth.
+
+Cette mˆme commande peut ˆtre plac‚e en tˆte de programme exploitant la
+programmation orient‚e objet.
+
+
+Liste des fichiers disponibles:
+
+FOOD.FTH       module de gestion des objets
+ECRAN.FTH      une gestion de l'‚cran en LOO (Langage Orient‚ Objet)
+POINTEUR.FTH   exemple de d‚finition de type de donn‚es suppl‚mentaire.
+
+
+Une documentation simplifi‚e figure aprŠs EOF dans FOOD.FTH. A terme, une
+documentation beaucoup plus d‚taill‚e et didactique vous sera propos‚e dŠs
+qu'elle sera disponible. Le prix de cette disquette sera int‚gralement
+d‚ductible lors de l'acquisition du produit complet.
+
+Si entre-temps vous utilisez le programme FOOD.FTH, vous ˆtes cordialement
+invit‚ … envoyer … envoyer votre contribution. Dans ce cas, vous recevrez le
+produit d‚finitif sans suppl‚ment de prix, sous r‚serve que votre
+contribution soit retenue.
+
+
+HOT-LINE:
+
+  - par t‚l‚phone:  1-43 42 32 15
+  - par fax:        1-43 40 96 53
+  - par minitel:    3612 MINICOM, nous ‚crire dans BAL 143409653 REM CORP
+                    3616 CALVATEL cit‚ FORTH
+  - via USENET:     MP127@calvacom.fr
+
+
+LES AUTRES CONTACTS FORTH:
+
+  - sur COMPUSERVE: GO FORTH       (la cit‚ Forth la plus fr‚quent‚e)
+                    GO CLM         (Computer Langage Magazine)
+                    GO DDJ         (Dr Dobb's Journal)
+                    (possibilit‚ de t‚l‚chargement via Minitel)
+
+
+Vous programmez en Forth. Mais parfois, vous tombez en panne d'inspiration.
+C'est grƒce aux contributions de chacun que vos id‚es sont relanc‚es.
+Partagez votre savoir-faire comme d'autres programmeurs partagent avec vous.
+Envoyez-nous vos contributions, nous les regrouperons dans des disquettes
+TF-Club. Si vous ˆtes contributeur, vous recevrez gratuitement la disquette
+… laquelle vous aurez contribu‚. Tous les sujets sont abordables.
+
+Si vous d‚veloppez une application pointue, n'h‚sitez pas … nous contacter.
+Si nous n'avons pas de solution imm‚diate, nous ferons part de votre
+problŠme aux autres programmeurs qui trouverons peut-ˆtre une r‚ponse.
+
+
+En pr‚paration: TFG32 (Turbo-Forth G‚n‚ration 32 bits):
+
+  - saviez-vous qu'un 80386 … 20 Mhz est plus performant qu'un 68030 … 25
+Mhz. C'est ce qu'affirme une ‚tude trŠs s‚rieuse parue dans Dr Dobb's. Avec
+Forth, nous serons bient“t en mesure de r‚veiller les potentialit‚s de ce
+processeur. En attendant, l'assembleur 80386 est d‚j… disponible en
+t‚l‚chargement sur CALVACOM (accŠs par 3616 CALVATEL pour les non abonn‚s -
+t‚l‚chargement via KERMIT).
+
+  - bient“t vous pourrez programmer en mode prot‚g‚. Vous aurez alors accŠs
+… un seul segment de 4 Go (4 Giga-octets) et non plus 64 Ko, ceci sans
+recourir au gestionnaire EMS.
+
+  - l'exploitation massive des instructions 32 bits en mode prot‚g‚ ne
+rendront pas le code beaucoup plus lourd. En contrepartie, les performances
+attendues seront v‚ritablement d‚coiffantes....
+
+
+Forth … l'Est:
+
+  - … l'Universit‚ des Sciences et Techniques de St PETERSBOURG (ex
+LENINGRAD), un fascicule a ‚t‚ tir‚ … 160.000 exemplaires et entiŠrement
+consacr‚ … Forth. Il a ‚t‚ ‚puis‚ en moins de deux semaines.
+
+  - il existe aussi un Forth con‡u … LEIPZIG (ex RDA), … l'‚poque o— le mur
+de Berlin n'‚tait pas encore tomb‚. Ce Forth, nomm‚ COMFORTH, est disponible
+en t‚l‚chargement sur CALVATEL.
+
+  - plus loin, UCC-Forth, ‚mane d'un groupe d'ing‚nieurs de Honk-Kong.
+Document‚ en Anglais, il est ‚galement disponible par t‚l‚chargement sur
+CALVATEL.
+
+  - FORTH est ‚gelement utilis‚ en Chine Populaire. C'est ce qu'… pu
+constater un de nos correspondants lors des Journ‚es Euro-FORML qui se sont
+tenues en octobre 1991 … MARIENBAD en Tch‚coslovaquie o— il a rencontr‚ une
+d‚l‚gu‚e chinoise.
+
+
+Dans l'industrie fran‡aise:
+
+  - le premier constructeur automobile fran‡ais (RENAULT) a choisi une
+application ‚crite avec TURBO-Forth pour g‚rer un systŠme de S.D.A.O.
+(SystŠme de D‚cision Assist‚ par Ordinateur). Le S.D.A.O. permet de
+contr“ler plus de 800 points de contacts r‚partis sur 14 cartes d'E/S
+d‚port‚es et reli‚es en RS422 … 38400 bauds … un PC. Le PC ne dispose que
+d'une carte silicium-drive de 360 Ko. Grƒce … sa compacit‚, Forth a ‚t‚ le
+seul langage capable de faire fonctionner l'application en temps r‚el avec
+aussi peu de ressource disque et en multi-tƒche.
+
+Le plus spectaculaire dans l'application S.D.A.O. a ‚t‚ la mise au point
+d'un pseudo-langage permettant une configuration complŠte … partir de
+six commandes seulement.
+
+  - la st‚ ASCINTER-OTIS utilise Forth pour ses applications de contr“le de
+processus.
+
+  - le collŠge de France gŠre des cartes d'acquisition grƒce … TURBO-Forth.
+
+  - une application ORTHO-LIRE a ‚t‚ mise au point avec TURBO-Forth pour
+l'apprentissage de la lecture par des enfants atteints de troubles
+dysorthographiques et dyslexiques. Ce programme est utilis‚ notamment dans
+les cabinets d'orthophonie.
+
+  - d'autres soci‚t‚s utilisent TURBO-Forth, mais nous manquons de pr‚cision
+sur la finalit‚ des applications. Citons quand mˆme EdF, CEA SACLAY,
+AEROSPATIALE, THOMSON, FRANCE TELECOM,...
+

@@ -1,0 +1,18 @@
+SOKOBAN.ZIP contains:
+
+sokoban.com, a DOS implementation of the Sokoban game written in Pygmy Forth.
+
+sokoban.dat, the mazes
+
+sokoban.scr, the Pygmy Forth source.
+
+sokoban.f, a text file version that should work with most ANS Forth systems.
+
+sokoban.txt, this file
+
+Leo Wong
+hello@albany.net
+http://www.albany.net/~hello/
+
+
+

@@ -1,0 +1,106 @@
+
+
+    Move and Sort Game
+    ==================
+
+Please use a monospacing font to read this file.
+
+This program must run under Windows95 or NT. A modern graphics card 
+required as well (No palette programming).
+
+In this game, the player has to sort numbered bricks. This bricks can be 
+moved by clicking with the mouse. If the bricks are sorted properly a 
+detailed message is displayed. --  The game can be played in three different 
+languages: German, English and Portuguese. --  The program was written by 
+a Forther with restricted experience. It was written to get experience in 
+using the new Win32Forth working together with Windows and other programming 
+tools. --  The author wanted to achieve as many as possible out of these 
+aims:
+
+    it can easily be played by children,
+    it is nice to look at,
+    something moves,
+    the use of various modern tools for Windows programming,
+    the use of the Help System with references between different chapters.
+
+The program was written for use on a contemporary computer. Modern 32 bit
+programming under control of a modern operating system.
+
+The result was a lot of new experience for the author, but unfortunately not 
+a good or particularly interesting program to show to other programmers. -- 
+The comments of the sources are written in German language only.
+
+------------------------------
+
+The .zip file contains an executable file and all sources ...
+
+    1 .exe    (Turnkey)   ready to play
+    3 .hlp    Help-files  in German, English and Portuguese
+    3 .wri    Abouts      in German, English and Portuguese
+
+    1 Readme.rtf     (English) Loading and access to the sources
+    1 VIP_Liste.rtf  (German)  List of all VIPs who got a copy so far
+
+    In these files the comments written in German language ...
+
+    16 .f     sources Win32Forth (small files),
+    1  .rc    dialog resources,
+    1  .bmp   bitmap with flags of Germany, Britain and Brazil
+    1  .res   compiled from .rc and .bmp,
+    1  .ico   the icon
+
+    These files in German, English and Portuguese language
+
+    3  .rtf   help source
+    3  .hpj   help commands
+
+------------------------------
+
+There are two small changes with regard to the original Win32Forth source, so
+a MakeForth is recommended. Avoidance of this MakeForth is discussed in 
+Readme.rtf. The files which are delivered here, work under a changed Forth 
+system.
+
+    In dialog.f the following was added:
+
+        5 VALUE ResType
+
+    The word 'find-dialog-ID' will be able to search different types
+    of resources.
+
+    --------------------------
+
+    In primutil.f major changes were done at the word ,"Text" in order
+    to translate the many strings appearing in all the small items.
+
+    There is a new
+
+        0 VALUE Sprache             \ german word for language.
+
+    If Sprache =  NULL , no changes of Win32Forth will appear.
+
+    If Sprache >  NULL , the definition of this word is changed to:
+
+        ,"Text"  ( Addr0  --  )     \ Addr0 = Address of a text in the
+                                    \ central string table in the FIRST
+                                    \ language (the other languages
+                                    \ follow immediately)
+
+    The central table with the strings in all languages is built by
+    ,"Text" while Sprache = NULL .
+
+    Sprache is set to nonzero by an initial dialog which asks for the
+    desired language.
+
+    ,"Text" now picks the PROPER text according to the amount of Sprache
+    out of the central table of strings and places it at 'here'.
+
+    Details see StringTabelle.f and MultLan.f .
+
+------------------------------
+
+Author of 'Move and Sort' program is:
+
+  Name                  Ulrich Richter
+  E-Mail  		u.richter@mhb.gun.de
+

@@ -1,0 +1,23 @@
+11/25/92
+
+XBASE.ZIP should contain:
+   XBASE.SCR    Source code for reading & writing .DBF files using PYGMY 1.4
+   TEST.DBF     A sample DBF file for testing purposes.
+   XBASE.DOC    This file
+
+XBASE.SCR is a small attempt at reading & writing dbase files using Frank
+Sergeant's PYGMY 1.4.  It is being distributed in the hope that someone will
+take pity on a novice Forther and provide the improvements & constructive
+criticism so sorely needed.
+
+DOUBQUAD.SCR (from the bonus pack) is needed by some of the words.
+
+XBASE.SCR expects to be loaded as file unit #5, i.e.:
+     " XBASE.SCR" 5 OPEN
+
+Shadow screens begin at scr# 5030, so print the file with:
+     5000 5029 5030 SHADOW
+
+The main load screen is at scr# 5001, so:
+     5001 LOAD
+                          C. E. Summers   11/25/92

@@ -1,0 +1,1090 @@
+---- Cut Here and unpack ----
+#!/bin/sh
+# shar:	Shell Archiver  (v1.22)
+#
+#                                                                          
+#                                                                          
+#
+#	Run the following text with /bin/sh to create:
+#	  readme.xdr
+#	  xdr.m4
+#	  xdr.fo
+#	  xdr-test.fo
+#	  clientx.fo
+#	  serverx.fo
+#
+if test -r s2_seq_.tmp
+then echo "Must unpack archives in sequence!"
+     next=`cat s2_seq_.tmp`; echo "Please unpack part $next next"
+     exit 1; fi
+echo "x - extracting readme.xdr (Text)"
+sed 's/^X//' << 'SHAR_EOF' > readme.xdr &&
+X       Documentation for XDR I/O  V1.2 for ThisForth.
+X
+X	The XDR (eXternal Data Representation) library provides the
+X	ability to write to files or sockets that can be properly
+X	read by machines with different data formats.  XDR provides
+X	for more than differences in the "endian-ness" of two machines,
+X	it allows for differences in floating point formats and word sizes
+X	as well.
+X
+X	To write using XDR, some data is converted from the native
+X	representation to XDR, then the XDR data is written as binary data.
+X
+X	     Native format Data  --> XDR-ENCODE --> Write encoded data
+X
+X
+X	The reading process reads the binary data and then uses an XDR
+X	conversion routine to convert to the local representation.
+X
+X	     Read encoded data --> XDR-DECODE --> Native format Data 
+X
+X
+X
+X	If you want to compile these into your version of Forth, then
+X	you need to add the following line to 'custom.m4',
+X
+Xifdef(`USE_XDR',`include(`xdr.m4')')
+X
+X
+X	And append -DUSE_XDR to the OPTIONS line in the Makefile, eg.  change,
+X
+XOPTIONS = -DFLOAT -DFILEHDL
+X
+X	to,
+X
+XOPTIONS = -DFLOAT -DFILEHDL -DUSE_XDR
+X
+X
+X	In the Makefile where, rth.m4 is built,
+X
+Xrth.m4:	fo rth save-4th
+X	fo rth $(ELECTIVES) $(EXTRA) save-4th
+X	rm -f hi.tmp
+X
+X
+X	Add 'xdr.fo' to the list of files, or put it in the definition of
+X	EXTRA.  So for example one way to do it is,
+X
+X	fo rth $(ELECTIVES) $(EXTRA) xdr.fo save-4th
+X
+X
+X
+X	Check that the values of the constants used in 'xdr.fo' correspond
+X	to what is used on your system; change them as necessary.
+X
+X	Note: You should make sure to also build FILEHDL words since they
+X	do the actual reading and writing of the data (XDR only does the
+X	encoding/decoding of the data).
+X
+X
+X	Then build Forth as usual.
+X
+X
+X
+X       The glossary for the additional words.
+X
+X
+X	XDR-BUFFER-INIT ( buffer_addr size flag --  )
+X
+X	Before using XDR a translation buffer must be associated with the
+X	internal XDR data structures.  The parameter 'size' is the number
+X	of bytes that this buffer has, it should be at least as large as
+X	any data structure to be read/written.  The parameter 'flag' is
+X	XDR_DECODE if READ operations are to be done or XDR_ENCODE if
+X	write operations are to be performed.  In the current version of
+X	the XDR interface, there can be one ENCODE and/or one DECODE XDR
+X	buffer in use by any given process.
+X
+X
+X	The other words follow the convention:
+X
+X	XDR->TYPE
+X
+X	An XDR DECODE word.  After performing a read into the buffer,
+X	these words can be used to convert the data to TYPE and push its
+X	value to the stack.
+X
+X
+X	TYPE->XDR
+X
+X	An XDR ENCODE word.  These words will convert data of the given TYPE
+X	to XDR format in the data buffer.  Subsequently the data buffer can
+X	be written out.
+X
+X
+X
+X
+X        TYPE          data type                     stack diagram
+X                                                encode          decode
+X	L             long int                  ( n -- )        ( -- n )
+X        UL            unsigned long int         ( u -- )        ( -- u )
+X        F             (float) double          ( -- , f: x -- )  ( -- , f: -- x)
+X        STR           Forth counted strings      see note below on stacks
+X
+X
+X
+X
+X
+X	THE WORDS BELOW HERE PROVIDE FOR CONVERSIONS TO NON-FORTH DATA TYPES.
+X	THEY ARE NECESSARY IN ORDER TO BE ABLE TO COMMUNICATE WITH XDR DATA
+X	STREAMS THAT DO NO ORIGINATE FROM A FORTH PROCESS.  FROM THE
+X	APPLICATION LEVEL THEY ALL WORK WITH NORMAL FORTH DATA TYPES, BUT THEY
+X	TREAT THAT DATA AS IF IT WERE ANOTHER TYPE FOR ENCODING OR DECODING.
+X
+X
+X
+X        TYPE          data type                     stack diagram
+X                                                encode          decode
+X	C             char                      ( c -- )        ( -- c )
+X	I             int                       ( n -- )        ( -- n )
+X        UI            unsigned int              ( u -- )        ( -- u )
+X        SI            short int                 ( n -- )        ( -- n )
+X        SF            (short) float             ( -- , f: x -- )  ( -- , f: -- x)
+X        CSTR          C string                   see STR note below
+X
+X
+X
+X	This list does NOT provide for all of the XDR defined data types,
+X	just the most basic ones are provided in this version of the interface.
+X
+X
+X
+X
+X	Special note on STR operations
+X
+X
+X	STR->XDR ( addr count -- count' )
+X
+X        This word will convert a Forth counted string to XDR format in the
+X	data buffer.  The XDR data format INCLUDES THE BYTE COUNT, so that
+X	the count return parameter includes this additional space.  Use
+X	count' to control the subsequent write of the data buffer.  The data
+X	actually need not be a string, a variable length byte array is actually
+X	used here.
+X
+X
+X	CSTR->XDR ( addr count -- count' )
+X
+X	The word CSTR->XDR works nearly identically to STR->XDR except it encodes
+X	the string as if it were a C (NULL terminated) string of characters
+X	instead of a counted string (it internally provides the NULL, the
+X	application can use it as a normal Forth string).
+X
+X
+X
+X
+X	XDR->STR ( addr count -- addr count' )
+X
+X	After performing a read into the buffer, XDR->STR is used to convert
+X	the data to a Forth counted string.  The 'addr' is the destination
+X	for the string and 'count' is the count of the number of characters.
+X	The data actually need not be a string, a variable length byte array
+X 	is actually used here.
+X
+X	Typically XDR-UI will be used to determine what the count actually
+X	is before calling XDR->STR, for examlple (error checking omitted
+X	for clarity),
+X
+X        FH @ BUFFER BYTES_PER_XDR_UNIT READ       \ read the byte count
+X
+X
+X        \ read the character data into the buffer after the count
+X        \ note the use of XDR->UI to determine how many bytes to read
+X	\ (XDR->UI - BYTES_PER_XDR_UNIT).
+X        \ For XDR counted strings, the byte count includes the space for
+X        \ the byte count itself.
+X
+X        FH @ BUFFER BYTES_PER_XDR_UNIT + XDR->UI BYTES_PER_XDR_UNIT - READ
+X
+X	PAD SWAP XDR->STR      \ convert the data to a Forth string in PAD
+X
+X
+X	XDR->CSTR ( addr count -- addr count' )
+X
+X	The word XDR->CSTR works identically to XDR->STR except it expects
+X	the XDR data stream to represent a C (NULL teriminated) string of
+X	characters.  This word returns a normal Forth counted string to the
+X	application.  When reading C strings, the byte count DOES NOT include
+X	an entry for the byte count or for the terminating NULL, so to perform
+X	the read after determining the byte count use something like,
+X
+X
+X        FH @ BUFFER BYTES_PER_XDR_UNIT READ       \ read the byte count
+X
+X
+X	\ the number of bytes to read is XDR->UI + 1
+X
+X        FH @ BUFFER BYTES_PER_XDR_UNIT + XDR->UI 1+ READ
+X
+X        PAD SWAP XDR->CSTR
+X
+X
+X
+X
+X==============================================================================
+X
+X
+X Everett (Skip) Carter        Phone:  408-656-3318 FAX: 408-656-2712
+X Naval Postgraduate School    INTERNET: skip@taygeta.oc.nps.navy.mil
+X Dept. of Oceanography, Code OC/CR  UUCP:     ...!uunet!taygeta!skip
+X Monterey, CA. 93943          TELEMAIL: s.carter/omnet
+X                  WWW: http://taygeta.oc.nps.navy.mil/skips_home.html
+SHAR_EOF
+chmod 0644 readme.xdr || echo "restore of readme.xdr fails"
+echo "x - extracting xdr.m4 (Text)"
+sed 's/^X//' << 'SHAR_EOF' > xdr.m4 &&
+X/* xdr.m4         Code to interface with XDR
+X
+X
+X
+X                      (c) Copyright 1994, Everett F. Carter Jr.
+X                      Permission is granted by the author to use
+X                      this software for any application provided this
+X                      copyright notice is preserved.
+X
+X*/
+X
+Xstatic char rcsid_xdr[] = "@(#)xdr.m4	1.3 12:15:09 3/2/95   EFC";
+X
+X#include <fcntl.h>
+X#include <rpc/rpc.h>
+X
+X#ifdef CRAY
+X#define char_type   signed char
+X#else
+X#define char_type   char
+X#endif
+X
+Xstatic XDR xdrs[2];
+X
+X/* initialize the XDR buffer and associate it with the specified buffer */
+XExecution(`XDR-BUFFER-INIT')
+X{
+X	u_int size;
+X	char *addr;
+X	enum xdr_op op;
+X	int idx;
+X
+X	op = top;
+X	size = *S;
+X	addr  = (char *)&data[ S[-1] ];
+X
+X	S -= 3;
+X
+X	if ( op == XDR_ENCODE )
+X		idx = 0;
+X	else
+X		idx = 1;
+X
+X	xdrmem_create( &xdrs[idx], addr, size, op );
+X
+X
+X}
+XDone
+X
+XExecution(`XDR-REWIND')      /* rewind XDR buffer for READERS ONLY */
+X{
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X}
+XDone
+X
+X/* Conversions between XDR and ThisForth native data types */
+X
+XExecution(`XDR->L')      /* convert from XDR to LONG INT */
+X{
+X	long int i;
+X
+X	xdr_long( &xdrs[1], &i );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	push (cell)i;
+X
+X}
+XDone
+X
+XExecution(`L->XDR')      /* convert from INT to XDR */
+X{
+X	long int i;
+X
+X	i = top;
+X	pop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_long( &xdrs[0], &i );
+X
+X}
+XDone
+X
+XExecution(`XDR->UL')      /* convert from XDR to UNSIGNED LONG INT */
+X{
+X	unsigned long int i;
+X
+X	xdr_u_long( &xdrs[1], &i );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	push (cell)i;
+X
+X}
+XDone
+X
+XExecution(`UL->XDR')      /* convert from UNSIGNED LONG INT to XDR */
+X{
+X	unsigned long int i;
+X
+X	i = (unsigned long int)top;
+X	pop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_u_long( &xdrs[0], &i );
+X
+X}
+XDone
+X
+XExecution(`XDR->F')      /* convert from XDR to DOUBLE FLOAT */
+X{
+X	double x;
+X
+X	xdr_double( &xdrs[1], &x );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	fpush x;
+X
+X}
+XDone
+X
+XExecution(`F->XDR')      /* convert from DOUBLE FLOAT to XDR */
+X{
+X	double x;
+X
+X	x = ftop;
+X	fpop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_double( &xdrs[0], &x );
+X
+X}
+XDone
+X
+XExecution(`XDR->STR')      /* convert from XDR to Forth string */
+X{                         
+X	char *sp;
+X	u_int sizep, maxsize;
+X
+X	sizep = maxsize = top + sizeof( u_int );
+X	sp  = (char *)&data[ *S ];
+X
+X	xdr_bytes( &xdrs[1], &sp, &sizep, maxsize );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	top = sizep - sizeof( u_int );
+X}
+XDone
+X
+XExecution(`STR->XDR')      /* convert from Forth string to XDR */
+X{
+X	char *sp;
+X	u_int sizep, maxsize;
+X
+X	sizep = maxsize = top + sizeof( u_int );
+X	sp  = (char *)&data[ *S ];
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_bytes( &xdrs[0], &sp, &sizep, maxsize );
+X
+X
+X	pop;
+X	top = sizep;
+X}
+XDone
+X
+X
+X/* conversions between XDR and non-ThisForth data types, converted to/from
+X   corresponding ThisForth data types */
+X
+XExecution(`XDR->C')      /* convert from XDR to CHAR */
+X{
+X	char c;
+X
+X	xdr_char( &xdrs[1], &c );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	push (cell)c;
+X
+X}
+XDone
+X
+XExecution(`C->XDR')      /* convert from CHAR to XDR */
+X{
+X	char c;
+X
+X	c = (char)top;
+X	pop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_char( &xdrs[0], &c );
+X
+X}
+XDone
+X
+XExecution(`XDR->I')      /* convert from XDR to INT */
+X{
+X	int i;
+X
+X	xdr_int( &xdrs[1], &i );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	push (cell)i;
+X
+X}
+XDone
+X
+XExecution(`I->XDR')      /* convert from INT to XDR */
+X{
+X	int i;
+X
+X	i = (int)top;
+X	pop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_int( &xdrs[0], &i );
+X
+X}
+XDone
+X
+XExecution(`XDR->UI')      /* convert from XDR to UNSIGNED INT */
+X{
+X	unsigned int i;
+X
+X	xdr_u_int( &xdrs[1], &i );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	push (cell)i;
+X
+X}
+XDone
+X
+XExecution(`UI->XDR')      /* convert from UNSIGNED INT to XDR */
+X{
+X	unsigned int i;
+X
+X	i = (unsigned int)top;
+X	pop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_u_int( &xdrs[0], &i );
+X
+X}
+XDone
+X
+XExecution(`XDR->SI')      /* convert from XDR to SHORT INT */
+X{
+X	short int i;
+X
+X	xdr_short( &xdrs[1], &i );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	push (cell)i;
+X
+X}
+XDone
+X
+XExecution(`SI->XDR')      /* convert from SHORT INT to XDR */
+X{
+X	short int i;
+X
+X	i = (short int)top;
+X	pop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_short( &xdrs[0], &i );
+X
+X}
+XDone
+X
+XExecution(`XDR->SF')      /* convert from XDR to SINGLE FLOAT */
+X{
+X	float x;
+X
+X	xdr_float( &xdrs[1], &x );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	fpush x;
+X
+X}
+XDone
+X
+X
+XExecution(`SF->XDR')      /* convert from SINGLE FLOAT to XDR */
+X{
+X	float x;
+X
+X	x = ftop;
+X	fpop;
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_float( &xdrs[0], &x );
+X
+X}
+XDone
+X
+X
+XExecution(`XDR->CSTR')      /* convert from XDR to C string */
+X{                         
+X	char *sp;
+X	u_int maxsize;
+X
+X	maxsize = top + sizeof( u_int );
+X	sp  = (char *)&data[ pocket + 1 ];
+X
+X	xdr_string( &xdrs[1], &sp, maxsize + 1 );
+X	xdr_setpos( &xdrs[1], 0 );
+X
+X	maxsize = strlen( &data[ pocket + 1 ] );
+X
+X	/* convert NUL-terminated string to Forth string */
+X        move( &data[ *S ], &data[ pocket + 1 ], maxsize);
+X
+X	top = maxsize;         /* return actual count */
+X}
+XDone
+X
+XExecution(`CSTR->XDR')      /* convert from C string to XDR */
+X{
+X	char *sp;
+X	u_int maxsize;
+X
+X	maxsize = top;
+X
+X	/* Make NUL-terminated string at &data[pocket+1] from S,top */
+X        move(&data[pocket + 1], &data[ *S ], top),
+X                data[pocket + top + 1] = EOS,
+X                        data[pocket] = top;
+X	sp  = (char *)&data[ pocket + 1 ];
+X
+X	xdr_setpos( &xdrs[0], 0 );
+X	xdr_string( &xdrs[0], &sp, maxsize + 1 );
+X
+X
+X	pop;
+X	top = strlen( sp ) + sizeof( u_int ) + 1;
+X}
+XDone
+X
+X
+X
+X
+X
+X
+SHAR_EOF
+chmod 0444 xdr.m4 || echo "restore of xdr.m4 fails"
+echo "x - extracting xdr.fo (Text)"
+sed 's/^X//' << 'SHAR_EOF' > xdr.fo &&
+X( XDR.FO V1.0         The constants for XDR )
+X
+X( WARNING: These values are what is used on the MIPS Workstation,
+X           they may have to be modified for other platforms )
+X
+X
+X
+X0 CONSTANT XDR_ENCODE
+X1 CONSTANT XDR_DECODE
+X2 CONSTANT XDR_FREE
+X
+X4 CONSTANT BYTES_PER_XDR_UNIT
+X
+SHAR_EOF
+chmod 0644 xdr.fo || echo "restore of xdr.fo fails"
+echo "x - extracting xdr-test.fo (Text)"
+sed 's/^X//' << 'SHAR_EOF' > xdr-test.fo &&
+X( XDR test code   )
+X(
+X xrdr    reads a file using XDR and sends it to the screen
+X xwrt    writes a file using XDR
+X
+X To use XDR with TCP/IP sockets, just replace the OPEN/OPEN-CREATE lines
+X below with the appropriate SOPEN line. Nothing else needs to be changed.
+X
+X)
+X 
+XVARIABLE fh
+X32 CONSTANT bufsize
+XCREATE buffer bufsize ALLOT
+X
+X
+X: Read-String ( fh -- )           \ read a counted string
+X
+X        buffer BYTES_PER_XDR_UNIT 2 PICK read      \ read the byte count
+X                                                \ this count INCLUDES the byte count
+X	0< ABORT" string read failure (1) "
+X
+X        
+X        \ read the character data into the buffer after the count
+X        \ note the use of XDR->UI to determine how many bytes to read
+X	\ (XDR->UI - BYTES_PER_XDR_UNIT).
+X        \ For XDR counted strings, the byte count includes the space for
+X        \ the byte count itself.
+X
+X        buffer BYTES_PER_XDR_UNIT + XDR->UI BYTES_PER_XDR_UNIT - ROT read
+X
+X
+X	DUP 0< ABORT" string read failure (2) "
+X
+X
+X        pad SWAP XDR->STR      \ convert the data to a Forth string
+X
+X        TYPE
+X
+X;
+X
+X: Read-CString ( fh -- )           \ read a counted string
+X
+X        buffer BYTES_PER_XDR_UNIT 2 PICK read         \ read the byte count
+X
+X	0< ABORT" cstring read failure (1) "
+X
+X
+X        \ read the data, note that the byte count is incremented by one in
+X        \ order to account for the terminating NULL which must be read.
+X	\ So the number of bytes to read is XDR->UI + 1
+X
+X        buffer BYTES_PER_XDR_UNIT + XDR->UI 1+ ROT read
+X
+X
+X	DUP 0< ABORT" cstring read failure (2) "
+X
+X        DUP . ." characters read, now converting " CR
+X
+X        pad SWAP XDR->CSTR      \ convert the data to a Forth string
+X
+X        TYPE
+X
+X;
+X
+X: xrdr ( str_addr count -- )
+X
+X         O_RDONLY open fh !
+X
+X	fh @ 0< ABORT" unable to open file "
+X
+X
+X        buffer bufsize XDR_DECODE XDR-BUFFER-INIT
+X
+X        ( now read in integer, a float, a double float and another integer )
+X        buffer BYTES_PER_XDR_UNIT fh @ read
+X
+X        0< ABORT" read failure (1) "
+X
+X
+X        XDR->I .          
+X
+X        buffer BYTES_PER_XDR_UNIT fh @ read
+X
+X        0< ABORT" read failure (2) "
+X
+X
+X        XDR->SF F.         
+X
+X        buffer BYTES_PER_XDR_UNIT fh @ read
+X
+X        0< ABORT" read failure (3) "
+X
+X
+X        XDR->F F.          
+X
+X
+X        buffer BYTES_PER_XDR_UNIT fh @ read
+X
+X        0< ABORT" read failure (4) "
+X
+X
+X        XDR->I .           
+X
+X
+X
+X        \ now read a counted string
+X	fh @ Read-String
+X
+X        CR
+X
+X
+X	fh @ Read-CString
+X
+X        CR
+X
+X        buffer BYTES_PER_XDR_UNIT fh @ read
+X
+X        0< ABORT" read failure (5) "
+X
+X
+X        XDR->I .           
+X
+X        fh @ close DROP
+X
+X;
+X
+X
+X: xwrt ( str_addr count -- )
+X
+X         O_WRONLY O_CREAT OR  438  open-create fh !      \ 438 = octal 666, rwrwrw
+X
+X	fh @ 0< ABORT" unable to open file "
+X
+X
+X        buffer bufsize XDR_ENCODE XDR-BUFFER-INIT
+X
+X        ( now write integer, a float, a double float and another integer )
+X	." Writing to the file:  1234 3.14159 2.71828 -5678 "
+X
+X	1234 I->XDR
+X        buffer BYTES_PER_XDR_UNIT fh @ write
+X
+X        0< ABORT" write failure (1) "
+X
+X	3.14159E0 SF->XDR
+X        buffer BYTES_PER_XDR_UNIT fh @ write
+X
+X        0< ABORT" write failure (2) "
+X
+X
+X	2.71828E0 F->XDR
+X
+X        buffer BYTES_PER_XDR_UNIT fh @ write
+X
+X        0< ABORT" write failure (3) "
+X
+X
+X        -5678 I->XDR
+X
+X        buffer BYTES_PER_XDR_UNIT fh @ write
+X
+X        0< ABORT" write failure (4) "
+X
+X        \ now write a counted string
+X        s" XDR and Forth" STR->XDR
+X     
+X        buffer SWAP fh @ write
+X
+X        CR
+X        . ." byte string (including count) 'XDR and Forth' written "
+X
+X
+X	\ now write a counted string as a C string
+X	s" This is a C string" CSTR->XDR
+X        buffer SWAP fh @ write
+X
+X         
+X         CR
+X
+X        . ."  byte string (including count) 'This is a C string' written " CR
+X
+X
+X	\ write one more integer for good measure
+X        21845         ." Finally writing 21845 " CR
+X	I->XDR
+X
+X        buffer BYTES_PER_XDR_UNIT fh @ write
+X
+X        0< ABORT" write failure (5) "
+X
+X         fh @ close DROP
+X
+X;
+X
+X
+SHAR_EOF
+chmod 0644 xdr-test.fo || echo "restore of xdr-test.fo fails"
+echo "x - extracting clientx.fo (Text)"
+sed 's/^X//' << 'SHAR_EOF' > clientx.fo &&
+X( Example client code, just get message from the server
+X                       then write some data to the server and
+X                       get its response.
+X
+X
+X			Uses XDR
+X
+X
+X                      Copyright 1994, Everett F. Carter Jr.
+X                      Permission is granted by the author to use
+X		      this software for any application provided this
+X		      copyright notice is preserved.
+X
+X
+X
+X	example usage:
+X
+X
+X	s" taygeta.oc.nps.navy.mil" 3146 clientx
+X
+X)
+X
+X\        @(#)clientx.fo	1.3 12:18:48 11/17/94   EFC
+X
+XVARIABLE sock
+X
+X5 CONSTANT numdat
+X
+X128 CONSTANT bufsize
+XCREATE tx_buffer bufsize ALLOT
+XCREATE rc_buffer bufsize ALLOT
+X
+X: Read-String ( fh -- )           \ read a counted string
+X
+X        rc_buffer BYTES_PER_XDR_UNIT 2 PICK read      \ read the byte count
+X                                                \ this count INCLUDES the byte count
+X        0< ABORT" read failure (1) "
+X
+X
+X        \ read the character data into the buffer after the count
+X        \ note the use of XDR->UI to determine how many bytes to read
+X        \ (XDR->UI - BYTES_PER_XDR_UNIT).
+X        \ For XDR counted strings, the byte count includes the space for
+X        \ the byte count itself.
+X
+X        rc_buffer BYTES_PER_XDR_UNIT + XDR->UI BYTES_PER_XDR_UNIT - ROT read
+X
+X
+X        DUP 0< ABORT" read failure (2) "
+X
+X        PAD SWAP XDR->STR      \ convert the data to a Forth string
+X
+X        TYPE
+X
+X;
+X
+X: float-test ( socket -- ) ( f: x -- )
+X
+X      ." sending floating point number " FDUP F.
+X
+X      F->XDR
+X
+X      tx_buffer BYTES_PER_XDR_UNIT 2 PICK write
+X       
+X      ." (wrote " . ." bytes) " CR
+X
+X      rc_buffer BYTES_PER_XDR_UNIT ROT read
+X
+X      ." (read " . ." bytes)   value: "  XDR->F F.  CR
+X
+X;
+X
+X: clientx ( addr count port -- )
+X
+X       0 sopen
+X
+X       DUP sock !
+X       
+X       0< ABORT" unable to open socket as client "
+X
+X       ( set up the XDR buffers, one for receiving and one for transmitting )
+X
+X       rc_buffer bufsize XDR_DECODE XDR-BUFFER-INIT
+X       tx_buffer bufsize XDR_ENCODE XDR-BUFFER-INIT
+X
+X
+X
+X
+X      ( read the welcome message from the server and echo it to the screen )
+X      sock @ Read-String
+X
+X
+X     ( now just send some data back and forth )
+X            
+X       ( tell the server how much data we are going to send )
+X      numdat I->XDR
+X
+X      tx_buffer BYTES_PER_XDR_UNIT sock @ write
+X       
+X      ." (wrote " . ." bytes) " CR
+X
+X
+X      ( now send the data, one at a time, and print the returned data )
+X      numdat 0 DO
+X
+X           I 1+ I->XDR
+X           tx_buffer BYTES_PER_XDR_UNIT sock @ write
+X
+X           ." (wrote " . ." bytes) " I 1+ . CR
+X
+X	   rc_buffer BYTES_PER_XDR_UNIT sock @ read
+X
+X           ." (read " . ." bytes)   value: "  XDR->I .  CR
+X
+X      LOOP
+X
+X      \ try sending and getting floating point data
+X      sock @ 3.14159E0 float-test
+X
+X
+X      sock @ close   DROP
+X
+X;
+X
+SHAR_EOF
+chmod 0444 clientx.fo || echo "restore of clientx.fo fails"
+echo "x - extracting serverx.fo (Text)"
+sed 's/^X//' << 'SHAR_EOF' > serverx.fo &&
+X( Example server code,
+X                  just accept some data and echo it back with the
+X		  sign changed
+X
+X                  Uses XDR
+X
+X                      Copyright 1994, Everett F. Carter Jr.
+X                      Permission is granted by the author to use
+X		      this software for any application provided this
+X		      copyright notice is preserved.
+X
+X
+X
+X	example usage:
+X
+X	3146 serverx
+X
+X)
+X
+X\        @(#)serverx.fo	1.3 12:19:01 11/17/94   EFC
+X
+XVARIABLE sock
+XVARIABLE local
+XVARIABLE from  16 ALLOT         \ MAKE SURE THIS IS BIG ENOUGH FOR YOUR SYSTEM !!
+X                                \ (see documentation on SOCKET-ACCEPT)
+X
+XVARIABLE data
+X
+XVARIABLE verbose         0 verbose !     \ turn this on if you want server
+X                                         \ write to standard output
+X
+X128 CONSTANT bufsize
+XCREATE tx_buffer bufsize ALLOT
+XCREATE rc_buffer bufsize ALLOT
+X
+X: float-test ( socket -- )
+X
+X        ( get a floating point value and echo it back after negation )
+X
+X        rc_buffer BYTES_PER_XDR_UNIT 2 PICK read
+X        XDR->F
+X
+X	verbose @ IF
+X      			." (read " . ." bytes)   value: "  FDUP F. CR
+X                  ELSE
+X                        DROP
+X		  THEN
+X
+X        FNEGATE
+X
+X        F->XDR
+X        tx_buffer BYTES_PER_XDR_UNIT ROT write
+X
+X	verbose @ IF
+X      			." (wrote " . ." bytes) " CR
+X                  ELSE
+X                        DROP
+X                  THEN
+X
+X;
+X
+X: serverx ( port -- )
+X
+X       0 0 rot 1 sopen
+X
+X       DUP sock !
+X       
+X       0< ABORT" unable to open socket as server "
+X
+X
+X       ( set up the XDR buffers, one for receiving and one for transmitting )
+X
+X       rc_buffer bufsize XDR_DECODE XDR-BUFFER-INIT
+X       tx_buffer bufsize XDR_ENCODE XDR-BUFFER-INIT
+X      
+X       5 sock @ listen
+X
+X       0< ABORT" listen failed "
+X
+X       verbose @ IF
+X       			." sock = "  sock @ . CR
+X		 THEN
+X
+X       ( now we wait for the client to connect )
+X       from 16 sock @ socket-accept
+X
+X       DUP local !
+X
+X       0< ABORT" accept failed "
+X
+X
+X       verbose @ IF  
+X       			." local = "  local @ . CR
+X		 THEN
+X
+X
+X      sock @ close DROP   ( not going to listen for more connections )
+X
+X
+X
+X      ( send a welcome message to the client )
+X      s" Welcome to Internetworking with Forth !" STR->XDR     \ encode the string
+X
+X      tx_buffer SWAP local @ write        ( write the string )
+X
+X      verbose @ IF
+X      			." (wrote " . ." bytes of message) " CR
+X                ELSE
+X                        DROP
+X		THEN
+X
+X
+X      ( read the number of points the remote is going to send )
+X      rc_buffer BYTES_PER_XDR_UNIT local @ read
+X
+X      XDR->I data !
+X      
+X      verbose @ IF
+X      			." (read " . ." bytes)   value: "  data ? CR
+X                ELSE
+X                        DROP
+X		THEN
+X
+X
+X      ( read the data from the remote, change it sign and send it back )
+X      data @ 0 DO
+X
+X      			rc_buffer BYTES_PER_XDR_UNIT local @ read
+X                        XDR->I data !
+X
+X			verbose @ IF
+X      				." (read " . ." bytes)   value: "  data ? CR
+X                                  ELSE
+X                                     DROP
+X			          THEN
+X
+X      			data @ -1 * I->XDR
+X
+X      			tx_buffer BYTES_PER_XDR_UNIT local @ write
+X
+X			verbose @ IF
+X      				    ." (wrote " . ." bytes) " CR
+X                                  ELSE
+X                                    DROP
+X			          THEN
+X		LOOP
+X
+X
+X	local @ float-test     \ get and echo back some floating point data
+X
+X
+X
+X	local @ close  DROP
+X
+X
+X	( This demonstration code, just services one request
+X          and then exits )
+X
+X;
+X
+SHAR_EOF
+chmod 0444 serverx.fo || echo "restore of serverx.fo fails"
+exit 0

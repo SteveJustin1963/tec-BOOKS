@@ -1,0 +1,7 @@
+
+ Global OS will allow to grant and to consume network services in INTERNET for
+ a internal currency. A given system I to consider, as the designer for
+ network development.
+ Is realized on WIN32FOR.
+ Read CLIENT\readme.txt
+
