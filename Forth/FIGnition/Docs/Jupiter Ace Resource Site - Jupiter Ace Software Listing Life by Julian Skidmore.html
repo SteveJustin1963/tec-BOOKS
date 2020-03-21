@@ -1,0 +1,470 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<!-- Jupiter Ace Archive Project    -->
+<!-- www.jupiter-ace.co.uk          -->
+<!-- version    12.04.01            -->
+<!-- File Name: listing_Life_JS.html  -->
+
+<HEAD>
+
+<title>Jupiter Ace Resource Site - Jupiter Ace Software Listing Life by Julian Skidmore</title>
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+
+ <meta name="keywords" content="Jupiter Ace ,Jupiter Ace Resource Site, Jupiter Cantab Ltd, Ace, Z80A, Forth, Forth-83 , Forth-79, Fig-Forth, Charles Moore, Elizabeth Rather, Steve Vickers, Richard Altwasser, Sinclair, ZX80, ZX81,ZX Spectrum, RAM, ROM, Memory, Computer, Retro, Programming, Stacks, reverse Polish notation">
+
+<meta name="description" content="Jupiter Ace Resource Site - Jupiter Ace Software Listing Life by Julian Skidmore.">
+
+  <link rel="stylesheet" title="Jupiter Ace default style" type="text/css" href="JADefult.css">
+
+	
+	
+</HEAD>	
+<BODY> 
+
+<script type="text/javascript" src="milonic_src.js"></script>	
+
+<script	type="text/javascript">	
+<!--
+if(ns4)_d.write("<scr"+"ipt type=text/javascript src=mmenuns4.js><\/scr"+"ipt>");		
+else _d.write("<scr"+"ipt type=text/javascript src=mmenudom.js><\/scr"+"ipt>");
+// --> 
+</script>
+
+
+
+
+<table class="mtable">
+		
+		<tr>
+			<td align="center">
+				<img src="graphics/jupiter_ace_logo.jpg" border="0" width="310" height="76" alt="">	 
+				<div style="text-align: center">www.jupiter-ace.co.uk</div>	 
+
+			</td>
+		</tr>
+												 
+</table> 
+
+  <br>	 
+  
+<table class="mtable" cellspacing="0" cellpadding="0">	
+    <tr >
+		<td class="tabs">
+		<script type="text/javascript" src="jupiter_menu_data.js">
+         </script>
+		</td>
+	</tr>
+
+
+<tr>
+	<td class="bar"> 
+   
+    <a class="index" href="index_program_listings.html" onClick="history.back();return false;">Previous Page</a>
+         		         &gt; <A  class="index" href="index_program_listings.html">Listings Index</a> &gt; Life listing
+	</td>
+</tr>
+
+
+	<tr>
+		<td>
+			
+			<br>  
+			<div style="text-align: center">
+				<img src="graphics/jup_image_1.gif" border="0" width="182" height="110" alt="">
+			</div>
+			<hr width="60%" size="1">
+		</td>
+	</tr>
+	
+	</table>
+	
+	<table class="mtable" cellpadding="4">
+	
+	<tr>
+		<td>
+	<div style="text-align: center">	
+	<img src="graphics/software_images/Life_JS/Life_2.jpg" border="0" width="300" height="224" alt="">
+	
+	</div>
+		</td>
+		<td><div style="text-align: left;font-size: 48pt">Life</div>
+		<div style="text-align: left;font-size: 20pt">by</div>
+		<div style="text-align: left;font-size: 20pt">Julian Skidmore</div>
+		
+		</td>
+	</tr>
+	
+	<tr>
+	
+	
+	
+	<td colspan="2">
+see <a href="sw_Life_JS.html">here</a> for the download files, wave, Ace and Tap. <br><br>	
+	
+	
+	
+	  <pre>
+64 constant width
+40 constant height
+width height * constant gridSize
+
+create grid0 gridSize allot
+create grid1 gridSize allot
+
+: showgrid ( grid -- )
+	gridSize + ( end of grid )
+	width - width dup + swap
+	height 0 do
+		width 0 do
+			i j 3 pick c@ plot
+			1+
+		loop
+		over -
+	loop
+	drop drop
+; 
+( 8 * 4096 = 4s, 4.37 slow. 2.6s fast, 12.6kips )
+
+
+( different show grid. )
+
+: hex 16 base c! ;
+
+hex 2c00 gChrSet decimal
+16 constant gUdg0
+
+( each cell is 0,0,0,0 for off, 6,9,9,6 for on
+	32
+	10
+)
+
+create cellpats
+6 c, 9 c, 9 c, 6 c,
+
+: GenCellChar ( n )
+	dup gUdg0 + 8 * gChrSet +
+	GenCellSemiChar
+	drop
+	swap 4 *
+	GenCellSemiChar
+;
+
+: GenCellSemiChar
+	cellPats ( n chrPtr cellpats )
+	3 0 do
+		3 pick 4 and if
+			dup c@
+		else
+			0
+		then ( n chrPtr cellPats val )
+		4 pick 8 and if
+			over c@ 16 *
+		else
+			0
+		then
+		+ ( n chrPtr cellPats val )
+		3 pick c!
+		1+ swap 1+ ( n chrPtr+1 cellPats+1 )
+	loop
+;
+
+: showgrid2
+	width 2 / swap 
+	height 2 / 0 do
+		3 pick 0 do ( width / 2 )
+			dup c@ dup + over 1+ c@ + dup +
+			over width + c@ + dup +
+			over +br + c@ + 65 + emit
+			1+
+		loop ( 27 words * 608, 1..2s )
+		width dup + + ( next row )
+	loop
+;
+
+: Calcpop (grid -- )
+	0
+	gridSize 0 do
+		over c@ +
+		swap 1+ swap
+	loop
+	0 20 at ." Pop=" . space space
+;
+
+0 variable seed
+
+( rand in range 0..64k)
+: rand ( -- rand )
+	seed @ 1+ 75 * dup seed !
+;
+
+: gengrid ( level grid -- )
+	height 0 do
+		width 0 do
+			over rand &lt; over c!
+			1+
+		loop
+	loop
+	drop drop	
+;
+
+( 123 On top, 123 are +gridsize-1, 
++gridsize-width and +gridsize-width+1
+4x5 That's +ftfr +ft +ftr
+678 4 and 6 are the same as 
+ calcCellL.) 
+ 
+: calcCell-lt ( gridloc -- )
+	dup +ftfr + c@ ( tl )
+	over +ft + c@ + ( +t )
+	over +ftr + c@ + ( +tr )
+	over +bl + c@ + ( +l )
+	over 1+ c@ + ( +r )
+	over +bfr + c@ + ( +bl )
+	over width + c@ + ( +b )
+	over +br + c@ + ( +br )
+; 
+( DONE )
+
+( 123 On top, 123 are +gridsize-width-1,
+ +gridsize-width and +gridsize-width+1
+  4x5 That's  +ftl  +ft  +ftr 678 )
+: calcCellT ( gridloc -- )
+	dup +ftl + c@ ( tl )
+	over +ft + c@ + ( +t )
+	over +ftr + c@ + ( +tr )
+	over 1- c@ + ( +l )
+	over 1+ c@ + ( +r )
+	over +bl + c@ + ( +bl )
+	over width + c@ + ( +b )
+	over +br + c@ + ( +br )
+; 
+( DONE )
+
+( 123 at rhs, 3 5 8 are: +gridsize-width-1, 
++gridsize-width, +gridSize-width*2+1
+  4x5 That's  +ftl  +ft +fbfl
+  678 Otherwise, like Calccell-r, but )
+
+
+: calcCellTR ( gridloc -- )
+	dup +ftl + c@ ( tl )
+	over ft + c@ + ( +t )
+	over +fbfl + c@ + ( +tr )
+	over 1- c@ + ( +l )
+	over +bl - c@ + ( +r )
+	over +bl + c@ + ( +bl )
+	over width + c@ + ( +b )
+	over 1+ c@ + ( +br )
+; 
+
+( DONE )
+
+: calcCellL ( gridloc -- )
+	dup 1- c@ ( far top right )
+	over width - c@ + ( +t )
+	over +bl - c@ + ( +tr )
+	over +bl + c@ + ( far right )
+	over 1+ c@ + ( +r )
+	over +bfr + c@ + ( +b far right )
+	over width + c@ + ( +b )
+	over +br + c@ + ( +br )
+; 
+
+( 38  - DONE )
+
+: calcCell ( gridloc -- gridloc sum )
+	dup +br - c@ ( tl )
+	over width - c@ + ( +t )
+	over +bl - c@ + ( +tr )
+	over 1- c@ + ( +l )
+	over 1+ c@ + ( +r )
+	over +bl + c@ + ( +bl )
+	over width + c@ + ( +b )
+	over +br + c@ + ( +br )
+; 
+
+( 38 words -  DONE )
+
+( 123 at rhs, 3 5 8 are: -127, -63, +1
+  4x5 That's +bfr  +bl -
+  678 Otherwise, like Central.)
+
+: calcCellR ( gridloc -- )
+	dup +br - c@ ( tl )
+	over width - c@ + ( +t )
+	over +bfr - c@ + ( +tr )
+	over 1- c@ + ( +l )
+	over +bl - c@ + ( +r )
+	over +bl + c@ + ( +bl )
+	over width + c@ + ( +b )
+	over 1+ c@ + ( +br )
+; 
+
+( DONE Tested )
+
+( 123 On bl, 78 are like b, 1, 4 are
+like calccell-l. 6 is -FBFL.
+4x5 That's  - +ftl- +ft - +ftr
+678 Like bottom, but with these changes )
+
+: calcCellBL ( gridloc -- )
+	dup 1- c@ ( far top right )
+	over width - c@ + ( +t )
+	over +bl - c@ + ( +tr )
+	over +bl + c@ + ( far right )
+	over 1+ c@ + ( +r )
+	over +fbfl - c@ + ( +bl )
+	over +ft - c@ + ( +b )
+	over +ftr - c@ + ( +br )
+;
+
+
+( 123 On bot, 678 are -(+gridsize-width-1),
+ -(+gridsize-width) and -(+gridsize-width+1)
+  4x5 That's - +ftl - +ft - +ftr 678
+  Like central, but with these changes )
+
+: calcCellB ( gridloc -- )
+	dup +br - c@ ( tl )
+	over width - c@ + ( +t )
+	over +bl - c@ + ( +tr )
+	over 1- c@ + ( +l )
+	over 1+ c@ + ( +r )
+	over +ftl - c@ + ( +bl )
+	over +ft - c@ + ( +b )
+	over +ftr - c@ + ( +br )
+; ( DONE )
+
+( 123 On br, 2,5 are like calcell-r,
+ 67 are like bot, 8 is -ftfr.
+4x5 That's  - +ftl - +ft  - +ftr 678
+Like central, but with these changes ) 
+
+: calcCellBR ( gridloc -- )
+	dup +br - c@ ( tl )
+	over width - c@ + ( +t )
+	over +bfr - c@ + ( +tr )
+	over 1- c@ + ( +l )
+	over +bl - c@ + ( +r )
+	over +ftr - c@ + ( +bl )
+	over +ft - c@ + ( +b )
+	over +ftfr - c@ + ( +br )
+;
+
+: updateCell ( dst src sum -- dst src )
+	dup 2 &lt; over 3 &gt; or if ( dst src sum -- )
+		drop over 0 swap c! ( dst src -- )
+	else
+		3 = if ( dst src )
+			over 1 swap c! ( dst src )
+		else
+			over over c@ swap c! ( dst src )
+		then
+	then
+; ( 14: die, 16: survive, 15: born )
+
+: nextCell
+	1+ swap 1+ swap
+;
+
+: calcCellsT ( dst src -- dst src )
+	calcCellTL UpdateCell nextCell
+	width 1- 1 do
+		calCellT UpdateCell nextCell
+	loop
+	calcCellTR UpdateCell nextCell
+;
+
+: ShowRow ( row -- )
+ 0 10 at ." Row=" . space
+;
+
+: ShowGen ( gen -- )
+ 0 0 at ." Gen=" .
+;
+
+: calcCellsMid
+	height 1- 1 do
+		calcCellL UpdateCell nextCell
+		i ShowRow
+		width 1- 1 do
+			calcCell UpdateCell
+			1+ swap 1+ swap
+		loop
+		calcCellR UpdateCell nextCell
+	loop
+;
+
+: calcCellsB
+	calcCellBL UpdateCell nextCell
+	width 1- 1 do
+	calCellB UpdateCell nextCell
+	loop
+	calcCellBR UpdateCell nextCell
+	drop drop
+; 
+
+( each loop, 38 + 14 + 4 =&gt; 56 words,
+	* 2560 = 143360 =&gt; 17.9s  to calc
+    in slow mode, 11.9s in fast mode. 
+	That's 4 generations / min
+    with the column method, each loop 34 words
+	 + 14 + 4 =&gt; 52 words * 2560 16.64
+    or 11.09s)
+
+: calcCells ( dst src -- )
+	calcCellsT
+	calcCellsMid
+	calcCellsB
+;
+
+0 variable gen
+
+: fill ( chr dst len -- )
+	0 do
+	over over c!
+	1+
+	loop
+;
+
+: Life ( level -- )
+	grid0 GenGrid
+	cls
+	grid0 showGrid
+	0 gen ! ( generation )
+	gen @ showGen
+	grid1 grid0
+	begin
+	calcCells ( update for next generation )
+	gen @ 1+ dup showGen gen !
+	swap dup ShowGrid
+	inkey
+	until
+;
+
+( Runs at 29s per generation)
+(including display update).
+  Still, since the zx81 version in Basic 
+  took 15 minutes per generation,
+  this version is about 31x faster.
+	  
+	  </pre>
+	
+	</td>
+	
+	</tr>
+	
+	
+	
+	
+</table>
+ 
+
+ 
+
+	
+	
+</BODY>
+</HTML>
