@@ -1,0 +1,136 @@
+Name     ALU;
+PartNo   00;
+Date     25/01/03;
+Revision 01;
+Designer AHolme;
+Company  ;
+Assembly ;
+Location ;
+Device   g22v10;
+
+/* ----------------------------------------------------------------- */
+
+PIN 1 = CLK;
+
+PIN [2,3,4,13] = [Bus0..3];
+PIN 5 = Equal;
+PIN 6 = Minus;
+PIN 7 = !Cin;
+PIN [8..11] = [IR0..3];
+
+PINNODE 14 = Satisfied;
+
+PIN 15 = M;
+PIN 16 = !Cout;
+PIN [17..20] = [S0..S3];
+
+PINNODE 21 = Carry;
+PINNODE 22 = Delay;
+
+PIN 23 = !Flags;
+
+/* ----------------------------------------------------------------- */
+
+$INCLUDE Ops.INC
+
+/* ----------------------------------------------------------------- */
+
+$DEFINE ALU_A_PLUS_CARRY        'h'1
+$DEFINE ALU_ADD                 'h'2
+$DEFINE ALU_ADC                 'h'3
+$DEFINE ALU_SUB                 'h'4
+$DEFINE ALU_SBB                 'h'5
+$DEFINE ALU_ASL                 'h'6
+$DEFINE ALU_ROL                 'h'7
+
+$DEFINE ALU_A                   'h'8
+$DEFINE ALU_B                   'h'9
+$DEFINE ALU_AND                 'h'A
+$DEFINE ALU_OR                  'h'B
+$DEFINE ALU_NOT_A               'h'C
+$DEFINE ALU_NOT_B               'h'D
+$DEFINE ALU_XOR                 'h'E
+$DEFINE ALU_ZERO                'h'F
+
+/* ----------------------------------------------------------------- */
+
+field Bus = [Bus0..3];
+field Func = [Func0..3];
+field Cond = [CF0..3];
+
+/* ----------------------------------------------------------------- */
+
+!Satisfied = IR2 $ (    Equal & !IR1 &  IR0 #
+                        Minus &  IR1 & !IR0 #
+                        Carry &  IR1 &  IR0);
+
+Cond = !Satisfied & ALU_A
+#       Satisfied & ALU_ADD;
+
+/* ----------------------------------------------------------------- */
+
+Func =  Bus:OP_START    & ALU_ZERO
+#       Bus:OP_FETCH    & ALU_A_PLUS_CARRY
+#       Bus:OP_RD_WORD  & ALU_B
+#       Bus:OP_RD_BYTE  & ALU_B
+#       Bus:OP_R2R      & [IR0..3]
+#       Bus:OP_TEST_R   & ALU_NOT_B
+#       Bus:OP_TEST_M   & ALU_NOT_B
+#       Bus:OP_IMMED    & [IR0..3]
+#       Bus:OP_COND     & Cond
+#       Bus:OP_IOR      & ALU_B
+#       Bus:OP_BIS      & ALU_ADD;
+
+/* ----------------------------------------------------------------- */
+
+table Func => [S0..3]
+{
+        ALU_A_PLUS_CARRY        => 'b'0000;
+
+        ALU_ADD                 => 'b'1001;
+        ALU_ADC                 => 'b'1001;
+        ALU_SUB                 => 'b'0110;
+        ALU_SBB                 => 'b'0110;
+        ALU_ASL                 => 'b'1100;
+        ALU_ROL                 => 'b'1100;
+
+        ALU_A                   => 'b'1111;
+        ALU_B                   => 'b'1010;
+        ALU_AND                 => 'b'1011;
+        ALU_OR                  => 'b'1110;
+        ALU_NOT_A               => 'b'0000;
+        ALU_NOT_B               => 'b'0101;
+        ALU_XOR                 => 'b'0110;
+        ALU_ZERO                => 'b'0011;
+}
+
+M = Func3;
+
+/* ----------------------------------------------------------------- */
+          
+function MUX(s, a, b)
+{
+        MUX = !s & a
+         #     s & b;
+}
+
+/* ----------------------------------------------------------------- */
+
+Cout =   Delay & (Func:ALU_ADC # Func:ALU_SBB # Func:ALU_ROL)
+/* #    'b'0    & (Func:ALU_A_PLUS_CARRY # Func:ALU_ADD #        Func:ALU_ASL) */
+#       'b'1    & (Func:ALU_SUB);
+
+CMux = !Func3 & Bus:OP_R2R;
+
+Flags = Bus:OP_TEST_R # Bus:OP_TEST_M;
+
+Carry.d = MUX(CMux, Carry, Cin);
+Delay.d = Carry;
+
+/* ----------------------------------------------------------------- */
+
+Carry.ar = 'b'0;
+Carry.sp = 'b'0;
+
+Delay.ar = 'b'0;
+Delay.sp = 'b'0;

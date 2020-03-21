@@ -1,0 +1,92 @@
+Name     CPU;
+PartNo   00;
+Date     24/01/03;
+Revision 01;
+Designer AHolme;
+Company  ;
+Assembly ;
+Location ;
+Device   g16v8;
+
+PIN 1 = CLK2;
+PIN 11 = CLK1;
+
+PIN [2..5] = [S0..3];
+PIN [6..9] = [Bus0..3];
+
+PIN 12 = LSNS0;
+PIN 13 = !GD;
+PIN 14 = !GA;
+PIN 15 = LSNS3;
+PIN 16 = Dir;
+PIN 17 = LE;
+PIN 18 = !WE;
+PIN 19 = !Fetch;
+
+$INCLUDE Ops.INC
+
+field Bus = [Bus0..3];
+
+table Bus => Dir
+{
+        OP_FLOAT        => 'b'1;
+        OP_START        => 'b'1;
+        OP_FETCH        => 'b'1;
+        OP_RD_WORD      => 'b'1;
+        OP_RD_BYTE      => 'b'1;
+        OP_WR_WORD      => 'b'0;
+        OP_WR_BYTE      => 'b'0;
+        OP_R2R          => 'b'0;
+        OP_TEST_R       => 'b'0;
+        OP_TEST_M       => 'b'1;
+        OP_IMMED        => 'b'1;
+        OP_COND         => 'b'1;
+        OP_IOR          => 'b'1;
+        OP_IOW          => 'b'0;
+        OP_BIS          => 'b'1;
+        OP_RESET        => 'b'1;
+}
+
+table Bus => Write
+{
+        OP_FLOAT        => 'b'0;
+        OP_START        => 'b'1;
+        OP_FETCH        => 'b'1;
+        OP_RD_WORD      => 'b'1;
+        OP_RD_BYTE      => 'b'1;
+        OP_WR_WORD      => 'b'0;
+        OP_WR_BYTE      => 'b'0;
+        OP_R2R          => 'b'1;
+        OP_TEST_R       => 'b'0;
+        OP_TEST_M       => 'b'0;
+        OP_IMMED        => 'b'1;
+        OP_COND         => 'b'1;
+        OP_IOR          => 'b'1;
+        OP_IOW          => 'b'0;
+        OP_BIS          => 'b'1;
+        OP_RESET        => 'b'0;
+}
+
+condition
+{
+        if Bus:OP_FETCH         out GA;
+        if Bus:OP_RD_WORD       out GA out GD;
+        if Bus:OP_RD_BYTE       out GA out GD;
+        if Bus:OP_WR_WORD       out GA out GD;
+        if Bus:OP_WR_BYTE       out GA out GD;
+        if Bus:OP_TEST_M        out GA out GD;
+        if Bus:OP_IMMED         out GD;
+        if Bus:OP_COND          out GD;
+        if Bus:OP_IOR           out GA out GD;
+        if Bus:OP_IOW           out GA out GD;
+        if Bus:OP_BIS           out GD;
+}
+
+Fetch = Bus:OP_FETCH;
+
+LSNS0 = S0 # Bus:OP_FETCH;
+LSNS3 = S3 # Bus:OP_FETCH;
+
+WE = !CLK1 & !CLK2 & Write;
+
+LE = CLK1 & CLK2;

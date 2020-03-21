@@ -1,0 +1,96 @@
+Name     Seq;
+PartNo   ;
+Date     24/01/03;
+Revision 01;
+Designer AHolme;
+Company  ;
+Assembly None;
+Location ;
+Device   g22v10;
+
+PIN 1 = CLK;
+PIN 2 = !IRQ;
+PIN 3 = Res;
+PIN [4..7] = [Opcode0..3];
+PIN 8 = IR4;
+PIN 9 = IR5;
+
+PIN [14..17] = [Bus0..3];
+PIN 18 = !Fetch;
+PIN 19 = Ext4;
+PIN 20 = Ext5;
+
+PINNODE [21..22] = [State0..1];
+PINNODE 23 = AllowIRQ;
+
+/* ----------------------------------------------------------------- */
+
+$DEFINE ST_RESET        'b'00
+$DEFINE ST_START        'b'01
+$DEFINE ST_FETCH        'b'10
+$DEFINE ST_EXECUTE      'b'11
+
+$INCLUDE Ops.INC
+
+/* ----------------------------------------------------------------- */
+
+field State = [State0..1];
+field Opcode = [Opcode0..3];
+
+field Bus = [Bus0..3];
+
+field BusOp = [BusOp0..3];
+field BisOp = [BisOp0..3];
+
+/* ----------------------------------------------------------------- */
+
+State.ar = Res;
+State.sp = 'b'0;
+
+sequence State
+{
+        present ST_RESET        next ST_START;
+        present ST_START        next ST_FETCH;
+        present ST_FETCH        next ST_EXECUTE;
+        present ST_EXECUTE      next ST_FETCH;
+}
+
+/* ----------------------------------------------------------------- */
+
+Bus =   State:ST_RESET          & OP_RESET
+#       State:ST_START          & OP_START
+#       State:ST_FETCH          & OP_FETCH
+#       State:ST_EXECUTE        & BusOp;
+
+BusOp = SetMask                         & OP_NOP
+#       Opcode:OP_BIS                   & BisOp
+#       !(SetMask # Opcode:OP_BIS)      & Opcode;
+
+/* ----------------------------------------------------------------- */
+
+SetMask = State:ST_EXECUTE & (Opcode:OP_EN # Opcode:OP_DI);
+
+/* ----------------------------------------------------------------- */
+
+Pending = IRQ & AllowIRQ;
+
+table Pending => BisOp
+{
+        'b'0 => OP_NOP;
+        'b'1 => OP_BIS;
+}
+
+/* ----------------------------------------------------------------- */
+
+Fetch = State:ST_FETCH;
+
+Ext4 = (Opcode:OP_COND # Opcode:OP_BIS) & IR4;
+Ext5 = (Opcode:OP_COND # Opcode:OP_BIS) & IR5;
+
+/* ----------------------------------------------------------------- */
+
+AllowIRQ.ar = Res;
+AllowIRQ.sp = 'b'0;
+
+AllowIRQ.d = !SetMask & AllowIRQ
+#             SetMask & Opcode:OP_EN;

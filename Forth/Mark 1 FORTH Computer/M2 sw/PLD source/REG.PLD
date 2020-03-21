@@ -1,0 +1,65 @@
+Name     Reg;
+PartNo   00;
+Date     24/01/03;
+Revision 01;
+Designer AHolme;
+Company  ;
+Assembly ;
+Location ;
+Device   g22v10;
+
+PIN [1..3,13] = [Bus0..3];
+PIN [4..7] = [IRA0..3];
+PIN [8..11] = [IRB0..3];
+
+PIN [14..17] = [RA0..3];
+PIN [18..21] = [RB0..3];
+
+PIN 22 = !DH;
+PIN 23 = !DL;
+
+$INCLUDE Ops.INC
+
+$DEFINE REG_PC 'd'7
+
+field Bus = [Bus0..3];
+
+[RA0..3] =      REG_PC          & Bus:OP_START
+        #       REG_PC          & Bus:OP_FETCH
+        #       [IRA0..3]       & Bus:OP_RD_WORD
+        #       [IRA0..3]       & Bus:OP_RD_BYTE
+        #       [IRA0..3]       & Bus:OP_WR_WORD
+        #       [IRA0..3]       & Bus:OP_WR_BYTE
+        #       [IRA0..3]       & Bus:OP_R2R
+        #       [IRA0..3]       & Bus:OP_TEST_R
+        #       [IRA0..3]       & Bus:OP_TEST_M
+        #       [IRB0..3]       & Bus:OP_IMMED
+        #       REG_PC          & Bus:OP_COND
+        #       [IRA0..3]       & Bus:OP_IOR
+        #       [IRA0..3]       & Bus:OP_IOW
+        #       REG_PC          & Bus:OP_BIS;
+
+[RB0..3] =      REG_PC          & Bus:OP_START
+        #       REG_PC          & Bus:OP_FETCH
+        #       [IRB0..3]       & Bus:OP_RD_WORD
+        #       [IRB0..3]       & Bus:OP_RD_BYTE
+        #       [IRB0..3]       & Bus:OP_WR_WORD
+        #       [IRB0..3]       & Bus:OP_WR_BYTE
+        #       [IRB0..3]       & Bus:OP_R2R
+        #       [IRB0..3]       & Bus:OP_TEST_R
+        #       [IRB0..3]       & Bus:OP_TEST_M
+        #       [IRB0..3]       & Bus:OP_IMMED
+        #       REG_PC          & Bus:OP_COND
+        #       [IRB0..3]       & Bus:OP_IOR
+        #       [IRB0..3]       & Bus:OP_IOW
+        #       REG_PC          & Bus:OP_BIS;
+
+DH =    Bus:OP_RD_BYTE
+#       Bus:OP_IMMED
+#       Bus:OP_COND
+#       Bus:OP_IOR
+#       Bus:OP_BIS;
+
+DL =    Bus:OP_IMMED
+#       Bus:OP_COND
+#       Bus:OP_BIS;

@@ -1,0 +1,10 @@
+@echo off
+ml /Zm /c /Fl %1.asm
+if errorlevel == 1 goto end
+link /vxd %1
+if errorlevel == 1 goto end
+split\debug\split 0 %1.vxd >..\HEX\%1.LO.txt
+split\debug\split 1 %1.vxd >..\HEX\%1.HI.txt
+del %1.vxd
+del %1.obj
+:end

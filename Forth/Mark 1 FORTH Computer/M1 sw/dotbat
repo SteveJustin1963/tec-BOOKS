@@ -1,0 +1,10 @@
+@echo off
+ml /Zm /c /Fl %1.asm
+if errorlevel == 1 goto end
+link /TINY %1,,nul,,,
+if errorlevel == 1 goto end
+..\bin2hex\release\bin2hex 0 %1.com >%1.HEX
+del %1.com
+del %1.obj
+del %1.lst
+:end

@@ -1,0 +1,9 @@
+@echo off
+ml /Zm /c /Fl %1.asm
+if errorlevel == 1 goto end
+link /vxd %1
+if errorlevel == 1 goto end
+..\..\mk1\macro\bin2hex\debug\bin2hex 16384 %1.vxd >..\HEX\%1.HEX
+del %1.vxd
+del %1.obj
+:end

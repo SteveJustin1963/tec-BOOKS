@@ -1,0 +1,50 @@
+Name     SER;
+PartNo   00;
+Date     24/01/03;
+Revision 01;
+Designer AHolme;
+Company  ;
+Assembly ;
+Location ;
+Device   g22v10;
+
+PIN 1 = CLK2;
+PIN [2..5] = [Bus0..3];
+PIN 6 = A14;
+PIN 7 = A15;
+PIN 8 = A0;
+PIN 13 = CLK1;
+
+PIN 14 = RES;
+PIN 15 = !UART;
+PIN 16 = !PIO;
+PIN 17 = !RD;
+PIN 18 = !WR;
+PIN 19 = !GATE;
+PIN 20 = DIR;
+PIN 21 = BA0;
+
+$INCLUDE Ops.INC
+
+field Bus = [Bus0..3];
+
+/* ----------------------------------------------------------------- */
+
+RES.d = Bus:OP_RESET;
+
+RES.ar = 'b'0;
+RES.sp = 'b'0;
+
+IO = Bus:OP_IOR # Bus:OP_IOW;
+
+UART = A14 & A15 & IO;
+PIO = !A14 & A15 & IO;
+
+RD = A15 & Bus:OP_IOR;
+WR = A15 & Bus:OP_IOW & !CLK2;
+
+GATE = A15 & IO;
+
+DIR = Bus:OP_IOW;
+
+BA0 = A0;

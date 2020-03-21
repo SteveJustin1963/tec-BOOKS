@@ -1,0 +1,57 @@
+Name     MEM;
+PartNo   00;
+Date     24/01/03;
+Revision 01;
+Designer AHolme;
+Company  ;
+Assembly ;
+Location ;
+Device   g16v8;
+
+PIN 1 = CLK2;
+PIN 11 = CLK1;
+
+PIN [2..5] = [Bus0..3];
+PIN 6 = A0;
+
+PIN 12 = !OE;
+PIN 13 = !WE;
+PIN 14 = !CSH;
+PIN 15 = !CSL;
+PIN 16 = DIR;
+PIN 17 = !LL;
+PIN 18 = !HL;
+PIN 19 = !HH;
+
+$INCLUDE Ops.INC
+
+field Bus = [Bus0..3];
+field Mem = [Mem0..3];
+
+/* ----------------------------------------------------------------- */
+
+field Settled = [Settled0..3];
+
+Settled =       Bus & !(CLK1 & CLK2);
+
+table Settled => Mem
+{
+        OP_FETCH        => OP_RD_WORD;
+        OP_TEST_M       => OP_RD_WORD;
+        OP_RD_WORD      => OP_RD_WORD;
+        OP_RD_BYTE      => OP_RD_BYTE;
+        OP_WR_WORD      => OP_WR_WORD;
+        OP_WR_BYTE      => OP_WR_BYTE;
+}
+
+condition
+{
+        if (Mem:OP_RD_WORD # Mem:OP_WR_WORD)  out CSH out CSL out HH out LL;
+
+        if (Mem:OP_RD_WORD # Mem:OP_RD_BYTE)  out OE out DIR;
+
+        if (Mem:OP_WR_BYTE # Mem:OP_RD_BYTE) & !A0  out CSL out LL;
+        if (Mem:OP_WR_BYTE # Mem:OP_RD_BYTE) &  A0  out CSH out HL;
+
+        if (Mem:OP_WR_WORD # Mem:OP_WR_BYTE) & !CLK2 & !CLK1   out WE;
+}
