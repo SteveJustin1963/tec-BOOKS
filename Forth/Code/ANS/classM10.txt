@@ -1,0 +1,33 @@
+Readme.txt
+Version 1.0, 6 Apr 1997
+Mike Hore
+mikeh@zeta.org.au
+
+This is the first release of an adaptation of Andrew McKewans's
+OOP system for ANS Standard Forth, to add further extensions as provided
+by the Mops language.  These extensions are:
+
+multiple inheritance
+public/private ivars and methods
+inline methods
+
+I have only had a chance to try this under Mops myself, and would
+appreciate feedback as to how it works under other Forth systems.
+So feel free to try this out on your Forth system, and report any
+problems to me, or any other suggested improvements.
+
+The following files are included in this release
+ 
+   classM.fth		main implementation file
+   var.fth			definition of cell-sized classes, as in Andrew's package
+   array.fth		definition of basic array classes, as in Andrew's package
+   tester.fth		John Hayes' automated testing program
+   test.fth			Class test suite
+   docs.txt			documentation
+   ANS.txt			ANS requirements
+   MopsProl.fth		If and only if you're running under Mops, load this first
+   readme.txt		this file
+
+I hope you find this package useful and interesting.
+
+--  Mike Hore.

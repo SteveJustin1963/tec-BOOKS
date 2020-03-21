@@ -1,0 +1,1 @@
+Useful floating-point output functions simply realized.

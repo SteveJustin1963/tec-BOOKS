@@ -1,0 +1,818 @@
+\ The following is the code I copied and ANSized from the book Starting
+\ Forth by Leo Brodie. It is divided up into chapters and you can save them
+\ out as separate files if you wish. Comments are welcome.
+\ 
+\ l8r, Benjamin Hoyt    email: benhoyt@clear.net.nz  July '97
+
+\ -----------------------------------------------------------------------
+\ CHAP1.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 1
+\ ANSized by Benjamin Hoyt in 1997
+
+( large letter F )
+: STAR   [CHAR] * EMIT ;
+: STARS   0 ?DO  STAR  LOOP ;
+: MARGIN   CR  30 SPACES ;
+: BLIP   MARGIN  STAR ;
+: BAR   MARGIN  5 STARS ;
+: F   BAR BLIP BAR BLIP BLIP  CR ;
+
+( problem 1-1 )
+: GIFT   ." chocolate" ;
+: GIVER   ." Mum" ;
+: THANKS   CR  ." Dear " GIVER ." ,"
+   CR  ."    Thanks for the " GIFT ." . " ;
+
+( problem 1-2 )
+: TEN-LESS  ( n -- n-10 )  -10 + ;
+: TEN-LESS  ( n -- n-10 )  10 - ;
+
+( problem 1-3
+  Because the old THANKS has the old GIVER compiled into the
+  dictionary already. )
+
+\ -----------------------------------------------------------------------
+\ CHAP2.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 2
+\ ANSized by Benjamin Hoyt in 1997
+
+: YARDS  ( yards -- inches )  36 * ;
+: FEET  ( feet -- inches )  12 * ;
+: INCHES  ( inches -- inches )  ;
+: YARD   YARDS ;
+: FOOT   FEET ;
+: INCH   INCHES ;
+
+: 5#SUM  ( n1 n2 n3 n4 n5 -- sum )  + + + + ;
+: DISTANCE  ( hours speed wind-speed -- distance )  +  * ;
+
+: QUARTERS>$  ( quarters -- quarters-left dollars )  4 /MOD ;
+: .DOLLARS  ( dollars -- )  .  ." dollar bill(s) " ;
+: .QUARTERS  ( quarters -- )  .  ." quarter(s) " ;
+: QUARTERS  ( dollars -- )
+   QUARTERS>$  ." Gives " .DOLLARS  ." and " .QUARTERS ;
+
+( problem 2-1
+  DUP DUP duplicates the top stack item twice whereas 2DUP
+  duplicates the two top stack items once. )
+
+( problems 2-2 thru 2-8 )
+: NIP  ( a b-- b )  SWAP DROP ;
+: TUCK  ( a b -- b a b )  SWAP OVER ;
+: -ROT  ( a b c -- c a b )  ROT ROT ;
+( a b c d -- d c b a )  1 2 3 4  SWAP 2SWAP SWAP  . . . .
+: 3DUP  ( a b c -- a b c a b c )  DUP 2OVER ROT ;
+: 2-7  ( c a b -- a**2+ab+c )  OVER +  *  + ;
+: 2-8  ( a b -- [a-b]/[a+b] ) 2DUP -  -ROT +  / ;
+
+( problem 2-9 )
+: CONVICTED-OF  ( -- no-sentence )  0 ;
+: ARSON  ( sentence -- sentence+10 )  10 + ;
+: HOMICIDE  ( sentence -- sentence+20 )  20 + ;
+: BOOKMAKING  ( sentence -- sentence+2 )  2 + ;
+: TAX-EVASION  ( sentence -- sentence+5 )  5 + ;
+: WILL-SERVE  ( sentence -- )  . ." years " ;
+
+( problem 2-10 )
+: EGG.CARTONS  ( TOTAL-EGGS -- )
+   12 /MOD . ." carton(s) and " . ." leftover(s) " ;
+
+\ -----------------------------------------------------------------------
+\ CHAP4.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 4
+\ ANSized by Benjamin Hoyt in 1997
+
+: STAR   [CHAR] * EMIT ;
+: STARS  ( n -- )  0 ?DO  STAR  LOOP ;
+
+: ?FULL  ( #eggs -- )  12 = IF  ." It's full. " THEN ;
+: ?TWELVE  ( n -- )  12 = 0= IF ." Not a twelve. " THEN ;
+: .TRUE?  ( flag -- )  IF  ." true "  THEN ;
+: ?TOO-HOT  ( temp -- )
+   220 > IF  ." DANGER! Reduce heat. " THEN ;
+
+: EGGSIZE  ( ounces-per-dozen -- )
+   DUP 18 <  IF ." reject "       ELSE
+   DUP 21 <  IF ." small "        ELSE
+   DUP 24 <  IF ." medium "       ELSE
+   DUP 27 <  IF ." large "        ELSE
+   DUP 30 <  IF ." extra large "  ELSE
+                ." ostrich egg? "
+   THEN THEN THEN THEN THEN DROP ;
+
+: ?DAY  ( day -- )  DUP 1 <  SWAP 31 >  OR
+   IF  ." Try again "  ELSE  ." Thank you "  THEN ;
+
+: ?SIGNS  ( n1 n2 -- )
+   0<  SWAP  0< XOR  IF ." Different signs "
+   ELSE  ." Same sign "  THEN ;
+
+: ?EMIT  ( char -- )  ?DUP IF  EMIT  THEN ;
+
+: /CHECK  ( numerator denominator -- result )
+   DUP 0=  ABORT" Zero denominator!"  / ;
+
+( problem 4-1 )
+-1 0= 0= ( true ) .
+0 0= 0= ( false ) .
+200 0= 0= ( true ) .
+
+( problem 4-3 )
+: CARD  ( age -- )
+   17 > IF ." Alcohal permitted "  ELSE ." Under age "  THEN ;
+
+( problem 4-4 )
+: ?SIGN  ( n -- )
+   DUP 0< IF ." Negative " DROP  ELSE 0> IF ." Positive "
+   ELSE ." Zero "  THEN THEN ;
+
+( problems 4-5 thru 4-10 )
+: <>  ( a b -- flag )  = 0= ;
+: XOR  ( a b -- x )
+   2DUP INVERT AND  SWAP ROT INVERT  AND  OR ;
+: STARS  ( n -- )  ?DUP IF  STARS  THEN ;
+: NEGATE  ( n -- -n )  0 SWAP - ;
+: ABS  ( n -- |n| )  DUP 0< IF  NEGATE  THEN ;
+: /UP  ( a n -- a/n' )  /MOD SWAP IF  1+  THEN ;
+: WITHIN  ( n lo hi+1 -- flag )  OVER -  >R  -  R> U< ;
+
+( problem 4-11 )
+: GUESS  ( answer guess -- answer | )
+   2DUP = IF ." Correct! " 2DROP ELSE
+   2DUP < IF ." Too high " ELSE ." Too low " THEN DROP THEN ;
+
+( problem 4-12 )
+: .SIGN  ( n -- |n| )  DUP 0<  IF ." Negative " THEN ABS ;
+: SPELLER  ( n -- )  DUP ABS 4 > IF ." Out of range " ELSE
+   .SIGN DUP  0= IF ." Zero " ELSE
+         DUP 1 = IF ." One " ELSE
+         DUP 2 = IF ." Two " ELSE
+         DUP 3 = IF ." Three " ELSE ." Four " THEN
+         THEN THEN THEN THEN DROP ;
+
+( problem 4-13 )
+: 3DUP  ( a b c -- a b c a b c )  DUP 2OVER ROT ;
+: TRAP  ( answer lo-try hi-try -- answer | )
+   3DUP  OVER =  ROT ROT = AND
+      IF ." You got it! "  2DROP DROP  ELSE
+   3DUP SWAP  1+  SWAP WITHIN  IF ." Between "
+      ELSE ." Not between " THEN  2DROP  THEN ;
+
+\ -----------------------------------------------------------------------
+\ CHAP5.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 5
+\ ANSized by Benjamin Hoyt in 1997
+
+: STAR   [CHAR] * EMIT ;
+: STARS  ( n -- )  0 ?DO  STAR  LOOP ;
+
+: DIFFERENCE  ( n1 n2 -- difference )  - ABS ;
+: COMMISION  ( price -- commision )  10 /  50 MIN ;
+: QUADRATIC  ( a b c x -- result )
+   >R SWAP  ROT R@ *  +  R> *  + ;
+
+: %  ( n % -- result )  100 */ ;
+: R%  ( n % -- result )  50 */  1+  2/ ;
+
+: PI  ( n -- n' )  355 113 */ ;
+: AREA  ( circle-radius -- area )  DUP *  PI ;
+
+( handy table of rational approximations, partial
+  pi         =  ~3.141  =   355 /   113
+  sqrt 2     =  ~1.414  = 19601 / 13860
+  sqrt 3     =  ~1.732  = 18817 / 10864
+  e          =  ~2.718  = 25946 /  9545
+  sqrt 10    =  ~3.162  = 27379 /  8658
+  12th root2 =  ~1.059  = 26797 / 25293
+  c          =  ~2.998  = 24559 /  8192 )
+
+: +1  ( -- scaled-"one" )  16384 ;
+: *.  ( n1 n2 -- n3 )  +1 */ ;
+: /.  ( n1 n2 -- n3 )  +1 SWAP */ ;
+: #.####  ( n -- )  DUP  ABS  0 <#  # # # #  [CHAR] . HOLD
+   #S  ROT SIGN  #>  TYPE SPACE ;
+: .F  ( fraction -- )  10000 *.  #.#### ;
+: D>F  ( d -- fraction )  DROP 10000 /. ;
+
+( problem 5-1
+  -1 puts the number negative one on the stack, whereas 1-
+  subtracts one from the top number on the stack. )
+
+( problems 5-2 thru 5-3 )
+( a b c -- -ab/c )  6 7 2  ROT ROT *  SWAP /  NEGATE  .
+( a b c d -- largest )  1 2 3 4  MAX MAX MAX  .
+
+( problem 5-4 )
+: 2ORDER  ( n1 n2 -- nlesser ngreater )
+   2DUP > IF  SWAP  THEN ;
+: 3ORDER  ( n1 n2 N3 -- nleast nmiddle ngreatest )
+   2ORDER  >R 2ORDER  R> 2ORDER ;
+: BOXTEST  ( length width height -- )  \ LWH in any order
+   3ORDER  2 >  ROT 6 >  ROT 19 >
+   AND AND IF ." Big enough " THEN ;
+
+( problem 5-5 )
+: PLOT  ( n% -- )  CR  80 100 */  STARS ;
+
+( problem 5-6 )
+0 32 -  10 18 */ .
+212 32 -  10 18 */ .
+-32 32 -  10 18 */ .
+16 18 10 */  32 + .
+233 273 - .
+
+( problem 5-7 )
+: F>C  ( fahr -- cels )  32 -  10 18 */ ;
+: C>F  ( cels -- fahr )  18 10 */  32 + ;
+: C>K  ( cels -- kelv )  273 + ;
+: K>C  ( kelv -- cels )  273 - ;
+: F>K  ( fahr -- kelv )  F>C C>K ;
+: K>F  ( kelv -- fahr )  K>C C>F ;
+
+\ -----------------------------------------------------------------------
+\ CHAP6.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 6
+\ ANSized by Benjamin Hoyt in 1997
+
+: STAR   [CHAR] * EMIT ;
+: LOAD   ;  \ if you don't have the block wordset
+
+: TEST   10 0 DO  CR  ." hello "  LOOP ;
+: DECADE   10 0 DO  I .  LOOP ;
+: SAMPLE   -243 -250 DO  I .  LOOP ;
+: STARS  ( #stars -- )  0 ?DO  STAR  LOOP ;
+: MULTIPLES  ( n -- )  CR  11 1 DO  DUP I * .  LOOP  DROP ;
+: RECTANGLE   256 0 DO  I 16 MOD  0= IF CR THEN  STAR LOOP ;
+: TABLE   CR  11 1 DO  11 1 DO  I J *  4 .R  LOOP CR  LOOP ;
+: PENTAJUMPS   50 0 DO  I .  5 +LOOP ;
+: FALLING   -10 0 DO  I .  -1 +LOOP ;
+: INC-LOOP  ( increment limit start -- )
+   DO  I .  DUP +LOOP  DROP ;
+: DOUBLING   CR  32767 1 DO  I .  I +LOOP ;
+
+( problems 6-1 TO 6-5 )
+: BOX  ( width height -- )
+   0 DO  CR  DUP STARS  LOOP DROP ;
+: \STARS  ( height -- )
+   0 DO  CR  I SPACES  10 STARS  LOOP ;
+: /STARS  ( height -- )
+   1- 0 SWAP DO  CR  I SPACES  10 STARS  -1 +LOOP ;
+: A/STARS  ( height -- )
+   BEGIN  CR  1- DUP SPACES  10 STARS  DUP 0= UNTIL  DROP ;
+
+( problem 6-6 )
+: TRIANGLE  ( increment limit start -- )
+   DO  CR  9 I - SPACES  I 2* 1+ STARS  DUP +LOOP  DROP ;
+: DIAMONDS  ( #diamonds -- )
+   0 ?DO  1 10 0 TRIANGLE  -1 0 9 TRIANGLE  LOOP ;
+
+( problem 6-7 )
+: THRU  ( start end -- )
+  1+ SWAP DO  CR  ." Loading block #" I .  I LOAD  LOOP ;
+
+( problem 6-8 )
+: R%  ( n1 % -- n2 )  10 */  5 +  10 / ;
+: DOUBLED  ( amount interest -- )
+   OVER 2*  SWAP ROT  21 1 DO
+      CR  ." Year "  I 2 .R  3 SPACES
+      2DUP  R% +  DUP  ." Bal "  .  DUP  2OVER DROP > IF
+      CR CR  ." More than doubled in "  I .  ." years "  LEAVE
+   THEN LOOP  2DROP  DROP ;
+
+( problem 6-9 )
+: ** ( n1 n2 -- n1**n2 )
+   1 SWAP  ?DUP IF  0 DO  OVER * LOOP  THEN  NIP ;
+
+\ -----------------------------------------------------------------------
+\ CHAP7.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 7
+\ ANSized by Benjamin Hoyt in 1997
+
+: MS  ( u -- )  DROP ;  \ if your system doesn't have MS
+
+: PRINTABLES   127 32 DO  I EMIT  SPACE  LOOP ;
+: UPPER  ( lower-case-letter -- upper-case-letter )  95 AND ;
+: .PHONE#  ( ud -- )
+   <#  # # # #  [CHAR] - HOLD  #S  #>  TYPE SPACE ;
+: /NN  ( ud -- ud' )  # #  [CHAR] / HOLD ;
+: .DATE  ( ud -- )
+   <#  /NN /NN  # #  #>  TYPE SPACE ;
+: SEXTAL   6 BASE ! ;
+: :00  ( ud -- ud' )  #  SEXTAL #  DECIMAL  [CHAR] : HOLD ;
+: .SECONDS  ( ud -- )  <#  :00 :00  #S  #>  TYPE SPACE ;
+: .$  ( d -- )
+   DUP >R  DABS  <#  # #  [CHAR] . HOLD  #S
+   R> SIGN  [CHAR] $ HOLD  #>  TYPE SPACE ;
+
+( problem 7-1  DON'T try this on a 32 bit system! :)
+: N-MAX  ( -- n )  0 BEGIN 1+ DUP 0< UNTIL 1- ;
+
+( problem 7-2 )
+: BINARY   2 BASE ! ;
+: BIT ( bit# -- mask )  1 SWAP  0 ?DO  2*  LOOP ;
+: SET-BIT  ( bits1 bit# -- bits2 )  BIT OR ;
+: CLEAR-BIT  ( bits1 bit# -- bits2 )  BIT INVERT AND ;
+: GET-BIT  ( bits1 bit# -- masked )  BIT AND ;
+: TOGGLE-BIT  ( bits1 bit# -- bits2 )  BIT XOR ;
+: CHANGED  ( bits1 bits2 -- bits3 )  XOR ;
+
+( problem 7-3 )
+: BEEP   ." BEEP "  7 EMIT ;  \ not ANS but works on many systems
+: DELAY   500 MS ;
+: RING   BEEP DELAY BEEP DELAY BEEP ;
+
+( problem 7-4 )
+: F>C  ( fahr -- cels )  -320 M+  10 18 M*/ ;
+: C>F  ( cels -- fahr )  18 10 M*/  320 M+ ;
+: C>K  ( cels -- kelv )  2732 M+ ;
+: K>C  ( kelv -- cels )  -2732 M+ ;
+: F>K  ( fahr -- kelv )  F>C C>K ;
+: K>F  ( kelv -- fahr )  K>C C>F ;
+
+( problem 7-3 )
+: .DEG  ( d -- )  TUCK DABS
+   <#  #  [CHAR] . HOLD  #S  ROT SIGN  #>  TYPE SPACE ;
+
+( problem 7-5  DON'T try ?DMAX on a 32 bit system! ;-)
+: DPOLY  ( X -- D )  DUP 7 M*  20 M+  ROT 1 M*/  5 M+ ;
+: ?DMAX   0 BEGIN  1+ DUP  DPOLY  0. D< UNTIL  1- . ;
+
+( problem 7-6
+  In hexadecimal, DEC is a valid number. )
+
+( problem 7-7 )
+: 3-BASES
+   17 0 DO  CR  ." decimal"  DECIMAL  I 4 .R  8 SPACES
+                ." hex "     HEX      I 3 .R  8 SPACES
+                ." binary"   BINARY   I 8 .R  8 SPACES
+   LOOP DECIMAL ;
+
+( problem 7-8
+  Some forth's interpret the decimal point as a double length
+  signifier. 65536. gets converted as a double length number
+  with one in the high cell and zero in the low cell. )
+
+( problem 7-9
+  It tells you that it's a forth which interprets any number
+  of decimal points as double specifiers. Likewise if you
+  enter . without the "normal" . already having been defined. )
+
+( problem 7-10 )
+: .PH#  ( d -- )  <#  # # # #  [CHAR] - HOLD  # # #
+   OVER IF  [CHAR] / HOLD  #S THEN  #>  TYPE SPACE ;
+
+\ -----------------------------------------------------------------------
+\ CHAP8.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 8
+\ ANSized by Benjamin Hoyt in 1997
+
+: STAR   [CHAR] * EMIT ;
+: STARS  ( n -- )  0 ?DO  STAR  LOOP ;
+
+( problem 8-1 )
+VARIABLE PIES  0 PIES !
+: BAKE-PIE   1 PIES +! ;
+: EAT-PIE   PIES @  IF -1 PIES +!  ." Thank you "
+   ELSE  ." What pie? "  THEN ;
+VARIABLE FROZEN-PIES  0 FROZEN-PIES !
+: FREEZE-PIES   PIES @  FROZEN-PIES +!  0 PIES ! ;
+: THAW-PIES  FROZEN-PIES @  PIES +!  0 FROZEN-PIES ! ;
+
+( problem 8-2 )
+: .BASE   BASE @  DUP DECIMAL .  BASE ! ;
+
+( problem 8-3 )
+: S>D  ( n -- d )  DUP 0< ;
+VARIABLE PLACES  2 PLACES !
+: M.  ( s|d -- )  TUCK DABS
+  <# PLACES @  DUP -1 <> IF  0 ?DO # LOOP  [CHAR] . HOLD  ELSE
+  DROP  S>D  THEN  #S  ROT SIGN  #>  TYPE SPACE ;
+
+( problem 8-4 )
+CREATE #PENCILS  4 CELLS ALLOT  \ # of pencils for each colour
+0 CELLS CONSTANT RED          1 CELLS CONSTANT GREEN
+2 CELLS CONSTANT BLUE         3 CELLS CONSTANT ORANGE
+: PENCILS  ( colour -- addr )  #PENCILS + ;
+23 RED PENCILS !              15 BLUE PENCILS !
+12 GREEN PENCILS !            0 ORANGE PENCILS !
+
+( problem 8-5 )
+CREATE 'SAMPLES  10 CELLS ALLOT
+: SAMPLES  ( sample# -- addr )  CELLS  'SAMPLES + ;
+: INIT-SAMPLES   10 0 DO  I 6 MOD  I SAMPLES !  LOOP ;
+: PLOT  10 0 DO CR  I 2 .R  SPACE  I SAMPLES @  STARS LOOP CR ;
+INIT-SAMPLES
+
+( problem 8-6 )
+1 CONSTANT FEMALE             0 CONSTANT MALE
+2 CONSTANT MARRIED            0 CONSTANT SINGLE
+4 CONSTANT EMPLOYED           0 CONSTANT UNEMPLOYED
+8 CONSTANT CITIZEN            0 CONSTANT NON-CITIZEN
+VARIABLE MARY                 VARIABLE JOHN
+: DESCRIBES  ( status status status status person -- )
+   >R  OR OR OR  R> ! ;
+MALE MARRIED UNEMPLOYED NON-CITIZEN  JOHN DESCRIBES
+FEMALE SINGLE EMPLOYED CITIZEN  MARY DESCRIBES
+
+: .SEX  ( bits -- )  FEMALE AND  IF ." fe"  THEN  ." male " ;
+: .MARITAL  ( bits -- )
+   MARRIED AND  IF ." married " ELSE ." single " THEN ;
+: .JOB-STATUS  ( BITS -- )
+   EMPLOYED AND  0= IF ." un" THEN  ." employed " ;
+: .CITIZENSHIP  ( BITS -- )
+   CITIZEN AND  0= IF ." non-" THEN ." citizen " ;
+: REPORT  ( PERSON -- )
+   @ DUP .SEX  DUP .MARITAL  DUP .JOB-STATUS  .CITIZENSHIP ;
+
+( problem 8-7 )
+CREATE BOARD  9 CHARS ALLOT
+: SQUARE  ( square# -- addr )  CHARS  BOARD + ;
+: CLEAR   BOARD  9 CHARS ERASE ;  CLEAR
+: BAR   ." | " ;
+: DASHES   CR  9 0 DO  [CHAR] - EMIT  LOOP CR ;
+: .BOX  ( square# -- )  SQUARE C@  DUP 0= IF  2 SPACES  ELSE
+   DUP 1 = IF  ." X "  ELSE ." O "  THEN THEN  DROP ;
+: DISPLAY   CR  9 0 DO  I IF  I 3 MOD  0= IF
+   DASHES  ELSE BAR  THEN THEN  I .BOX  LOOP  CR QUIT ;
+: PLAY  ( player square# -- )
+   1-  0 MAX  8 MIN  SQUARE C! ;
+: X!  ( square# -- )   1 SWAP  PLAY  DISPLAY ;
+: O!  ( square# -- )  -1 SWAP  PLAY  DISPLAY ;
+
+\ -----------------------------------------------------------------------
+\ CHAP9.F ---------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 9
+\ ANSized by Benjamin Hoyt in 1997
+
+: STAR   [CHAR] * EMIT ;
+: STARS  ( n -- )  0 ?DO  STAR  LOOP ;
+: BOX  ( width height -- )  0 ?DO  CR  DUP STARS  LOOP DROP ;
+
+VARIABLE 'ALOHA  \ our vector
+: ALOHA   'ALOHA @ EXECUTE ;
+: HELLO   ." Hello " ;
+: GOODBYE   ." Goodbye " ;
+: COMING   ['] HELLO 'ALOHA ! ;  COMING
+: GOING   ['] GOODBYE 'ALOHA ! ;
+
+: WHY  ( n -- )  CR ." Why do you ask? "
+   1- ?DUP IF  RECURSE  THEN ;
+
+( problem 9-1 )
+VARIABLE 'EQUALS
+: EQUALS  ( n1 n2 -- )  'EQUALS @ EXECUTE  . ;
+: ADDING   ['] +  'EQUALS ! ;  ADDING
+: MULTIPLYING   ['] *  'EQUALS ! ;
+
+( problem 9-2
+  Find out with the phrase HERE U. )
+
+( problem 9-3
+  Find out with the phrase PAD HERE - U. )
+
+( problem 9-4
+  a> No difference.
+  b> Ditto, depending on how BASE was defined. )
+
+( problem 9-5 )
+: GREET   ." Hello, I speak Forth. " ;
+: SEQUENCE   11 1 DO  I .  LOOP ;
+: TILE   10 5 BOX ;
+: NOTHING  ;
+CREATE 'TO-DO    ' GREET ,           ' SEQUENCE ,
+                 ' TILE ,            ' NOTHING ,
+                 ' NOTHING ,         ' NOTHING ,
+: TO-DO  ( index -- addr )  0 MAX  5 MIN  CELLS 'TO-DO + ;
+: DO-SOMETHING  ( index -- )  TO-DO  @ EXECUTE ;
+
+\ -----------------------------------------------------------------------
+\ CHAP10.F --------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 10
+\ ANSized by Benjamin Hoyt in 1997
+
+: BLOCK  ;  \ if you don't have the BLOCK WordSet
+: UPDATE  ;
+
+( problem 10-1 )
+: CHARACTER  ( index -- addr )  CHARS  228 BLOCK + ;
+: CHANGE  ( char1 char2 -- )
+   1024 0 DO  OVER  I CHARACTER C@  = IF  DUP  I CHARACTER C!
+   UPDATE  THEN  LOOP  2DROP ;
+
+( problem 10-2 )
+0 CONSTANT FORTUNES  \ change this to block # with fortunes
+: FORTUNE   CR  16 CHOOSE  [ 64 CHARS ] LITERAL *
+   FORTUNES BLOCK +  64 -TRAILING TYPE  SPACE ;
+
+( problem 10-3 )
+: Y/N?  ( -- flag )  KEY  DUP EMIT  [CHAR] Y = ;
+: Y/N?  ( -- flag )  KEY  95 AND  DUP EMIT  [CHAR] Y = ;
+: Y/N?  ( -- flag )  BEGIN  KEY  95 AND  DUP [CHAR] Y =
+   OVER [CHAR] N =  OR 0= WHILE  DROP REPEAT  [CHAR] Y = ;
+
+( problem 10-4 )
+: ANIMALS  ( -- addr )
+ C" rat   ox    tiger rabbitdragonsnake horse ram   monkeycock  dog   boar  " ;
+: .ANIMAL  ( index -- )
+   6 * CHARS  ANIMALS CHAR+  +  6 -TRAILING TYPE ;
+: (JUNEESHEE)  ( year -- )
+   1900 -  12 MOD  ." You were born in the year of the "
+   .ANIMAL  [CHAR] . EMIT  CR ;
+: DIGIT  ( -- digit )  KEY  DUP EMIT  [CHAR] 0 - ;
+: YEAR  ( -- year )  ( lets hope he types in proper digits! )
+   0  4 0 DO  10 *  DIGIT +  LOOP ;
+: JUNEESHEE
+   CR  ." In what year were you born? "  YEAR  CR (JUNEESHEE) ;
+
+( problem 10-6 )
+: >DATE  ( addr -- day/month year )
+   0 0 ROT CONVERT  ROT >R  0 SWAP CONVERT  ROT >R
+   0 SWAP  CONVERT  2DROP  1900 +  R>  R> 256 * +  SWAP ;
+: SCAN-DATE  \ date  ( -- day/month year )
+   BL WORD >DATE ;
+
+( problem 10-7 )
+VARIABLE STUFF  300 STUFF !  \ first block of file
+: ELEMENT  ( index -- addr )
+   CELLS  1024 /MOD  STUFF @  + BLOCK  +  UPDATE ;
+: INIT-ARRAY   600 0 DO  I  I ELEMENT !  LOOP ;
+: .ARRAY   600 0 DO  I . SPACE  I ELEMENT ?  LOOP ;
+: USED  ( -- addr )  STUFF @  BLOCK  UPDATE ;
+: ELEMENT  ( index -- addr )
+   1+ CELLS  1024 /MOD  STUFF @  + BLOCK  +  UPDATE ;
+: NO-STUFF   0 USED ! ;  NO-STUFF
+: PUT  ( n -- )  USED @  ELEMENT !  1 USED +! ;
+: ENTER  ( n1 n2 -- )  SWAP  PUT PUT ;
+: TABLE   CR  USED @  0 ?DO  I 8 MOD  0= IF  CR  THEN
+   I ELEMENT @  8 .R  LOOP  CR ;
+
+\ -----------------------------------------------------------------------
+\ CHAP11.F --------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Code from Starting Forth Chapter 11
+\ ANSized by Benjamin Hoyt in 1997
+
+: [COMPILE]  ( "<spaces>name" -- )  ' COMPILE, ;  IMMEDIATE
+: LOAD  ;  \ if you don't have the BLOCK WordSet
+: STAR   [CHAR] * EMIT ;
+
+: CARRAY  ( #chars -- )  CREATE  CHARS ALLOT
+   DOES>  ( index -- addr )  CHARS + ;
+
+: .ROW  ( c -- )
+   CR  8 0 DO  DUP 128 AND IF  STAR  ELSE  SPACE  THEN
+   2*  LOOP  DROP ;
+: SHAPE  ( c1 c2 c3 c4 c5 c6 c7 c8 -- )
+   CREATE  8 0 DO  C,  LOOP
+   DOES>  DUP  7 + DO  I C@ .ROW  -1 +LOOP  CR ;
+
+( problem 11-1 )
+: LOADS  ( block# -- )  CREATE ,
+   DOES>   @ LOAD ;
+
+( problem 11-2 )
+: BASED.  ( base -- )  CREATE ,
+   DOES>  ( n -- )  BASE @  SWAP @ BASE !  SWAP .  BASE ! ;
+
+( problem 11-3 )
+: PLURAL  ( xt -- )  CREATE ,
+   DOES>  ( n -- )  @ SWAP  0 ?DO  DUP EXECUTE  LOOP DROP ;
+
+( problem 11-4 )
+: TOURNE   [COMPILE] DO ; IMMEDIATE
+: RETOURNE   [COMPILE] LOOP ; IMMEDIATE
+: TEST-T/R  10 0 TOURNE  I .  RETOURNE ;
+
+( problem 11-5 )
+: LOOPS  ( #times -- )
+   0 ?DO  SOURCE  >IN @ /STRING  EVALUATE  LOOP  POSTPONE \ ;
+
+( problem 11-6 )
+VARIABLE PATTERN
+: BIT  ( flag -- )  1 AND  PATTERN @ 2*  +  PATTERN ! ;
+: STARS>BITS  ( addr -- char )  0 PATTERN !
+   8 OVER + SWAP DO  I C@  BL <> BIT  LOOP  PATTERN @ ;
+: SHAPE   CREATE  8 0 DO  ' EXECUTE DROP
+   STARS>BITS C,  REFILL DROP  LOOP
+   DOES>   8 OVER + SWAP DO  I C@ .ROW  LOOP  CR ;
+
+SHAPE .L  S" ***     "
+          S"  *      "
+          S"  *      "
+          S"  *      "
+          S"  *      "
+          S"  *      "
+          S"  *     *"
+          S" ********"
+
+SHAPE .B  S" ******* "
+          S"  *     *"
+          S"  *     *"
+          S"  ****** "
+          S"  *     *"
+          S"  *     *"
+          S"  *     *"
+          S" ******* "
+
+\ there must be a line here ;-)
+
+\ -----------------------------------------------------------------------
+\ BUZZWORD.F ------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ Buzzphrase generator from Starting Forth Chapter 12
+\ ANSized by Benjamin Hoyt in 1997
+
+BASE @  DECIMAL  \ save BASE and change to decimal
+
+VARIABLE REMAINING  \ # of chars remaining to be scanned
+VARIABLE ACROSS  \ current horizontal output cursor position
+70 CONSTANT RMARGIN  \ right margin
+
+: SCANWORD  ( a search-length -- adr-of-blank|end-of-field )
+   OVER CHARS +  DUP ROT  DO  I C@ BL =
+   IF  DROP  I LEAVE  THEN  [ 1 CHARS ] LITERAL +LOOP ;
+: GETWORD  ( a -- a #chars )  \ get next word to format
+   DUP  REMAINING @  DUP 0> IF  SCANWORD  ELSE  DROP  THEN  OVER -
+   [ 1 CHARS ] LITERAL /  DUP  1+  NEGATE  REMAINING +! ;
+: FITS  ( #chars -- t=fits-on-this-line )
+   ACROSS @  +  RMARGIN < ;
+: SPACE'   ACROSS @ IF  SPACE  1 ACROSS +!  THEN ;
+: CR'   CR  0 ACROSS ! ;
+
+: .WORD  ( a #chars -- )  \ type word with space, doing cr if necessary
+   DUP  FITS IF  SPACE'  ELSE  CR'  THEN
+   DUP ACROSS +!  TYPE ;
+: NEXTWORD  ( a #chars -- next-adr )  CHARS +  CHAR+ ;
+: DISPLAY  ( a #chars -- )  \ output formatted text
+   REMAINING !
+   BEGIN  GETWORD  DUP WHILE  2DUP .WORD  NEXTWORD  REPEAT
+   2DROP ;
+
+: W"  ( "ccc<quote>" -- )  \ compiles chars until ending "
+   [CHAR] " PARSE  CHARS  HERE  OVER ALLOT  SWAP MOVE ;
+
+CREATE INTROS  ( -- a )  \ sentence openers
+   W" In this paper we will demonstrate that                          "
+   W" On the one hand, studies have shown that                        "
+   W" On the other hand, however, practical experience indicates that "
+   W" In summary, then, we propose that                               "
+
+CREATE FILLERS  ( -- a )  \ glue phrases
+   W" by using                                                        "
+   W" by applying available resources towards                         "
+   W" with structured deployment of                                   "
+   W" coordinated with                                                "
+   W" to offset                                                       "
+   W" balanced by                                                     "
+   W" it is possible for even the most                                "
+   W" it becomes not unfeasable for all but the least                 "
+   W" it is necessary for all                                         "
+   W" to function as                                                  "
+   W" to generate a high level of                                     "
+   W" to avoid                                                        "
+
+CREATE BUZZWORDS  ( -- a )  \ random words
+   W" integrated          management          criteria                "
+   W" total               organization        flexibility             "
+   W" systematized        monitored           capability              "
+   W" parallel            reciprocal          mobility                "
+   W" functional          digital             programming             "
+   W" responsive          logistical          concepts                "
+   W" optimal             transitional        time phasing            "
+   W" synchronized        incremental         projections             "
+   W" compatible          third generation    hardware                "
+   W" qualified           policy              through-put             "
+   W" partial             decision            engineering             "
+   W" stand-alone         undocumented        out-flow                "
+   W" random              context-sensitive   superstructures         "
+   W" representative      fail-safe           interaction             "
+   W" optional            omni-range          congruence              "
+   W" transient           unilateral          utilities               "
+
+VARIABLE SEED  HERE SEED !  \ simple random number generator
+: RAND  ( -- u )  SEED @  272958469 *  1+  DUP SEED ! ;
+: CHOOSE  ( u -- 0..u-1 )  RAND  UM* NIP ;
+
+64 CHARS CONSTANT /LINE  \ # of address units per line
+: BUZZWORD  ( row# column# -- a )  \ get address of word
+   [ 20 CHARS ] LITERAL *  SWAP  /LINE *  +  BUZZWORDS + ;
+: .BUZZWORD  ( row# column# -- )  BUZZWORD  20 DISPLAY ;
+: PART  ( column# -- )  CREATE  ,  \ defined parts of speech
+   DOES>  @  16 CHOOSE  SWAP .BUZZWORD ;
+0 PART 1ADJECTIVE   1 PART 2ADJECTIVE   2 PART NOUN
+: PHRASE   1ADJECTIVE  2ADJECTIVE  NOUN ;
+: FILLER  ( group# -- )  [ 3 /LINE * ] LITERAL *
+   3 CHOOSE  /LINE *  +  FILLERS +  64 DISPLAY ;
+: SENTENCE   4 0 DO  I FILLER  PHRASE  LOOP  ." ."  CR' ;
+: INTRO  ( paragraph# -- )
+   CR'  /LINE *  INTROS +  64 DISPLAY ;
+: PAPER   4 0 DO  I INTRO  SENTENCE  LOOP ;
+
+PAPER  \ try it out
+
+BASE !
+
+\ -----------------------------------------------------------------------
+\ NOWEIGHT.F ------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ "No Weighting" from Starting Forth Chapter 12
+\ ANSized by Benjamin Hoyt in 1997
+
+BASE @  DECIMAL  \ save BASE and change to decimal
+
+VARIABLE DENSITY   VARIABLE THETA   VARIABLE I.D.
+: PLACE  ( a u dest -- )
+   2DUP 2>R  CHAR+ SWAP  CHARS MOVE  2R> C! ;
+: STRING  ( char "ccc<char>" -- )
+   PARSE  HERE  OVER  1+ CHARS ALLOT  PLACE ;
+: ,"  ( "ccc<quote> -- c-addr )
+   ALIGN HERE  [CHAR] " STRING ;
+
+: .SUBSTANCE   I.D. @  COUNT TYPE  SPACE ;
+: MATERIAL  ( 'string density theta -- )  CREATE  , , ,
+   DOES>   DUP @ THETA !  CELL+ DUP @ DENSITY !  CELL+ @ I.D. ! ;
+
+: FOOT  ( feet -- scaled-height )  10 * ;
+: INCH  ( scaled-height -- scaled-height' )
+   100 12 */  5 +  10 /  + ;
+
+: /TAN  ( n -- n' )  1000 THETA @  */ ;
+: PILE  ( scaled-height -- )
+   DUP DUP 10 */  1000 */  355 339 */  /TAN /TAN
+   DENSITY @  200 */  ." = "  .  ." tons of "  .SUBSTANCE ;
+
+\ table of materials
+\ string-address   density   theta
+," cement"           131      700  MATERIAL CEMENT
+," loose gravel"      93      649  MATERIAL LOOSE-GRAVEL
+," packed gravel"    100      700  MATERIAL PACKED-GRAVEL
+," dry sand"          90      754  MATERIAL DRY-SAND
+," wet sand"         118      900  MATERIAL WET-SAND
+," clay"             120      727  MATERIAL CLAY
+
+BASE !
+
+\ -----------------------------------------------------------------------
+\ ASM8080.F -------------------------------------------------------------
+\ -----------------------------------------------------------------------
+\ 8080 assembler from Starting Forth Chapter 12
+\ ANSized by Benjamin Hoyt in 1997
+
+BASE @  HEX  \ change conversion BASE to hexadecimal
+
+VOCABULARY ASSEMBLER  ( -- )
+: CODE   CREATE   ALSO ASSEMBLER ;  \ change to suit your system
+ALSO ASSEMBLER  DEFINITIONS
+: END-CODE   PREVIOUS ;
+
+0 CONSTANT B    1 CONSTANT C    2 CONSTANT D    3 CONSTANT E
+4 CONSTANT H    5 CONSTANT L    6 CONSTANT PSW  6 CONSTANT M
+6 CONSTANT SP   7 CONSTANT A
+
+: 1MI   CREATE  C,  DOES>  C@  C, ;
+: 2MI   CREATE  C,  DOES>  C@  OR  C, ;
+: 3MI   CREATE  C,  DOES>  C@  SWAP 8 *  OR  C, ;
+: 4MI   CREATE  C,  DOES>  C@  C,  C, ;
+: 5MI   CREATE  C,  DOES>  C@  C,  , ;
+
+00 1MI NOP    76 1MI HLT    F3 1MI DI     FB 1MI ED
+07 1MI RLC    0F 1MI RRC    17 1MI RAL    1F 1MI RAR
+E9 1MI PCHL   F9 1MI SPHL   E3 1MI XTHL   EB 1MI XCHG
+27 1MI DAA    2F 1MI CMA    37 1MI STC    3F 1MI CMC
+80 2MI ADD    88 2MI ADC    90 2MI SUB    98 2MI SBB
+A0 2MI ANA    A8 2MI XRA    B0 2MI ORA    B8 2MI CMP
+09 3MI DAD    C1 3MI POP    C5 3MI PUSH   02 3MI STAX
+0A 3MI LDAX   04 3MI INR    05 3MI DCR    03 3MI INX
+0B 3MI DCX    C7 3MI RST    D3 4MI OUT    DB 4MI SBI
+E6 4MI ANI    EE 4MI XRI    F6 4MI ORI    FE 4MI CPI
+22 5MI SHLD   2A 5MI LHLD   32 5MI STA    3A 5MI LDA
+CD 5MI CALL   C9 1MI RET    C3 5MI JMP
+
+C2 CONSTANT 0=  D2 CONSTANT CS  E2 CONSTANT PE  F2 CONSTANT 0<
+
+: NOT   8 OR ;
+: MOV   8 *  40 +  +  C, ;
+: MVI   8 *  6 +  C,  C, ;
+: LXI   8 *  1+  C,  , ;
+
+: THEN   HERE  SWAP ! ;  \ Another bug? It had no ;
+: IF   C,  HERE  0 , ;
+: ELSE   C3 IF  SWAP  THEN ;
+: BEGIN   HERE ;
+: UNTIL   C, , ;
+: WHILE   IF ;
+: REPEAT   SWAP  JMP  THEN ;
+: NEXT   (NEXT) JMP ;
+
+PREVIOUS DEFINITIONS  \ restore search order
+DECIMAL  \ restore conversion BASE
+

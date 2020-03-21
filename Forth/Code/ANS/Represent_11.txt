@@ -1,0 +1,453 @@
+REPRESENT - A Report and ANS FORTH Proposal
+
+2005-10-09
+
+Background
+----------
+Forth-94 has few floating point display functions [none in the
+Floating-Point wordset, three in the Extension wordset].  To
+allow users to create their own output functions the Standard
+provides the float-to-string primitive  REPRESENT .
+
+Though intended to be portable,  REPRESENT 's loose definition
+has given rise to implementations that differ in critical
+respects.  It is also lacks adequate functionality to implement
+fixed-point notation display.
+
+These deficiencies create significant obstacles for programmers
+attempting to write portable applications based on  REPRESENT .
+While "work-arounds" may be used to minimize the problems, they
+tend to be complex and cumbersome (ref. 2).
+
+It is perhaps inevitable that  REPRESENT  will need revision
+in the future.  To that end, I wish to propose the following
+redefinition.  It addresses all the key issues while remaining
+compatible with the Forth-94 specification.  As the changes
+largely reflect common practice, compatibility with existing
+applications is unlikely to be affected.
+
+Redefinition
+------------
+
+   12.6.1.xxxx  REPRESENT
+   FLOATING
+
+      ( c-addr u -- n flag1 flag2 )  (F: r -- )
+      or ( r c-addr u -- n flag1 flag2 )
+
+   At c-addr, place the character-string external representation
+   of the significand of the floating-point number r.  Return the
+   decimal-base exponent as n, the sign as flag1 and valid result
+   as flag2.
+
+   If u is greater than zero the character string shall consist
+   of the u most significant digits of the significand represented
+   as a decimal fraction with the implied decimal point to the
+   left of the first digit, and the first digit zero only if all
+   digits are zero.  The significand is rounded to u digits.
+
+   If u is zero the string shall consist of one digit representing
+   the fractional significand r rounded to a whole number, either
+   one or zero, with an implied decimal point to the left of the
+   digit.
+
+   Rounding follows the round to nearest rule; n is adjusted, if
+   necessary, to correspond to the rounded magnitude of the
+   significand.  If r is zero or evaluates to zero after rounding,
+   then n is 1 and the sign is implementation-defined.
+
+   If flag2 is true then r was in the implementation-defined range
+   of floating-point numbers.  If flag1 is true then r is negative.
+
+   An ambiguous condition exists if the value of BASE is not
+   decimal ten.
+
+   When flag2 is false, n and flag1 are implementation-defined,
+   as are the contents of c-addr.  The string at c-addr shall
+   consist of graphic characters left-justified with any unused
+   positions to the right filled with space characters.  The
+   number of characters is one if u is zero, or u characters
+   otherwise.
+
+Rationale
+---------
+
+1. Floating point zero issues
+
+a) Exponent value
+
+   Forth-94 does not explicitly indicate the exponent value (n)
+   that should be returned in the case of floating-point zero.
+
+   Mathematically any value would do since zero raised to any
+   power remains zero.  This has led to portability issues with
+   various implementations returning n = 0, 1 or other value.
+
+   From a number display perspective however, the exponent value
+   is important since it determines where the decimal point shall
+   be shown.
+
+   The new specification requires  REPRESENT  to return n = 1.
+   This corresponds to the common convention that zero has an
+   implied decimal point to the right of the digit i.e. "0."
+
+   [C library function  ecvt  similarly returns 1 for the
+   exponent value - presumably for the same reasons.]
+
+b) Negative zero
+
+   Certain floating point representations such as IEEE-754
+   allow "negative zero".  While Forth-94 is silent regarding
+   "negative zero" there appears to be nothing that would
+   prevent its use.  See Implementation
+
+   Note: Forths that choose to implement negative zero should
+   do so consistently.  Not only must  REPRESENT  return the
+   appropriate sign, so also should  >FLOAT FROUND F. FS. FE.
+
+2. Out of range numbers
+
+   Forth-94 states that when flag2 = false, the number is not
+   within the defined range and a user-defined string shall be
+   returned in the buffer.
+
+a) String contents
+
+   "the string at c-addr shall consist of graphic characters"
+
+   Nothing is stated regarding the string's length, alignment
+   or padding.  Most forths adopt the following practice -
+
+   - The length of the returned string is the same as when
+     flag2 = true  i.e. the length is determined by u.
+
+   - Characters are positioned left-justified within the buffer
+     with any unused positions to the right filled with space
+     characters.  A users may subsequently trim off the padding
+     spaces with  -TRAILING  e.g.
+
+     ( r ) PAD u REPRESENT ... PAD u -TRAILING ( c-addr u2 )
+
+b) Value of n and flag1
+
+   "n and flag1 are implementation defined"
+
+   Some forths have  REPRESENT  return a basic string ('NAN'
+   'INF' etc) and then use flag1 to later indicate the sign.
+   While such practices are permitted under Forth-94, they are
+   not portable.
+
+   Portable applicationa can only make use of the returned
+   string.  If a sign needs to be passed to an application
+   then it must be included in the string e.g. '+NAN' '-INF'
+
+c) String length
+
+   A difficulty with the present system is that the returned
+   string becomes increasingly truncated as u decreases.  At
+   one or two characters most strings are unintelligible.
+
+   The situation could be alleviated somewhat by requiring
+   REPRESENT  to return a minimum string of [say] five
+   characters.  This would give a programmer greater scope
+   in handling "not a number" situations since a usable
+   string would always be available e.g.
+
+     ( r )  PAD u REPRESENT  0= IF  PAD u 5 MAX ...  THEN
+
+   Such a requirement could, however, break existing code and
+   therefore has NOT been included in the new specification.
+   It is mentioned here only for purposes of opening up
+   discussion on the topic.
+
+3. Rounding
+
+   Applications often require floating point numbers to be
+   displayed rounded to a lesser precision than the internal
+   maximum allows.
+
+   In Forth-94 this rounding is performed through  REPRESENT
+   with parameter 'u' controlling the amount of rounding e.g.
+
+     ( r )  PAD u REPRESENT 2DROP  PAD u TYPE  SPACE .
+
+     r         u      string    n (exponent)
+     --        --     ------    --
+     0.6489    4      '6489'    0
+     0.6489    3      '649'     0
+     0.6489    2      '65'      0
+     0.6489    1      '6'       0
+
+   But what if we need to display 0.6489 rounded to 0 decimal
+   places?  This would require fraction .6489 be rounded to
+   the nearest whole number i.e. 1.
+
+   Such situations arise when displaying fixed-point notation
+   to a given number of decimal places.  Failure to round the
+   entire significand when appropriate leads to incorrect
+   results.  Here are some examples.
+
+   Display 0.009 to 2 decimal places in a field width of 5
+   characters -
+
+     0.009E  2 5 F.R       0.00 ok  ( FPOUT 1.6 and prior )
+     0.009E  5 2 0 F.RDP   0.00 ok  ( Gforth 0.6.2 )
+
+   ( The result should have been 0.01 )
+
+   REPRESENT  currently has no provision for such rounding
+   and it is a serious omission.
+
+   Luckily we can add the missing functionality by simply
+   allowing 'u' to take the value zero e.g.
+
+     ( r )  PAD u REPRESENT 2DROP  PAD u 1 MAX TYPE  SPACE .
+
+     r         u      string    n (exponent)
+     --        --     ------    --
+     0.6489    4      '6489'    0
+     0.6489    3      '649'     0
+     0.6489    2      '65'      0
+     0.6489    1      '6'       0
+     0.6489    0      '1'       1
+
+   As the above table shows we are merely extending  REPRESENT
+   in a logical direction.  This makes it easy to implement
+   and use.
+
+   Usage:
+
+   Existing applications using  REPRESENT  may be left alone
+   and they will continue to function as before.
+
+   Applications that will benefit from  REPRESENT 's new
+   rounding facility are those in which parameter 'u' takes
+   the value zero.
+
+   Previously such applications needed  1 MAX  inserted before
+   REPRESENT  to mask the fact that it could not handle u = 0
+   e.g.
+
+     c-addr u ... 1 MAX REPRESENT ... c-addr u ...
+
+   Making these applications work correctly will require the
+   following code re-arrangement in addition to the replacement
+   REPRESENT .
+
+     c-addr u ... REPRESENT ... c-addr u  1 MAX ...
+
+   By way of demonstration, let's apply these principles to our
+   earlier Gforth example.
+
+   Step 1.  Load a version of  REPRESENT  that is compliant with
+            the new specification (the sample one given below
+            will do).
+
+   Step 2.  Edit the source for  F.RDP  (located in Gforth 0.6.2
+            distribution file "stuff.fs").  Change line 211 from
+            "1 max ur min" to "0 max ur min" and then re-load.
+
+   Step 3.  Trying our previous example:
+
+            0.009E  5 2 0 F.RDP   0.01 ok
+
+            It now functions correctly.
+
+Implementation
+--------------
+Implementing the new specification should not be difficult.  A
+sample  REPRESENT  which includes all the critical features is
+given below.
+
+Tips:
+
+ - Forth implementations that have "negative zero", and wish to
+   display it, should ensure  REPRESENT  returns the appropriate
+   sign even when rounding produces a result of zero e.g.
+
+   -0.4E PAD 0 REPRESENT PAD 1 TYPE  DROP SPACE .   0 -1 ok
+    0.4E PAD 0 REPRESENT PAD 1 TYPE  DROP SPACE .   0  0 ok
+
+ - "Forths written in C" may be able to implement  REPRESENT
+   using library functions fcvt and ecvt.
+
+A sample REPRESENT
+
+  \ Assumes flag2 is always true and MPREC digits can be held
+  \ as a double number. "Negative zero" is not implemented.
+
+   7 VALUE MPREC  \ your maximum precision
+   2VARIABLE EXP  \ exponent & sign
+
+   : REPRESENT  ( c-addr u -- n flag1 flag2 ) ( F: r -- )
+     2DUP [CHAR] 0 FILL
+     MPREC MIN  2>R
+     FDUP F0<  0 EXP 2!
+     FABS  FDUP F0= 0=
+     BEGIN  WHILE
+       FDUP 1.0E F< 0= IF
+         10.0E F/
+         1
+       ELSE
+         FDUP 0.1E F< IF
+           10.0E F*
+           -1
+         ELSE
+           0
+         THEN
+       THEN
+       DUP EXP +!
+     REPEAT
+     1.0E  R@ 0 ?DO 10.0E F* LOOP  F*
+     FROUND F>D
+     2DUP <# #S #>  DUP R@ - EXP +!
+     2R>  ROT MIN 1 MAX CMOVE
+     D0=  EXP 2@ SWAP  ROT IF 2DROP 1 0 THEN  \ 0.0E fix-up
+     TRUE ;
+
+Summary
+-------
+A portable and functional  REPRESENT  reduces the burden on
+the programmer.  It eliminates the need for work-arounds,
+simplifies application code and hides system-specific detail
+such as negative zero and rounding method.
+
+As author of the FPOUT package, it is perhaps fitting to
+finish off with a demonstration of what the code would have
+been had the  REPRESENT  proposed here been available.
+In the following (a) shows original subroutine (F1) with
+work-arounds to make it portable; while (b) shows (F1) as
+it would be using the proposed  REPRESENT .
+
+a) Original subroutine (F1) with portability "work-arounds"
+
+   0 VALUE NZ#  ( initialized to true if REPRESENT responds
+                  to "negative zero"; or false otherwise )
+
+   \ float to ascii
+   : (F1)  ( F: r -- ) ( places -- c-addr u flag )
+     TO PL#  PRECISION TO BS#
+     FDUP FBUF BS# REPRESENT SWAP ( r exp flag2 sgn )
+     \ save sign for negative zero systems
+     [ NZ# ] [IF]  TO NZ#  [ELSE]  DROP  [THEN]
+     FBUF C@ [CHAR] 0 = IF ( r=0 )
+       >R  DROP FDROP  1 NZ#  R> ( exp sgn flag2 )
+     ELSE
+       AND ( exp & flag2 )  PL# 0< IF
+         DROP PRECISION
+       ELSE
+         EF# 0> IF  1- (F0) DROP 1+  THEN  PL# +
+       THEN
+       DUP ( size ) 0= >R  1 MAX  PRECISION MIN  TO BS#
+       FBUF R@ IF  PRECISION  ELSE  BS#  THEN  REPRESENT
+       DUP  R> AND IF ( flag2 & size=0 )
+         >R  FBUF C@  DUP [CHAR] 5 =
+         FBUF PRECISION  1 /STRING (T0) NIP 0=  AND
+         SWAP [CHAR] 5 <  OR
+         IF    2DROP  1 NZ#  [CHAR] 0
+         ELSE  SWAP 1+ SWAP  [CHAR] 1
+         THEN  FBUF C!  R>
+       THEN
+     THEN
+     >R  TO SN#  1- TO EX#  FBUF BS#  -TRAILING  R> <# ;
+
+b) Replacement subroutine (F1) using the new REPRESENT
+
+   \ float to ascii
+   : (F1)  ( F: r -- ) ( places -- c-addr u flag )
+     TO PL#  FDUP FBUF PRECISION REPRESENT NIP AND
+     PL# 0< IF
+       DROP PRECISION
+     ELSE
+       EF# 0> IF  1- (F0) DROP 1+  THEN  PL# +
+     THEN  0 MAX  PRECISION MIN  TO BS#
+     FBUF BS# REPRESENT >R  TO SN#  1- TO EX#
+     FBUF BS#  1 MAX  -TRAILING  R> <# ;
+
+References
+----------
+1. ANS Forth-94 Standard
+
+2. FPOUT - a floating point output package
+   ftp.taygeta.com/pub/Forth/Applications/ANS/fpout18.f
+
+Addendum
+--------
+1. Common questions answered
+
+Q. If only one float-to-string primitive is needed then why do
+   certain C language libraries provide several?
+
+A. A good question and one that should be asked of the library
+   designers!  As applications such as FPOUT demonstrate it is
+   not only easy to reproduce the functionality of ecvt fcvt gcvt
+   etc with but a single primitive, it is more efficient to do so.
+
+Q. Rather than change  REPRESENT  isn't it better to leave it
+   alone and introduce another function like fcvt which has the
+   necessary rounding required for fixed-point notation?
+
+A. This is a restatement of the previous question in a different
+   form.  Reflection will reveal that in order to implement fcvt
+   it would require, at minimum, all the functionality of the
+   proposed  REPRESENT .  In other words, fcvt is not a primitive
+   at all but rather an application built upon an underlying
+   primitive.
+
+Q. "c-addr u" is a buffer address and length.  The proposal has
+   u = 0 write a character beyond the end of the buffer.
+
+A. The premise that "c-addr u" represents a buffer and length
+   into which  REPRESENT  writes is incorrect.  ANS defines
+   c-addr as the buffer address where the character string is
+   placed, and u as the number of "most significant digits"
+   that shall be represented by the string.  It was always the
+   programmer's responsibility to ensure that adequate space
+   was allocated to the buffer beforehand.
+
+Q. If u represents the number of significant digits then surely
+   u = 0 means that no characters or a null string should result?
+
+A. This assumes that u is a length - which it is not.  The usual
+   result of rounding a number to n significant digits is another
+   number which can be subsequently represented as an ascii string.
+   Before one can assert a null string should result, one would
+   need to demonstrate there exists a number which it represents
+   and that this number is the valid result of rounding to zero
+   significant digits.
+
+Q. Most forths currently have  REPRESENT  return a null string
+   when u = 0.  Even though such behaviour may be technically in
+   doubt, won't changing it affect existing applications?
+
+A. No.  It should be remembered that it is the application and
+   not  REPRESENT  that determines how many characters will be
+   extracted from the buffer.  So, if an application [mistakenly]
+   chooses to extract u characters when u = 0 then the result
+   will be the same irrespective of which  REPRESENT  was used.
+   Having said that, I am unaware of any applications which
+   actually use the null string.
+
+Q. If the ANS requirements at u = 0 are undefined then what makes
+   you so certain the rounding behaviour you're advocating should
+   be the adopted one?
+
+A. Put simply, it produces the right outcome in applications on
+   every occasion without contrivance or work-arounds.  The
+   proposed rounding turns  REPRESENT  into a true universal
+   primitive - one that can be used to build any float-to-string
+   function.
+
+History
+-------
+2005-09-02  First release
+2005-10-09  Clarify number of characters at c-addr when flag2 is
+            false.  REPRESENT code cleaned-up.  Addendum added.
+
+
+-----------------------------------------------------------------
+
+Comments to: edsa@alphalink.com.au
+ 
+
+Page updated: 09 Oct 2005

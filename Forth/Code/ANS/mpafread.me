@@ -1,0 +1,41 @@
+Hi,
+
+I started going through the process of writing my own Forth a little
+while ago.  I found there were plenty of DIY Forths around - but without
+exception they are all intended for use 'as is' with negligble
+documentation.  This makes them unsuitable as a starting point for writing
+your own Forth.  You have to invest so much time in finding out what has
+been done and figuring out why it's been done that way that you might as
+well start from scratch!
+
+That's what I've done.  However ... I'm trying to leave a trail which may
+be helpful to others who want to write their own Forth.  Along the way,
+I've made two discoveries:
+
+- it is possible to write a portable ANS Forth which leaves all the
+  implementation decisions to the kernel (so you can use my implementation
+  or simply unplug it and add your own).
+
+- a useful Forth is too complex to describe in a single document.  I've
+  divided it into 2 documents MAF and PAF - MAF is truly minimal.  This
+  split allows the fundamentals in MAF to be documented independently of the
+  bits which PAF adds to make a useful Forth:
+
+        - exception handling
+        - compiler security
+        - input buffer editing
+        - vocabularies
+        - block and file handling
+
+Bye for now                                                       _
+                                          _______________________| |_____
+Chris Jakeman                            / _Forth_Interest_Group_| |____/
+                                        / /_  __  ______  _   _  | | __
+at Peterborough                        / __/ / / / __  / | | | | | |/ /
+(a cathedral city                     / /   / / / /_/ /  | \_| | |   <
+ 80 miles north of London)           /_/   /_/ /___  /    \____| |_|\_\
+Where do you come from?                           / /
+                                   ______________/ /     United Kingdom
+Voice +44 (0)1733 346477          /_______________/          Chapter
+
+

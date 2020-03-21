@@ -1,0 +1,58 @@
+                      AN ANS FORTH TOOL
+                         Jet Thomas
+
+The block file STWORDS.SCR contains the source code for a tool that,
+among other things, can help to document standard code.
+
+First you load the file on a standard system.
+
+Then you load your application file on top.
+
+Then REQS will display a list of all the optional standard words your
+application uses.  Standard programs should include this list with
+their documentation.
+
+REDEFS will display a list of all the standard words that you have
+redefined.  The documentation for standard programs should include
+a claim that the system is still standard after loading the program,
+or the admission that it is not.  You should look carefully at each
+word which has been redefined to decide whether it makes the system
+break the standard.
+
+
+n >BLOCK will redirect these outputs to block n .
+>FILE <filename> will redirect these to the file <filename>.
+>SCREEN will redirect them back to the screen.
+
+The program cannot handle nonstandard words which you don't define
+yourself, it will stop with a warning message when it finds one of
+these.  You must start over in that case.
+
+START-OVER will zero out the database.  Use
+
+NONSTANDARD: <name>
+
+to get past that word.
+
+The code to run applications from text files has not been tested, but
+that for block files and keyboard entry should work fine.
+
+This product is shareware with a price of zero.  You are welcome to
+use it and modify it, and you may put it into commercial products
+without payment to me provided you acknowledge my ownership of this
+code.. (I would very much welcome a copy of your product, of course.)
+
+If you have any questions, or if you would like modifications made,
+or if you prefer the code in a text-file version, contact me.
+
+jethomas@ix.netcom.com
+
+Jet Thomas
+340 Calle Miramar
+Redondo Beach, CA 90277
+
+(310) 373-5488
+
+( all of these are subject to change.  At worse someone on
+comp.lang.forth should know how to reach me.)
+

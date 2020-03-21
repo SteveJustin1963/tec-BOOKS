@@ -1,0 +1,26 @@
+\ FPOUT.F
+\
+\ Floating Point Output Words
+\
+\ Version:      1.1
+\ Date:         15-Sep-02
+\
+\ This code is public domain.  Use at your own risk.
+\
+\ It was tested on a 16-bit forth but should run on most
+\ ANS forth systems.
+\
+\ Main words:
+\   (FS.) FS.R FS. (FE.) FE.R FE. (F.) F.R F.
+\
+\ Caveats:
+\ - Does not catch errors from REPRESENT
+\ - No rounding for 'digits right of decimal point' mode
+\
+\ Notes:
+\ If your REPRESENT does not return an exponent of +1 in the
+\ case of 0.0E it will result in multiple leading zeros being
+\ displayed.  This is a bug in your REPRESENT and you should
+\ have it fixed!  In the meantime, I have supplied a
+\ work-around in the form of an alternate definition for (F1).
+\

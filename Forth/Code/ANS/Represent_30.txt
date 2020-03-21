@@ -1,0 +1,776 @@
+REPRESENT: A Complete Solution
+
+Revision 3.0  2010-12-05
+
+The following specification builds upon an earlier paper 'REPRESENT -
+ A Report and ANS FORTH Proposal' which details deficiencies in the
+Forth-94 float-to-string conversion primitive REPRESENT.
+
+---------------------------------------------------------------------
+
+1. MAX-FLOAT-DIGITS
+2. REPRESENT-CHARS
+3. REPRESENT
+4. Sample Applications
+5. History
+
+---------------------------------------------------------------------
+
+1. MAX-FLOAT-DIGITS
+
+1.1 Rationale
+
+There is no easy way for applications to know the number of usable
+digits a system can output when printing a floating-point number.
+
+System designers know and use this value in functions such as
+REPRESENT and SET-PRECISION.  Portable applications need this value
+in order to determine:
+
+- maximum precision a given Forth system can usefully display
+- upper value to use with SET-PRECISION
+
+This proposal adds the environment query string MAX-FLOAT-DIGITS.
+MAX-FLOAT-DIGITS should not be confused with the intrinsic precision
+of a floating-point number.
+
+The Forth Vendors Group Floating Point Standard has an equivalent
+function named F#PLACES.
+
+1.2 Proposal
+
+Add to Table 12.2 - Environmental query strings
+
+String             Value       Constant?   Meaning
+                   data type
+------             ---------   ---------   -------
+
+MAX-FLOAT-DIGITS   u           yes         largest number of usable
+                                           digits available from
+                                           REPRESENT
+
+1.3 Implementation
+
+The value of MAX-FLOAT-DIGITS is implementation dependent.  If the
+constant it represents cannot be found in the system documentation
+or source code, the following tests may assist in determining it
+empirically.
+
+  : TEST1  ( -- )  \ scan forward 80 chars
+    80 SET-PRECISION
+    1E0 3E0 F/  PAD 80 REPRESENT 0= ABORT" failed" DROP DROP
+    PAD 0  80 0 DO  OVER  I CHARS +  C@ [CHAR] 3 - IF LEAVE
+    THEN  1+  LOOP  SWAP DROP  CR ." Max usable digits = " . ;
+
+  : TEST2  ( -- )  \ scan forward PRECISION chars
+    80 SET-PRECISION
+    1E0 3E0 F/  PAD PRECISION REPRESENT 0= ABORT" failed" DROP DROP
+    PAD 0  PRECISION 0 DO  OVER  I CHARS +  C@ [CHAR] 3 - IF LEAVE
+    THEN  1+  LOOP  SWAP DROP  CR ." Max usable digits = " . ;
+
+  : TEST3  ( -- )  \ trim trailing '0's
+    80 SET-PRECISION
+    1E0 3E0 F/  PAD 80 REPRESENT 0= ABORT" failed" DROP DROP
+    PAD 80  BEGIN  DUP WHILE  1- 2DUP CHARS +  C@ [CHAR] 0 -
+    UNTIL  1+  THEN  SWAP DROP  CR ." Max usable digits = " . ;
+
+---------------------------------------------------------------------
+
+2. REPRESENT-CHARS
+
+2.1 Rationale
+
+To support non-number representations with lengths in excess of
+MAX-FLOAT-DIGITS (e.g. 32-bit IEEE NANs with payload information)
+this proposal adds the environment query string REPRESENT-CHARS.
+
+REPRESENT-CHARS is a system constant which returns the length of
+the largest character representation available from REPRESENT.
+This value is used by applications when allocating a buffer for
+REPRESENT or retrieving data from it.
+
+2.2 Proposal
+
+Add to Table 12.2 - Environmental query strings
+
+String             Value       Constant?   Meaning
+                   data type
+------             ---------   ---------   -------
+
+REPRESENT-CHARS    u           yes         number of characters in
+                                           the largest representation
+                                           available from REPRESENT
+
+2.3 Implementation
+
+REPRESENT-CHARS shall equal the number of characters in the largest
+representation available from REPRESENT when flag2 is false, or
+MAX-FLOAT-DIGITS, whichever is the greater.
+
+Implementation of REPRESENT-CHARS is optional for systems where the
+value REPRESENT-CHARS equals MAX-FLOAT-DIGITS.  If REPRESENT-CHARS
+is not present in a system, applications shall substitute the value
+returned by MAX-FLOAT-DIGITS.
+
+2.4 Usage
+
+See the sample applications provided in this paper.
+
+---------------------------------------------------------------------
+
+3. REPRESENT
+
+3.1 Rationale
+
+The deficiencies of Forth-94 REPRESENT are discussed in the paper:
+
+ftp://ftp.taygeta.com/pub/Forth/Applications/ANS/Represent_11.txt
+
+A proposal for a revised specification was included.  While it
+corrected several problems, the issue of string truncation remained.
+The specification that follows resolves all known issues while
+providing the portability and functionality necessary for a
+universal float-to-string primitive.
+
+3.2 Proposal
+
+   12.6.1.xxxx  REPRESENT
+   FLOATING
+
+      ( c-addr n1 -- n2 flag1 flag2 )  (F: r -- )
+      or ( r c-addr n1 -- n2 flag1 flag2 )
+
+   c-addr represents a buffer in data space of length REPRESENT-CHARS
+   or n1 characters whichever is the greater.
+
+   Place the character string representation of the significand of
+   floating-point number r at c-addr.  The remainder of the buffer
+   is filled with '0' characters.  Return the decimal base exponent
+   as n2, the sign as flag1 and true as flag2.
+
+   If n1 is greater than zero, the significand is rounded to n1
+   digits represented as a decimal fraction with an implied decimal
+   point to the left of the first digit.  The first digit is zero
+   only if all digits are zero.
+
+   If n1 is zero, the significand is rounded to a whole number,
+   either one or zero, and represented as above.  If n1 is negative
+   the significand is rounded to zero.
+
+   Rounding follows the implementation defined rounding rule.  n2
+   is adjusted, if necessary, to correspond to the rounded magnitude
+   of the significand.  If r is zero or evaluates to zero after
+   rounding, then n2 is 1 and the sign is implementation-defined.
+
+   If flag2 is true then r was in the implementation-defined range
+   of floating-point numbers.  If flag1 is true then r was negative.
+
+   When flag2 is false, n2 and flag1 are implementation-defined, as
+   are the contents of c-addr.  The string at c-addr shall consist
+   of graphic characters representing r.  The remainder of the
+   buffer is filled with space characters.
+
+   An ambiguous condition exists if the value of BASE is not decimal
+   ten.
+
+   If REPRESENT-CHARS is not present in a system the value returned
+   by MAX-FLOAT-DIGITS shall be substituted.
+
+3.3 Notes
+
+   The rounding rule is specified more openly than in Forth-94.
+   Whichever rounding method is employed it should be applied
+   consistently across the system i.e. REPRESENT and FROUND should
+   round the same way.
+
+   When flag2 is false, the character string at c-addr contains
+   the complete represention of r including sign, if any.
+
+3.4 Compatibility
+
+   Existing applications using REPRESENT should be unaffected by
+   this proposal provided a buffer not less than REPRESENT-CHARS
+   has been allocated.
+
+   New applications need only ensure a minimum of REPRESENT-CHARS
+   characters is allocated for the REPRESENT buffer.
+
+3.5 Sample REPRESENT implementation
+
+   \ Sample REPRESENT implementation.  Assumes flag2 is always
+   \ true and MAX-FLOAT-DIGITS can be held as a double number.
+   \ Negative-zero not implemented.  This code is PUBLIC DOMAIN.
+
+   S" MAX-FLOAT-DIGITS" ENVIRONMENT? 0= [IF]
+     CR .( MAX-FLOAT-DIGITS not found ) ABORT
+   [THEN]
+   CONSTANT maxdigits   \ maximum usable digits
+
+   S" REPRESENT-CHARS" ENVIRONMENT? 0= [IF]
+     maxdigits
+   [THEN]
+   CONSTANT maxchars    \ maximum float chars
+
+   2VARIABLE expsgn     \ exponent, sign
+
+   : REPRESENT  ( c-addr n1 -- n2 flag1 flag2 ) ( F: r -- )
+   \ 2>R  FDUP nan? IF  ( r was not a number )
+   \   FDROP  2R> maxchars MAX
+   \   OVER SWAP BLANK
+   \   S" NAN" ROT SWAP CMOVE
+   \   0 FALSE FALSE  EXIT
+   \ THEN  2R>
+     2DUP maxchars MAX [CHAR] 0 FILL
+     DUP 0< IF
+       2DROP FDROP  0.
+     ELSE
+       maxdigits MIN  2>R
+       FDUP F0<  0 expsgn 2!
+       FABS  FDUP F0= 0=
+       BEGIN  WHILE
+         FDUP 1.0E F< 0= IF
+           10.0E F/
+           1
+         ELSE
+           FDUP 0.1E F< IF
+             10.0E F*
+             -1
+           ELSE
+             0
+           THEN
+         THEN
+         DUP expsgn +!
+       REPEAT
+       1.0E  R@ 0 ?DO 10.0E F* LOOP  F*
+       FROUND F>D
+       2DUP <# #S #>  DUP R@ - expsgn +!
+       2R>  ROT MIN 1 MAX CMOVE
+     THEN
+     D0= IF  1 0  ELSE  expsgn 2@ SWAP  THEN  \ 0.0E fix-up
+     TRUE ;
+
+---------------------------------------------------------------------
+
+4. Sample applications
+
+4.1 Example 1
+    ---------
+   Create a floating-point output function to display fixed point
+   notation and handle all conditions including 'not-a-number'.
+
+   The following code assumes PRECISION is available and its value
+   does not exceed REPRESENT-CHARS.  If PRECISION is unavailable
+   then replace with maxchars.
+
+   DECIMAL
+
+   S" MAX-FLOAT-DIGITS" ENVIRONMENT? 0= [IF]
+     CR .( MAX-FLOAT-DIGITS not found ) ABORT
+   [THEN] CONSTANT maxdigits
+
+   S" REPRESENT-CHARS" ENVIRONMENT? 0= [IF]
+     maxdigits
+   [THEN] CONSTANT maxchars
+
+   CREATE buf  maxchars CHARS ALLOT
+
+   : .mant  ( u -- )
+     buf OVER TYPE  [CHAR] . EMIT
+     buf PRECISION  ROT /STRING  TYPE ;
+
+   : F.  ( r -- )
+     buf PRECISION REPRESENT IF
+       IF [CHAR] - EMIT THEN
+       DUP >R  0 PRECISION 1+ WITHIN IF
+         R> .mant
+       ELSE
+         1 .mant  [CHAR] E EMIT  R> 1- .
+       THEN
+     ELSE
+       2DROP  buf maxchars -TRAILING TYPE SPACE
+     THEN ;
+
+   \ Test the function
+
+   : TEST1  ( -- )
+     CR 1.23456E20   F.
+     CR 1.23456E9    F.
+     CR 1.23456E8    F.
+     CR 1.23456E7    F.
+     CR 1.23456E6    F.
+     CR 1.23456E5    F.
+     CR 1.23456E4    F.
+     CR 1.23456E3    F.
+     CR 1.23456E2    F.
+     CR 1.23456E1    F.
+     CR 1.23456E0    F.
+     CR 0.0E         F.
+     CR 1.23456E-1   F.
+     CR 1.23456E-2   F.
+   \  CR 1.0E 0.0E F/ F.  ."  {+Infinity on 80x87}"
+   \  CR 0.0E 0.0E F/ F.  ."  {-NaN() on 80x87}"
+   ;
+
+   TEST1
+
+4.2 Example 2
+    ---------
+   Implement the FORTH-94 floating-point display function FE.
+   Check that it performs correctly when PRECISION is less than
+   the number of digits to be displayed in the significand.
+
+   DECIMAL
+
+   S" MAX-FLOAT-DIGITS" ENVIRONMENT? 0= [IF]
+     CR .( MAX-FLOAT-DIGITS not found ) ABORT
+   [THEN] CONSTANT maxdigits
+
+   S" REPRESENT-CHARS" ENVIRONMENT? 0= [IF]
+     maxdigits
+   [THEN] CONSTANT maxchars
+
+   CREATE buf  maxchars CHARS ALLOT
+
+   : .mant  ( u -- )
+     buf OVER TYPE  [CHAR] . EMIT
+     buf PRECISION  ROT OVER MIN  /STRING  TYPE ;
+
+   : FE.  ( r -- )
+     buf PRECISION REPRESENT IF
+       IF [CHAR] - EMIT THEN
+       1-  S>D 3 FM/MOD  3 *  >R
+       1+ .mant  [CHAR] E EMIT  R> .
+     ELSE
+       2DROP  buf maxchars -TRAILING TYPE  SPACE
+     THEN ;
+
+
+   : TEST2  ( -- )
+     PRECISION >R
+     2 SET-PRECISION  467.8E  CR FE.  ."  {should be 470.E0}"
+     R> SET-PRECISION ;
+
+   TEST2
+
+4.3 Example 3
+    ---------
+   Implements a suite of floating-point output functions comparable
+   with those found in Fortran and C.
+
+   \
+   \ FPOUT.F  version 3.5
+   \
+   \ A Forth floating-point output words package
+   \
+   \ Main words:
+   \
+   \   Compact   Formatted   String
+   \   -------   ---------   ------
+   \   FS.       FS.R        (FS.)     Scientific
+   \   FE.       FE.R        (FE.)     Engineering
+   \   F.        F.R         (F.)      Fixed-point
+   \   G.        G.R         (G.)      General
+   \
+   \   FDP ( -- a-addr )
+   \
+   \   A variable controlling decimal point display.  If zero
+   \   then trailing decimal points are not shown. If non-zero
+   \   (default state) the decimal point is always displayed.
+   \
+   \   FECHAR ( -- a-addr )
+   \
+   \   A variable containing the output character used to
+   \   indicate the exponent. Default is 'E'.
+   \
+   \   FEDIGITS ( -- a-addr )
+   \
+   \   A variable containing the minimum number of digits
+   \   output for the exponent. Must be 2 or more. Default
+   \   is 2. Does not affect compact modes.
+   \
+   \ Notes:
+   \
+   \ Display words that specify the number of places after
+   \ the decimal point may use the value -1 to force compact
+   \ mode.  Compact mode displays all significant digits
+   \ with redundant zeros and signs removed.  FS. FE. F. G.
+   \ are displayed in compact mode.
+   \
+   \ The character string returned by (FS.) (FE.) (F.) (G.)
+   \ resides in the pictured-numeric output area.
+   \
+   \ An ambiguous condition exists if: BASE is not decimal;
+   \ character string exceeds pictured-numeric output area;
+   \ PRECISION is set greater than MAX-FLOAT-DIGITS.
+   \
+   \ For use with separate or common stack floating-point
+   \ Forth models.
+   \
+   \ This code is PUBLIC DOMAIN.  Use at your own risk.
+   \
+   \ *****************************************************
+   \ This version of FPOUT requires REPRESENT conform to
+   \ the specification proposed here:
+   \
+   \  ftp://ftp.taygeta.com/pub/Forth/Applications/ANS/
+   \  Represent_30.txt  (2010-12-05)
+   \
+   \ If your Forth does not have a compliant REPRESENT
+   \ then use FPOUT v2.2 instead.
+   \ *****************************************************
+   \
+   \ History:
+   \
+   \ v3.1 2006-11-13 es  Demo for REPRESENT proposal.
+   \ v3.2 2007-06-05 es  Changed default to trailing
+   \                     decimal point on.
+   \ v3.3 2007-11-19 es  Add FECHAR FEDIGITS. Fix zero
+   \                     sign in (F.) F.R
+   \ v3.4 2008-01-23 es  Updated to REPRESENT spec 2.1
+   \ v3.5 2010-12-05 es  Updated to REPRESENT spec 3.0
+   \
+
+   CR .( Loading FPOUT 3.5  2010-12-05 ... ) CR
+
+   DECIMAL
+
+   \ Compile application
+
+   CREATE FDP  2 CELLS ALLOT
+   VARIABLE FECHAR
+   VARIABLE FEDIGITS
+
+   \ ******************  USER OPTIONS  *******************
+
+   1 FDP !                 \ trailing decimal point control
+   2 FEDIGITS !            \ minimum exponent digits
+   CHAR E FECHAR !         \ output character for exponent
+
+   \ *****************************************************
+
+   S" MAX-FLOAT-DIGITS" ENVIRONMENT? 0= [IF]
+     CR .( MAX-FLOAT-DIGITS not found ) ABORT
+   [THEN]  ( u )
+
+   \ Define PRECISION SET-PRECISION if not present
+
+   [UNDEFINED] PRECISION [IF]
+
+   ( u ) DUP VALUE PRECISION ( -- u )
+
+   : SET-PRECISION  ( u -- )
+     DUP  1 [ PRECISION 1+ ] LITERAL  WITHIN AND
+     ?DUP IF  TO PRECISION  THEN ;
+
+   [THEN]
+
+   ( u ) CONSTANT mp#      \ maximum usable precision
+
+   S" REPRESENT-CHARS" ENVIRONMENT? 0= [IF]  mp#  [THEN]
+
+   ( u ) CONSTANT mc#      \ maximum float chars
+
+   CREATE fbuf  mc# CHARS ALLOT
+
+   0 VALUE ex#             \ exponent
+   0 VALUE sn#             \ sign
+   0 VALUE ef#             \ exponent factor  1=FS. 3=FE.
+   0 VALUE pl#             \ +n  places right of decimal point
+                           \ -1  compact display
+
+   \ get exponent, sign, flag2
+   : (f1)  ( F: r -- r ) ( -- exp sign flag2 )
+     FDUP fbuf PRECISION REPRESENT ;
+
+   \ apply exponent factor
+   : (f2)  ( exp -- offset exp2 )
+     S>D ef# FM/MOD ef# * ;
+
+   \ float to ascii
+   : (f3)  ( F: r -- ) ( places -- c-addr u flag )
+     TO pl#  (f1) NIP AND ( exp & flag2 )
+     pl# 0< IF
+       DROP PRECISION
+     ELSE
+       ef# 0> IF  1- (f2) DROP 1+  THEN  pl# +
+     THEN  PRECISION MIN  fbuf SWAP REPRESENT >R
+     TO sn#  TO ex#  fbuf mc# -TRAILING  R> <# ;
+
+   \ insert exponent
+   : (f4)  ( exp -- )
+     DUP  ABS S>D  pl# 0< 0=  DUP >R  IF  FEDIGITS @
+     1 DO # LOOP  THEN  #S 2DROP  DUP SIGN  0< 0=
+     R> AND IF  [CHAR] + HOLD  THEN  FECHAR @ HOLD ;
+
+   \ insert digit and update flag
+   : (f5)  ( char -- )
+     HOLD  1 FDP CELL+ ! ;
+
+   \ insert string
+   : (f6)  ( c-addr u -- )
+     0 MAX  BEGIN  DUP  WHILE  1- 2DUP CHARS + C@ (f5)
+     REPEAT 2DROP ;
+
+   \ insert '0's
+   : (f7)  ( n -- )
+     0 MAX 0 ?DO [CHAR] 0 (f5) LOOP ;
+
+   \ insert sign
+   : (f8)  ( -- )
+     sn# SIGN  0 0 #> ;
+
+   \ trim trailing '0's
+   : (f9)  ( c-addr u1 -- c-addr u2 )
+     pl# 0< IF
+       BEGIN  DUP WHILE  1- 2DUP CHARS +
+       C@ [CHAR] 0 -  UNTIL  1+  THEN
+     THEN ;
+
+   : (fa)  ( n -- n n|pl# )
+     pl# 0< IF  DUP  ELSE  pl#  THEN ;
+
+   \ insert fraction string n places right of dec. point
+   : (fb)  ( c-addr u n -- )
+     0 FDP CELL+ !
+     >R (f9)  R@ +
+     (fa) OVER - (f7)     \ trailing 0's
+     (fa) MIN  R@ - (f6)  \ fraction
+     R> (fa) MIN (f7)     \ leading 0's
+     FDP 2@ OR IF
+       [CHAR] . HOLD
+     THEN ;
+
+   \ split string into integer/fraction parts at n and insert
+   : (fc)  ( c-addr u n -- )
+     >R  2DUP R@ MIN 2SWAP R> /STRING  0 (fb) (f6) ;
+
+   \ exponent form
+   : (fd)  ( F: r -- ) ( n factor -- c-addr u )
+     TO ef#  (f3) IF  ex# 1- (f2) (f4) 1+ (fc) (f8)  THEN ;
+
+   \ display c-addr u right-justified in field width u2
+   : (fe)  ( c-addr u u2 -- )
+     OVER - SPACES TYPE ;
+
+   \ These are the main words
+
+   \ Convert real number r to a string c-addr u in scientific
+   \ notation with n places right of the decimal point.
+
+   : (FS.)  ( F: r -- ) ( n -- c-addr u )
+     1 (fd) ;
+
+   \ Display real number r in scientific notation right-
+   \ justified in a field width u with n places right of the
+   \ decimal point.
+
+   : FS.R  ( F: r -- ) ( n u -- )
+     >R (FS.) R> (fe) ;
+
+   \ Display real number r in scientific notation followed by
+   \ a space.
+
+   : FS.  ( F: r -- )
+     -1 0 FS.R SPACE ;
+
+   \ Convert real number r to a string c-addr u in engineering
+   \ notation with n places right of the decimal point.
+
+   : (FE.)  ( F: r -- ) ( n -- c-addr u )
+     3 (fd) ;
+
+   \ Display real number r in engineering notation right-
+   \ justified in a field width u with n places right of the
+   \ decimal point.
+
+   : FE.R  ( F: r -- ) ( n u -- )
+     >R (FE.) R> (fe) ;
+
+   \ Display real number r in engineering notation followed
+   \ by a space.
+
+   : FE.  ( F: r -- )
+     -1 0 FE.R SPACE ;
+
+   \ Convert real number r to string c-addr u in fixed-point
+   \ notation with n places right of the decimal point.
+
+   : (F.)  ( F: r -- ) ( n -- c-addr u )
+     0 TO ef#  (f3) IF
+       ex#  DUP mc# > IF
+         fbuf 0 ( dummy ) 0 (fb)
+         mc# - (f7) (f6)
+       ELSE
+         DUP 0> IF
+           (fc)
+         ELSE
+           ABS (fb) 1 (f7)
+         THEN
+       THEN (f8)
+     THEN ;
+
+   \ Display real number r in fixed-point notation right-
+   \ justified in a field width u with n places right of the
+   \ decimal point.
+
+   : F.R  ( F: r -- ) ( n u -- )
+     >R (F.) R> (fe) ;
+
+   \ Display real number r in fixed-point notation followed
+   \ by a space.
+
+   : F.  ( F: r -- )
+     -1 0 F.R SPACE ;
+
+   \ Convert real number r to string c-addr u with n places
+   \ right of the decimal point.  Fixed-point is used if the
+   \ exponent is in the range -4 to 5 otherwise use scientific
+   \ notation.
+
+   : (G.)  ( F: r -- ) ( n -- c-addr u )
+     >R  (f1) NIP AND [ -4 1+ ] LITERAL [ 5 2 + ] LITERAL WITHIN
+     R> SWAP IF  (F.)  ELSE  (FS.)  THEN ;
+
+   \ Display real number r right-justified in a field width u
+   \ with n places right of the decimal point.  Fixed-point
+   \ is used if the exponent is in the range -4 to 5 otherwise
+   \ use scientific notation.
+
+   : G.R  ( F: r -- ) ( n u -- )
+     >R (G.) R> (fe) ;
+
+   \ Display real number r followed by a space.  Fixed-point
+   \ is used if the exponent is in the range -4 to 5 otherwise
+   \ use scientific notation.
+
+   : G.  ( F: r -- )
+     -1 0 G.R SPACE ;
+
+   CR  FDP @ [IF]
+     CR .( Decimal point always displayed.  Use  0 FDP ! )
+     CR .( or  FDP OFF  to disable trailing decimal point. )
+   [ELSE]
+     CR .( Trailing decimal point not displayed.  Use )
+     CR .( 1 FDP !  or  FDP ON  for FORTH-94 compliance. )
+   [THEN]  CR
+
+   \ ******************  DEMONSTRATION  ******************
+
+   0 [IF]
+
+   CR .( Loading demo words... ) CR
+   CR .( TEST1  formatted, n decimal places )
+   CR .( TEST2  compact & right-justified )
+   CR .( TEST3  display FS. )
+   CR .( TEST4  display F. )
+   CR .( TEST5  display G. )
+   CR .( TEST6  display 8087 non-numbers ) CR
+   CR .( 'n PLACES' sets decimal places for TEST1. )
+   CR .( SET-PRECISION sets maximum significant )
+   CR .( digits displayable. )
+   CR CR
+
+   [UNDEFINED] F, [IF]
+   : F,  ( r -- )  FALIGN HERE 1 FLOATS ALLOT F! ;
+   [THEN]
+
+   CREATE f-array  \ floating-point numbers array
+
+   FALIGN HERE
+   1.23456E-16  F,
+   1.23456E-11  F,
+   1.23456E-7   F,
+   1.23456E-6   F,
+   1.23456E-5   F,
+   1.23456E-4   F,
+   1.23456E-3   F,
+   1.23456E-2   F,
+   1.23456E-1   F,
+   0.E0         F,
+   1.23456E+0   F,
+   1.23456E+1   F,
+   1.23456E+2   F,
+   1.23456E+3   F,
+   1.23456E+4   F,
+   1.23456E+5   F,
+   1.23456E+6   F,
+   1.23456E+7   F,
+   1.23456E+11  F,
+   1.23456E+16  F,
+   HERE SWAP -  1 FLOATS /  CONSTANT #numbers
+
+   : do-it  ( xt -- )
+     #numbers 0 DO
+       f-array FALIGNED I FLOATS +
+       OVER >R  F@  CR  R> EXECUTE
+     LOOP DROP ;
+
+   2VARIABLE (dw)
+   : d.w  ( -- dec.places width )  (dw) 2@ ;
+   : PLACES ( places -- ) d.w SWAP DROP (dw) 2! ;
+   : WIDTH  ( width -- )  d.w DROP SWAP (dw) 2! ;
+
+   5 PLACES  19 WIDTH
+
+   : (t1)  ( r -- )
+     FDUP d.w FS.R  FDUP d.w F.R  FDUP d.w G.R  d.w FE.R ;
+
+   : TEST1  ( -- )
+     CR ." TEST1   right-justified, formatted ("
+     d.w DROP 0 .R ."  decimal places)" CR
+     ['] (t1) do-it  CR ;
+
+   : (t2)  ( r -- )
+     FDUP -1 d.w NIP FS.R  FDUP -1 d.w NIP F.R
+     FDUP -1 d.w NIP G.R        -1 d.w NIP FE.R ;
+
+   : TEST2  ( -- )
+     CR ." TEST2   right-justified, compact" CR
+     ['] (t2) do-it  CR ;
+
+   : TEST3  ( -- )
+     CR ." TEST3   FS."
+     CR ['] FS. do-it  CR ;
+
+   : TEST4  ( -- )
+     CR ." TEST4   F."
+     CR ['] F. do-it  CR ;
+
+   : TEST5  ( -- )
+     CR ." TEST5   G."
+     CR ['] G. do-it  CR ;
+
+   : TEST6  ( -- )
+     PRECISION >R  1 SET-PRECISION
+     CR ." TEST6   8087 non-numbers  PRECISION = 1" CR
+     CR 1.E0 0.E0 F/  FDUP G.
+     CR FNEGATE            G.
+     CR 0.E0 0.E0 F/  FDUP G.
+     CR FNEGATE            G.
+     CR
+     R> SET-PRECISION ;
+
+   [ELSE]
+
+   CR .( To compile demonstration words TEST1..TEST6 )
+   CR .( enable conditional in FPOUT source. ) CR
+
+   [THEN]
+
+   \ end
+
+---------------------------------------------------------------------
+
+5. History
+   -------
+2006-10-01  Revision of REPRESENT proposal (version 1.1 to 2.0)
+2006-10-30  Add addendum and examples
+2006-10-31  Add FPOUT example
+2006-11-27  Example corrected
+2008-01-23  Revised proposal (version 2.0 to 2.1)
+            Specification extended to include negative values
+            of rounding specifier n1.
+2010-12-05  Revised proposal (version 2.1 to 3.0)
+            Specification extended to include environment query
+            string REPRESENT-CHARS.
+

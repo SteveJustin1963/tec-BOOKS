@@ -1,0 +1,23 @@
+\ CRC16B.F
+\
+\ A collection of CRC routines for 16-bit Forth
+\
+\ Version: 1.2
+\ Date:    27-Mar-03
+\
+\ This code is public domain.  Use at your own risk.
+\
+\ It was designed for 16-bit Forth use only - it will
+\ not run on 32-bit Forths.
+\
+\ Four types of CRC are included:
+\
+\   CRC-16
+\   CRC-CCITT
+\   CRC-XMODEM (CRC-CCITT variant)
+\   CRC32-CCITT
+\
+\ The user may select from simple or table-driven CRC.
+\ Source supplied in both high level and 8086 machine
+\ code.
+\

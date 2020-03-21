@@ -1,0 +1,212 @@
+>FLOAT - A Forth-94 Compliant Implementation
+
+Revision 0.3  2012-06-04
+
+Background
+
+>FLOAT is the Forth-94 string-to-float conversion primitive. While most 
+implementations seek to follow the specification given by the Standard, few are 
+strictly compliant. A common deficit is the inability to exclude all illegal 
+input.
+
+The implementation presented here aims to achieve full compliance with Forth-94 
+in a minimum of code. A test is included to check against common errors.
+
+Implementation
+
+\ FINPUT.F  version 0.3  2012-06-04
+\
+\ A minimum yet compliant implementation of Forth-94 >FLOAT.
+\ Works with separate or common stack float model. No
+\ particular effort has been made to optimize for speed or
+\ conversion accuracy.
+\
+\ The requirements for Forth-94 floating-point text input
+\ are met through the function (fnumber).
+\
+\ Implementation dependencies:
+\   2's complement arithmetic
+\   1 char = 1 address unit
+\
+\ This code is PUBLIC DOMAIN.  Use at your own risk.
+\
+\ History:
+\
+\ 0.1  Replaced .1E F* with 10E F/ for better accuracy.
+\      Added conditional to allow leading decimal point
+\      on forth text input.
+\
+\ 0.2  Simplified case-insensitive character tests.
+\
+\ 0.3  Factored fnumber to provide (fnumber).
+
+FORTH DEFINITIONS DECIMAL
+
+CR .( Loading FINPUT 0.3  2012-06-04 ... )
+
+1 \ Change to 0 to compile shorter less strict code
+
+DUP [IF] .( strict ) [ELSE] .( short ) [THEN]
+.( version ) CR
+
+VARIABLE exp  \ exponent
+VARIABLE dpf  \ decimal point
+
+FVARIABLE tmp
+
+10 0 D>F FCONSTANT ften  \ 10.E0
+
+: getc ( a u -- a' u' c )
+  1 /STRING  OVER 1- C@ ;
+
+\ get sign
+: gets ( a u -- a' u' n|0 )
+  DUP IF
+    getc  DUP [CHAR] - = IF EXIT THEN
+              [CHAR] + <> /STRING
+  THEN 0 ;
+
+: getdigs ( a u -- a' u' )
+  BEGIN  DUP  WHILE
+    getc  [CHAR] 0 -  DUP 9 U> IF
+      DROP  -1 /STRING  EXIT
+    THEN
+    0 D>F  tmp F@  ften F*  F+  tmp F!
+    dpf @  exp +!
+  REPEAT ;
+
+DUP [IF] ( strict )
+
+: getmant ( a u -- a' u' flag )
+  TUCK
+  getdigs  DUP IF
+    OVER C@ [CHAR] . = IF
+      -1 dpf !  1 /STRING  getdigs
+    THEN
+  THEN
+  ROT OVER - dpf @ + ;
+
+[ELSE]
+
+: getmant ( a u -- a' u' flag )
+  getdigs  DUP IF
+    OVER C@ [CHAR] . = IF
+      -1 dpf !  1 /STRING  getdigs
+    THEN
+  THEN ;
+
+[THEN]
+
+: getexp ( a u -- a' u' )
+  DUP IF
+    OVER C@  33 OR  [CHAR] e = ( 'D' 'E' 'd' 'e')
+    1 AND /STRING
+  THEN
+  gets >R  0 0 2SWAP >NUMBER 2SWAP D>S
+  R> IF NEGATE THEN  exp @ +
+  BEGIN  ?DUP WHILE  DUP 0<
+    IF    1+  tmp F@  ften  F/
+    ELSE  1-  tmp F@  ften  F*  THEN  tmp F!
+  REPEAT ;
+
+[IF] ( strict )
+
+\ Forth-94 function (strict)
+: >FLOAT ( c-addr u -- r true | false )
+  [ 0 0 D>F ] FLITERAL tmp F!  0 exp !  0 dpf !
+  2DUP  -TRAILING  NIP 0<> AND DUP IF
+    gets >R  getmant IF
+      getexp DUP WHILE
+    THEN
+    2DROP  R> DROP  0 EXIT  THEN
+  ELSE  0 >R
+  THEN  2DROP  tmp F@  R> IF FNEGATE THEN  TRUE ;
+
+[ELSE]
+
+\ Forth-94 function (non-strict)
+: >FLOAT ( a u -- r true | false )
+  [ 0 0 D>F ] FLITERAL tmp F!  0 exp !  0 dpf !
+  -TRAILING
+  gets >R  getmant
+  getexp IF  R> 2DROP 0 EXIT  THEN
+  DROP  tmp F@  R> IF FNEGATE THEN  TRUE ;
+
+[THEN]
+
+\ Forth text float input. Floating-point numbers may be
+\ entered using F#.
+
+1 [IF] ( Scan for 'E' or 'e')
+: escan ( c-addr u1 -- u2 )
+  BEGIN  DUP  WHILE  OVER C@  32 OR  [CHAR] e -
+  WHILE  1 /STRING  REPEAT  THEN  NIP ;
+
+[ELSE] ( Forth-94 specifies 'E')
+: escan ( c-addr u -- fl )  S" E" SEARCH >R 2DROP R> ;
+
+[THEN]
+
+1 [IF] ( Standard behaviour )
+
+: (fnumber) ( c-addr u -- [r] flag )
+  DUP 1 > IF ( at least 2 chars )
+    OVER  DUP C@ [CHAR] . < -  ( skip sign)
+    C@ [CHAR] . >  >R          ( 1st char must be a digit)
+    2DUP escan R> AND  BASE @ 10 = AND  0= WHILE
+  THEN  2DROP 0  ELSE  >FLOAT  THEN ;
+
+[ELSE] ( allow leading decimal point )
+
+: (fnumber) ( c-addr u -- [r] flag )
+  2DUP escan  BASE @ 10 = AND IF  >FLOAT  ELSE  2DROP 0
+  THEN ;
+
+[THEN]
+
+: fnumber ( c-addr u -- [r] flag )  (fnumber)
+  DUP >R  STATE @ AND IF  POSTPONE FLITERAL  THEN R> ;
+
+: F# ( "number" )
+  BL WORD COUNT fnumber 0= ABORT" bad float" ; IMMEDIATE
+
+[DEFINED] DXFORTH [IF]
+  BEHEAD exp getexp  BEHEAD escan escan
+[THEN]
+
+0 [IF] ( Test )
+
+: CHECK ( addr len flag )
+  >R CR [CHAR] " EMIT 2DUP TYPE [CHAR] " EMIT
+  8 OVER - SPACES  >FLOAT DUP >R IF FDROP THEN R>
+  ." --> " DUP IF ." TRUE " ELSE ." FALSE" THEN
+  R> - IF ."   *fail* " ELSE ."   pass " THEN ;
+
+: TEST ( -- )
+  CR ." Checking >FLOAT Forth-94 compliance ..." CR
+  S" ."    FALSE CHECK
+  S" E"    FALSE CHECK
+  S" .E"   FALSE CHECK
+  S" .E-"  FALSE CHECK
+  S" +"    FALSE CHECK
+  S" -"    FALSE CHECK
+  S"  9"   FALSE CHECK
+  S" 9 "   FALSE CHECK
+  S" "     TRUE CHECK
+  S"    "  TRUE CHECK
+  S" 1+1"  TRUE CHECK
+  S" 1-1"  TRUE CHECK
+  S" 9"    TRUE CHECK
+  S" 9."   TRUE CHECK
+  S" .9"   TRUE CHECK
+  S" 9E"   TRUE CHECK
+  S" 9e+"  TRUE CHECK
+  S" 9d-"  TRUE CHECK
+;
+
+TEST
+
+[THEN]
+
+\ end
+

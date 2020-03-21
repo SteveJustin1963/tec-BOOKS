@@ -1,0 +1,44 @@
+00Index                     This list
+big.zip                     Leonard Zettel's big number package
+debugger.ans                Joerg Plewe's ANS Forth Debugger
+f68kans.txt                 Info on ANS Forth for 68K processors by Joerg Plewe 
+f68kans.zip                 ANS Forth for 68K processors by Joerg Plewe 
+fp-load                     ThisForth file for loading floating point
+                            (this should have been in the source distribution
+                            but it got left out).
+memory.fth                  An implementation of ANS Memory Allocation wordset
+pfe096.txt                  PFE Forth V0.9.6 info   (TO BE DELETED SOON)
+pfe096.zip                  PFE Forth V0.9.6 source and docs (TO BE DELETED SOON)
+pfe099.txt                  PFE Forth V0.9.9 info 
+pfe099.zip                  PFE Forth V0.9.9 source and docs
+pfe099.MIPS                 PFE Forth V0.9.9 exectuable for MIPS
+pfe099.SGI                  PFE Forth V0.9.9 exectuable for SGI
+pfe099.SUN                  PFE Forth V0.9.9 exectuable for SUN (SunOS 4.1C)
+pfe-0.9.11.tar.gz           PFE Forth V0.9.11 sources
+pfe-0.9.11.bin.tar.gz       PFE Forth V0.9.11 DOS and OS/2 binaries
+pfe-0911.zip                PFE Forth V0.9.11 sources (zip format)
+pfe-0911b.zip               PFE Forth V0.9.11 DOS and OS/2/ binaries (zip format)
+pfetcp.sh01                 PFE Forth Low Level, TCP/IP and XDR I/O package
+				 (shell archive)
+pfetcp.tar.Z                PFE Forth Low Level, TCP/IP and XDR I/O package
+				 (compressed tar)
+pfetcp.tar.gz               PFE Forth Low Level, TCP/IP and XDR I/O package
+				 (gnu compressed tar)
+stand4th.zip                Jet Thomas' Forth Standardizer
+tcp.sh01                 Low level and TCP/IP I/O for ThisForth (shell archive)
+tcp.tar.Z                Low level and TCP/IP I/O for ThisForth (compressed tar)
+tcp.tar.gz               Low level and TCP/IP I/O for ThisForth (gnu compressed tar)
+this4th.CRAY                ThisForth binary for the CRAY (Y-MP)
+this4th.MIPS                ThisForth binary for MIPS (95-02-25)
+this4th.SGI                 ThisForth binary for SGI  (95-02-25)
+this4th.SUN                 ThisForth binary for SUN (SunOS 4.1C) (95-02-25)
+this4th.exe                 ThisForth binary for MS-DOS (386/486) (94-09-12)
+this4thx.exe                ThisForth binary for 32 bit MS-DOS (386/486) (95-02-25)
+this4th.tar.gz              ThisForth source and docs (94-09-12)
+this4th.zip                 ThisForth source and doocs (94-09-12)
+this4th-00b01.mac.cpt.bin   ThisForth binary for Macintosh and PowerMac (94-09-12)
+uudecode.seq                UUDECODE utility
+uuencode.seq                UUENCODE utility
+xdr.sh01		    XDR interface for ThisForth (shell archive)
+xdr.tar.Z		    XDR interface for ThisForth (compressed tar)
+xdr.tar.gz		    XDR interface for ThisForth (gnu compressed tar)
