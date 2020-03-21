@@ -1,0 +1,4 @@
+Uri: http://www.perschl.at/minimon/
+File Name: D:\Engineering\Z80 monitor\MINIMON\www.perschl.at\minimon\index.htm
+Content Type: text/html
+
