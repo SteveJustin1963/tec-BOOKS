@@ -1,0 +1,62 @@
+\ AUTHOR:    Jack W Brown
+\ Date:      June 8, 1988
+\ Subject:   Dynamic arrays.
+
+
+( DYNAMIC ARRAYS: Allocate both size and storage at run time!! )
+VARIABLE DFLAG    DFLAG OFF
+VARIABLE SFLAG    SFLAG OFF
+
+: -> SFLAG ON ;
+: ADDR 1 DFLAG ! ;
+: SIZE -1 DFLAG ! ;
+
+: DARRAY  ( --   -- )
+  CREATE  0 , ( size defaults to 0 )
+          0 , ( storage address defaults to 0 )
+  DOES>   DFLAG @  ?DUP DFLAG OFF
+          IF ( non data operation )
+             SFLAG  @  SFLAG OFF
+             IF  ( storing size or address )
+                 1+ IF    2+ ! ( current storage address )
+                    ELSE  ! ( current array size      )
+                    THEN
+             ELSE ( fetching size or address )
+                  1+ IF   2+ @ ( save array size )
+                     ELSE    @ ( save array storage address )
+                     THEN
+             THEN
+          ELSE ( data fetch or store )
+             DUP @ 1 <   ABORT" Undefined or invalid size."
+             DUP 2+ @ 0= ABORT" Undefined storage space."
+             2DUP @ >    ABORT" Index out of range."
+             SFLAG @  SFLAG OFF
+             IF ( data store operation )
+                ( stack: num index pfa )
+                SWAP 2+ 2* + !
+             ELSE ( data fetch )
+                 ( stack: index pfa )
+                SWAP 2+ 2* + @
+             THEN
+          THEN  ;
+
+\ Sample usage:
+
+DARRAY JACK   ( Make one of the suckers )
+SIZE JACK .  ( 0  OK )
+ADDR JACK .  ( 0  OK )
+\ Set size of JACK to 10
+10 -> SIZE JACK
+\ Make some space 
+HERE 20 ALLOT -> ADDR JACK
+
+SIZE JACK . ( 10  OK )
+ADDR JACK . ( 33102  or value of HERE  OK )
+1234 1 -> JACK  (  OK )
+1 JACK .  ( 1234   OK )
+4567 2 -> JACK  (  OK )
+2 JACK .  ( 4567   OK )
+
+\ Now how would you like to make me a version of DARRAY that will
+\ work with external ( to forth's code seqment ) memory?
+

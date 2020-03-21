@@ -1,0 +1,81 @@
+---------------------XSEG2CFA.seq:
+\\ xseg2cfa    convert a absolute Xseg-paragraph to the cfa   \ ALL980610
+
+ this is very useful for chasing bugs in MULTItasker, where you
+ usually only know the forth-IP, i.e. a Xseg:offset to X-space.
+
+ ALL980610 v0.02   improved comments
+ ALL980529 v0.01   added X.ID ...
+ ALL980527 v0.00   idea stolen from DEBUG.seq
+                   according to an eMail hint from Tom Zimmer
+
+From: All@business.forth-ev.de (Wolfgang Allinger)
+
+{
+
+ anew --xseg2cfa--
+
+\ ------------------
+
+ defined seg>cfa nip 0= #IF
+
+\if 'docol      ' HEX   @REL>ABS          CONSTANT 'DOCOL
+\if 'dodoes     ' FORTH @REL>ABS @REL>ABS CONSTANT 'DODOES
+
+}
+: advance       ( a1 u1 u2 -- a+u2 u1-u2 | u1<u2: a+u1 0 )
+        /string exit
+                2DUP U< IF   UMIN DUP   THEN
+                ROT OVER + -ROT -         ( -- a+u2 u1-u2 )
+ ;
+{
+
+: find_:        ( a1 n1 -- a2 n2 )   \ find any :-definition
+                begin   $E9 ( jmp ) scan        ( -- a$E9 n2 | aZ 0 )
+                        over @rel>abs 'docol <> over and
+                while   3 /string	( -- a+3 n-3 )
+                repeat ;
+
+: find_dodoes   ( a1 n1 -- a2 n2 )   \ find any DOES>-definition
+                begin   $E8 ( call ) scan       ( -- a$E8 n2 | aZ 0 )
+                        over @rel>abs @rel>abs 'dodoes <> over and
+                while   3 /string	( -- a+3 n-3 )
+                repeat ;
+
+: seg>cfa       ( seg -- cfa f1 )       \ find cfa given the physical segment
+                                        \ t=found, f=not found
+                xseg @ - >r             \ convert to XSEGrel
+
+        \ search for :-def w/ (body)=XSEGrel
+                $100 here $100 - \ dictionary=codeSEG: $100 (DP-$100)times
+                begin   find_:  ( -- a$E9docol n | a' 0 )
+                        over >body @ r@ <> over and     \ (body)=Xrel?
+                while   5 /string       \ no, advance behind 5byte $E9....
+                repeat  ( -- a n )
+                dup 0=
+                if      2drop
+        \ search for DOES>-part w/ (body)=XSEGrel
+                        $100 here $100 -
+                        begin   find_dodoes over @rel>abs
+                                >body @ r@ <> over and  \ (body)=Xrel?
+                        while   5 /string  \ no, advance behind 5byte $E8...
+                        repeat
+                then
+                r>drop
+ ;
+
+ #THEN
+
+: (X.id)   ( Xpara -- )       \ show the name where XPARAGRAPH .2
+                SEG>CFA ( xseg -- cfa ? )  DROP >NAME (%.ID) \ no spaces
+ ;
+
+: X.ID    ( Xpara -- )    (X.id) SPACE ;
+
+
+\s
+
+: T     @> SEG>CFA +XSEG SPACE X.ID ;	\ should type 'SEG>CFA'
+
+
+\ end of ALL's garbage

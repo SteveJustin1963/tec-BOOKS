@@ -1,0 +1,160 @@
+
+\ DIV0.SEQ   Division interrupt routine for 80286      900609 rmb
+   \ Processes division overflow, so as to return the
+   \ lower-order bits of the quotient, and the correct remainder.
+   \ Also processes division by zero to return the remainder equal
+   \ to the dividend (as specified by Knuth).
+
+Note: this file uses my assembler and interrupt utilities--it's not a
+cookbook divide-by-zero interrupt.  The file is for system level 80x8n
+programmers, as well as Forth PC-DOS implementors.  Assumptions include
+familiarity with the register conventions of the division opcode, some
+familiarity with the values pushed on the stack during an interrupt,
+and the implementation of MU/MOD .  The semantic goal of this overflow
+processing is so that UM/MOD gives the same results as   MU/MOD DROP .
+
+The file also briefly describes the interrupt handler I use,
+INTERRUPT-PRESERVE , which I can best describe as pleasant, as well as
+the F-PC DEFERS construct.
+
+
+
+Comment:
+        Opcodes that generate a divide by zero interrupt
+    F6 /6  eb DIV         \ could have segment prefix(s)
+    F7 /6  ew DIV                          "
+    F6 /7  eb IDIV                         "
+    F7 /7  ew IDIV                         "
+    D4 nn  byte div immediate, AAM   \ no segment prefix
+
+    (Here's a puzzle: why would Intel implement a byte div immediate
+     opcode on their 80286 and then decline to document it, except
+     for it's use to divide by ten?  It works on their other
+     80x8n processor's too, as far as I know.)
+
+To keep things simple, most of the above possibilities will not be
+checked.
+   1) No byte div immediate (ignore AAM )
+   2) No eb div's           (ignore byte-wide divisors)
+   3) No segment prefix(es) or lock prefixes
+Also, the coding requires a usage convention that:
+   4) Divisor is always in the CX register
+   (This also means we'll know that the opcode is two bytes in length.)
+Therefore, we only look at the 2nd byte of the opcode, and see if the
+division is signed or not.
+
+Comment;
+
+
+LABEL DIV0       \ the routine that gets installed
+                 \ in interrupt vector 0, divide by zero.
+
+   bp push   sp, bp mov   \ use BP to remember where the stack started
+                          \ now, check for a divisor of zero
+   cx<>0 if               \ no, it's an overflow
+      si push   ds push   \ free-up a memory-pointer register pair
+      ax push             \ save low-order dividend
+      2 [+bp], si lds     \ get the offending-opcode address
+      si inc   lodsb      \ and get the second byte of the opcode
+      8 #b, al test       \ a zero in this bit is an unsigned opcode
+      dx, ax mov          \ move hi-order dividend into position
+      0= if   ( /6, unsigned )
+         dx, dx xor   cx div   ax pop
+         \ after this routine is exited, processor repeats DIV opcode
+      else    ( /7, signed )
+         \ Note:
+         \         cwd   cx idiv   ax pop
+         \  as in the unsigned part doesn't work (but looks ok at first
+         \  glance).
+         \  The following is a quick fix that solves my immediate
+         \  problems: it simply doesn't try to handle negative
+         \  operands.  Improvements?
+         dx, dx xor   cx div
+         ax pop
+         cx div
+         2 #w, 2 [+bp] add    \ don't let processor repeat the opcode
+      then
+      ds pop   si pop
+   else   \ divide by zero
+        2 #w, 2 [+bp] add   \ Increment over the opcode
+        dx, ax xchg   \ Make the lower-order part of the dividend be the
+                      \ remainder.  The resulting quotient is
+                      \ unimportant, but happens to be the high-order
+                      \ part of the dividend.
+   then
+   bp pop   iret
+   end-code
+
+\ That's the end of the interrupt routine.  Following is the
+\ compiler utility to install it.  DOS expects you to restore the
+\ interrupt vectors you've used when you're done with them.
+
+0 interrupt-preserve
+   \ (0 is the interrupt-vector number for divide by zero)
+
+Comment:
+   INTERRUPT-PRESERVE is a compilation procedure for automatically
+   maintaining the interrupt structure.
+   On invocation of the Forth, (and also during the compilation) the
+   existing value in the interrupt vector is preserved.
+   When the Forth program is terminated, the preserved value is
+   restored into the interrupt vector.
+   A related process occurs when an external DOS function, such as
+   DIR or another program, is called from within the Forth.
+   Current interrupt-vector values are temporarily stored, and the
+   original ones are put back into place--until the external call is
+   finished.
+
+   The PRESERVE concept was first developed as a part of the
+   Dysan Forth project which included Kim Harris and Michael McNeil.
+   We knew not to FORGET without undoing forward references in execution
+   vectors, but weren't always so careful.  PRESERVE only remembers
+   when we FORGET (!)  The related problem with leaving interrupt vectors
+   unrestored leads to a curious effect, in which the Forth is exited
+   and DOS works fine until a large program is loaded.  Poof!--it's
+   reset time.
+
+Comment;
+
+div0 ?cs: 0 interrupt!       \ sets the div0 interrupt during compilation
+
+: +div0
+   defers resurrect
+   div0 ?cs: 0 interrupt! ;
+' +div0 is resurrect         \ sets the div0 interrupt on subsequent
+                             \ invocation of the Forth, and also returning
+                             \ from external DOS calls.
+
+Comment:
+   DEFERS is an F-PC construct that creates a "linked" list of
+   executable procedures.  The technical beauty here, (thanks, Tom
+   Zimmer) is that no special links are needed because the inner
+   interpreter and colon definitions do the linking.
+
+   RESURRECT is the name of the top routine in one of those linked
+   lists, and is executed at boot-up time.  By consistent placement of
+   the DEFERS at the beginning of such link routines, a low-memory to
+   high-memory executing chain is created, so that newer routines in
+   the link can supercede previous processes in the chain.  The
+   related RESTORE process, executed on termination of the Forth
+   program, must execute from high-memory to low-memory.  Michael
+   McNeil, of the Dysan group, is credited with naming RESURRECT .
+
+Comment;
+
+
+\s
+
+Implementation idea for the divide-interrupt routine:
+   Since the   cx div  repeats the identical opcode that we are
+   patching, the processor's single-step utility might be used to
+   simplify the implementation and improve it's generality.  If we
+   knew that all of the divisions were word-wide and unsigned, for
+   example, this would handle all possible registers, addressing modes,
+   and opcode lengths with no analysis.
+
+ide divisors)
+   3) No segment prefix(es) or lock prefixes
+Also, the coding
+
+

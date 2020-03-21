@@ -1,0 +1,552 @@
+
+\ PFO-001.SEQ    Prefix Frame Operators for F-PC (2.25)  by Jose Betancourt.
+\ See Forth Dimensions Vol. XI, No. 1, pg. 23  for explanation of approach.
+\ Contents:  a method of creating parameter stack frames for the use of
+\ local variables and parameters.  String words for the creation and
+\ reference of labels.  Extentions for utility.  Thoughts and comments.
+
+\ ********************  Vocabulary specification  **************************
+
+VOCABULARY PFO  \ define all internal PFO words in the PFO vocabulary.
+ONLY   FORTH ALSO   PFO ALSO  DEFINITIONS  \ Start PFO system definitions.
+
+\ **************************  Simple string words **************************
+
+: $=            ( $1 $2 --- flag )      \ compare strings, same=true flag
+        -1 -ROT   DUP C@  1+    OVER + SWAP (  Tflg  $1  $2+len+1  $2  )
+        DO    COUNT   I C@   <>    ( Tflg adr  flag )
+              IF    SWAP DROP  0  SWAP  ( Fflg adr )    LEAVE  THEN
+        LOOP   DROP ;
+
+: GETNAMES      \ name1....nameN )  ( adr --- count ) count is #items
+    \ get instream labels and form string array at adr
+    \ form:  [ 1len |$....|1len|$.........|1len|$..| 0 |   ]
+    0 SWAP BEGIN    32 WORD  DUP 1+   (  cnt adr here here+1 )
+             C@ ASCII  )  <>  ( right parenthesis not reached? )
+           WHILE    ROT 1+  -ROT    2DUP  C@ 1+ ( cnt+1  adr here adr len+1 )
+                    >R    R@ CMOVE R> +  ( cnt+1   adr+len+1 )
+           REPEAT   DROP    ( cnt adr )     0 SWAP C!  ; \ mark end of array.
+
+: $SRCH   (  $adr $array --- offset flag )  \ srch for $ at array, t=found
+        0 0 2SWAP      ( count  Fflg  $adr  bufadr )
+        BEGIN   DUP C@  0=   3 PICK   OR NOT     \ not ( end or found )
+        WHILE     2DUP $=     (  cnt Fflg $adr badr flg )
+                    IF  ROT DROP -1 -ROT    \ change flag to true
+                    ELSE   >R ROT 1+ -ROT R>  ( increment count )
+                           COUNT +  ( point to next $ in buffer )
+                    THEN
+        REPEAT   2DROP   ;
+
+VARIABLE LPTR    \ name buffer pointer, this will be set to point at DP+1024
+
+: SRCH.CHAR   ( adr char --- adr')  \ search starting at adr for char
+    BEGIN
+       SWAP COUNT   ( char adr+1 char' )
+       SWAP -ROT OVER =  ( adr+1 char flag )
+    UNTIL   DROP   1- ;
+
+: REMOVE\       \ remove "\" from name list at LPTR $array
+    \ this is to avoid allocating "\" as a local argument.
+    LPTR @  DUP  ASCII \  ( buffer buffer "\" )  SRCH.CHAR  ( buf buf adr\ )
+    SWAP 0  ( buf adr buf 0 )  SRCH.CHAR  ( adr\  adr0 )
+    SWAP DUP    >R 1+  SWAP  ( adr\+1  adr0 )   \ R( adr\ )
+    R@ -  R>  1-  SWAP (  a\+1   a\-1  a0-a\  )  CMOVE   ;
+
+\ *********************** lazy variables ***********************************
+
+: >SHOVE        ( $buffer n )   \ make room for lazy names in $array
+    SWAP  >R  2*  R@  +   R>   ( n  2n+a  a )
+    LPTR @ 2+ C@ + 3 +   SWAP  OVER  \  ( a+len+3   2n+a  a+len+3 )
+    LPTR @  0  SRCH.CHAR    SWAP   - 1+  (  a+len+3,  2n+a,  a0-[a+len+3]+1)
+    CMOVE> ;
+
+: SKIP.O        ( C --- C' )  \ if c is O convert to P using hybrid logic
+    DUP  ASCII O  =  1 AND  + ;
+
+: RESERVE       ( $buffer  n )      \ create lazy variables if needed
+    2DUP   >SHOVE  2*   2DUP   1  ( buf 2n buf 2n 1 )   FILL
+    ASCII M   -ROT  SWAP  1+  SWAP  ( m  b+1  2n )
+    OVER + SWAP   ( m   2n+b+1   b+1 )
+    DO   SKIP.O  DUP I C!  1+   2 +LOOP    DROP ;
+
+: ?LAZY     (  #parsed --- new.number )  \ make lazy variables if needed.
+    LPTR @   @     8961 =   \ first name is "#"?
+    IF   0 0    LPTR @   2+  CONVERT   2DROP   ( parsed  n )
+         LPTR @    OVER   ( parsed n a n )  RESERVE  + 2-  ( parsed+n-2 )
+    THEN ;
+
+\ *********   STACK EXTENSION for uninitialized local variables.************
+
+CREATE SLASH   1 C,  ASCII \ C,   \ the character "\" as a string.
+
+CODE   EXTSTK    (   )      \ extend stack by decrementing stack pointer.
+    LODSW ES:   \ ax=n
+    SUB SP, AX  \  sp=sp-n, where n is multiple of 2.
+    NEXT
+END-CODE
+
+: ?TEMPS        ( #parsed ---new# )     \ stack extension if needed.
+    SLASH   LPTR @    $SRCH
+    IF ( parsed offset )   OVER SWAP -  2*    ( p  [p-o]*2 )
+       COMPILE EXTSTK    X,   REMOVE\
+    ELSE  DROP
+    THEN   ;
+
+/*
+    The following source uses many CODE words with repetitive code.  A better
+alternative is to code the primitives 'N and 'NN as in the 68000 version.
+Since the stack frame pointer is nested on the return stack to allow calling
+of words that may each use frames, the use of subroutines would complicate
+the hiding of the frame pointer in the return address.
+*/
+
+\ ****************  FRAMING ***********************************************
+
+VARIABLE FPTR    \ stack frame pointer, should be a register for speed.
+
+CODE (FRAME)     \ run-time creation of stack frame
+    LODSW ES:       \ ax=n  ( load string word at SI, increment SI by 2 )
+    MOV CX, AX      \ CX=N  ( cx now has size of frame needed )
+    ADD CX, SP      \ cx=sp+n  ( cx is now address of stack pointer + size )
+    MOV BX, FPTR    \ bx=fptr  ( get fptr )
+    MOV AX, 0 [BX]  \ ax=fprt @ ( get old frame address )
+    SUB RP, # 2     \ rp=rp-2   ( make room on return stack )
+    MOV 0 [RP], AX  \ save frame address in return stack.
+    MOV 0 [BX], CX  \ fptr =sp+n is new value of fptr.
+    NEXT
+END-CODE
+
+FORTH DEFINITIONS
+
+: L(       \ name...) |name..)\ temps..)|\ temps.)|# n \ temps.. )
+    ?COMP  PFO   HERE 1024 +  DUP  LPTR !    GETNAMES  DUP
+    0=  ABORT"  empty parameter list!"   \ empty list is useless
+    ?LAZY  ( make any lazy )  ?TEMPS   ( add any extensions to stack )
+    1-  0 MAX   2*    COMPILE  (FRAME)     X,   ;  IMMEDIATE
+
+/*
+                                       ZDDDD< DDDD?
+                        ZDDDDD?        3          3
+Syntax diagram.         3    ZAD>DD \ DADD name DDAD?
+      ZDDDDDDDDDDD>DDDDDY    3                      3
+L(DDDDEDDD name DDDBDDD>DDBDDADDDDDDDDDDDDDDDDDDDDDDADDDDD >DDDDDD)
+      CDDDDDDD<DDDDY      3
+      @DD # DDD numberDD>DY      Examples:  L( # 3 \ radius depth )
+                                            L( rate time \  interest )
+                                            L( # 2 \ one two )
+                                            L(   \ row col width )
+
+ Perhaps a better syntax would be the parameters separated by commas rather
+then blanks:    L( # 3 \ radius,depth ).   But, that would complicate
+things.  How would the compiler know what are the parameters?  Maybe by
+using commas everywhere as in C.  L( #,3,\,radius,depth).  But that doesn't
+look good.  No wonder Forth uses blanks as delimiters!
+*/
+
+\ ************************ UNFRAMING **************************************
+
+PFO DEFINITIONS
+
+CODE (NONE)      \ run-time stack reset leaving no parameters.
+    MOV BX, FPTR      ( bx=fptr )         MOV AX, 0 [BX]  \ ax=fptr @
+    ADD AX, # 2       ( ax = fptr @ + 2 ) MOV SP, AX      \ sp=fptr@+2
+    MOV CX, 0 [RP]    ( cx=oldfptr )      ADD RP, # 2     \ rp=rp+2
+    MOV 0 [BX], CX    ( fptr=oldfptr )    NEXT
+END-CODE
+
+\ This unframing code word, (SOME), is too long and will be a big slow down.  I'm
+\ There must be a better way to code this.
+CODE (SOME)         \ run-time stack reset returning parameters.
+    LODSW ES:        ( ax=n )          MOV DX, AX       ( dx=n )
+    MOV CX, 0 [RP]   ( cx=oldfptr )    ADD RP, # 2  ( drop top of rstack )
+    MOV BX, FPTR     ( bx=fptr )       MOV AX, 0 [BX]   ( ax=newfptr )
+    MOV 0 [BX], CX   ( fptr=oldfptr )  SUB AX, DX       ( ax=fptr-n )
+    ADD AX, # 2      ( ax=f-n+2 )      MOV BX, SP       ( bx=sp )
+    PUSH AX PUSH BX PUSH AX PUSH DX   \  R( f-n+2 sp f-n+2 n )
+    \ code for cmove> from f-pc source code by T. Zimmer.
+    STD  ( set direction to decrement ) MOV BX, IP    MOV AX, DS
+    POP CX       DEC CX  \ bx=IP  ax=DS  cx=n-1
+    POP DI       POP IP  \ di=f-n+2      ip=sp
+    ADD DI, CX   ADD IP, CX      INC CX  \ di=f-n+2-1 ip=sp+n-1 cx=n
+    PUSH ES      MOV ES, AX   \ stack <-- ES   es=ds
+    REPNZ        MOVSB  \ do movsb n times.  it uses SI in DS and DI in ES
+    MOV IP, BX   CLD  POP ES   \ restore IP and ES
+    POP SP   ( reset SP with f-n+2 )  NEXT
+END-CODE
+
+FORTH DEFINITIONS
+
+: S(         \ names...) | # n ) | # n names.. ) compile frame release .
+    ?COMP     LPTR @    GETNAMES   DUP
+    IF  LPTR @   @ 8961 =   \ there are parameters and first string is "#"?
+        IF     \ convert next string to number
+           DROP  0 0  LPTR @  2+  CONVERT  2DROP
+        THEN   COMPILE (SOME)    2*  X,
+    ELSE    \ zero parameters.  Or in C parlance a Void.
+        DROP  COMPILE (NONE)
+    THEN   FORTH    ;  IMMEDIATE
+
+: S()        \ compile null frame release. Same as S(  ) but shorter.
+        ?COMP  COMPILE (NONE)  FORTH ;   IMMEDIATE
+
+/* Note that a parameter frame can be made at any point in a colon
+definition, not just at the beginning and closed at the end.  This is good
+feature since a frame can be made and used based on decision or state.
+Example:    IF  L( eeny miny moe ) ....S()... ELSE ..... THEN....
+*/
+/*        syntax diagram for S(
+
+S( DDDDBDDDDDDDDDDDDDDDDDDDDDDBD>DDDDBDDDDDDDDDDDDDDDDDDDBDD>DDDDDDD)
+       3                      3      CDDDDDname D>DDDDDDD4
+       @DDDDD#  number  DDD>DDY      @DDDDDDDDD<DDDDDDDDDY
+
+*/
+
+\ *****************   PREFIXING ********************************************
+
+PFO DEFINITIONS
+
+: ?LOCAL        \ name       compile name's frame offset.
+    32 WORD LPTR @ $SRCH 0=  ( name not found in $array? )
+    IF    HERE   COUNT TYPE ABORT"     is local?"   THEN
+    2*  X,  ( compile the stack frame offset ) ;
+
+CODE (L)        ( ---n )    \ run-time fetch, C term "rvalue."
+    LODSW ES:           \ ax=n    \ ax now has inline number offset.
+    MOV BX, FPTR        \ bx=fptr       \  get frame pointer.
+    MOV CX, 0 [BX]      \ cx=fptr@      \  get frame address.
+    SUB CX, AX          \ cx=fptr@-n    \  adr=frame.address-offset.
+    MOV BX, CX          \ bx=fptr@-n    \  bx=     "
+    MOV AX, 0 [BX]      \ ax=[fptr@-n]@ \  ax now has stored number.
+    PUSH AX             \ [sp]=n        \  push to parameter stack.
+    NEXT
+END-CODE
+
+CODE (IS)      ( value )   \ run-time store,  C term "=".
+    LODSW ES:           ( ax=n )  MOV BX, FPTR    \ bx=fptr
+    MOV CX, 0 [BX]      ( cx=fptr@ ) SUB CX, AX   \ cx=f-n
+    MOV BX, CX          ( bx=f-n ) POP 0 [BX]     \ stackcell=value on stack
+    NEXT
+END-CODE
+
+CODE (AT)       ( --- address )     \ run-time pointer, C term "lvalue".
+    LODSW ES:           ( ax=n ) MOV BX, FPTR        \ bx=fptr
+    MOV CX, 0 [BX]      ( cx=fptr@ ) SUB CX, AX      \ cx=fptr@-n
+    PUSH CX             ( tos=fptr@-n ) NEXT
+END-CODE
+
+/*     What I want to really do is define a word called 'N that will
+allow a shorter definition of prefixes.  Such as:
+        : (L)     'N @ ;
+        : (IS)    'N ! ;
+        : (AT)    'N   ;
+But, I'm having trouble defining 'N.  It should get the inline number that
+follows (L) in a definition.  I guess it must use the second address on the
+return stack as the pointer, then increment the address so that the
+interpreter returns to the address past the inline number.  Of course, I
+will also need another word, 'NN, to get the address of two inline offsets
+for dual prefix operators such as SUM, SUB, XCHG.....
+*/
+
+: L             \ name          compile call to stack cell fetch.
+    ?COMP  COMPILE (L) ?LOCAL ; IMMEDIATE
+
+: IS            \ name          compile call to stack cell store.
+    ?COMP COMPILE (IS) ?LOCAL ; IMMEDIATE
+
+: AT            \ name          compile call to stack cell address.
+    ?COMP COMPILE (AT) ?LOCAL ; IMMEDIATE
+
+\ *********************  EXTENSIONS ***************************************
+
+CODE (LC@)      ( ---char ) \ run-time byte fetch
+    LODSW ES:           \ ax=n
+    MOV BX, FPTR        \ bx=fptr
+    MOV CX, 0 [BX]      \ cx=f
+    SUB CX, AX          \ cx=f-n
+    MOV BX, CX          \ bx=f-n
+    MOV BX, 0 [BX]      \ bx=[f-n]    bx now has target address
+    SUB AX, AX          \ clear ax
+    MOV AL, 0 [BX]      \ al=([fprt@-n])     al = address C@
+    PUSH AX             \ [sp]=n
+END-CODE
+
+CODE (LC!)      ( char--- )   \ run-time byte store.
+    LODSW ES:        ( ax=n )       MOV BX, FPTR   \ bx=fptr
+    MOV CX, 0 [BX]   (  cx=f )      SUB CX, AX     \ cx=f-n
+    MOV BX, CX       ( bx=f-n )     SUB AX, AX     \ clear ax
+    MOV BX, 0 [BX]   ( bx=address ) POP AX         \ ax=character
+    MOV 0 [BX], AL   ( address=character )    NEXT
+END-CODE
+
+\ There must be better names for these two prefixes.
+: LC@           \ name          compile call to stack cell C@.
+    ?COMP COMPILE (LC@)  ?LOCAL ; IMMEDIATE
+
+: LC!           \ name          compile call to stack cell C!.
+    ?COMP   COMPILE (LC!)    ?LOCAL   ; IMMEDIATE
+
+CODE  (++)              \ run-time increment of local variable.
+    LODSW ES:           ( ax=n )    MOV BX, FPTR        \ bx=fptr
+    MOV CX, 0 [BX]      ( cx=f )    SUB CX, AX          \ cx=f-n
+    MOV BX, CX          ( bx=f-n )  INC 0 [BX] WORD     \ [bx]=[bx]+1
+    NEXT        END-CODE
+
+CODE  (--)       \ run-time decrement of local variable.
+    LODSW ES:           ( ax=n )    MOV BX, FPTR        \ bx=fptr
+    MOV CX, 0 [BX]      ( cx=f )    SUB CX, AX          \ cx=f-n
+    MOV BX, CX          ( bx=f-n )  DEC 0 [BX] WORD     \ [bx]=[bx]-1
+    NEXT   END-CODE
+
+: ++            \ name             compile call to increment.
+    ?COMP  COMPILE (++)  ?LOCAL  ; IMMEDIATE
+
+: --            \ name             compile call to decrement.
+    ?COMP COMPILE (--)  ?LOCAL ; IMMEDIATE
+
+/*   The words ++ and -- came from the C language.
+Since C is so popular, perhaps Forth should just ransack it for anything
+useful?  But, C functions are so complex!  No wonder it takes so long to
+compile anything.  By the time something compiles, I forgot why I wanted
+to compile it in the first place.  QuickBASIC at least has an interpretive
+mode.  But it is non-extendable, lacks an inline assembler, not all that
+interactive, and its Basic.
+How about the word == to compare two local variables?  == lv1 lv2 .
+*/
+
+\ *********************  Vectored Execution ********************************
+
+CODE (GO)    (  )   \  run-time vectored execution of CFA in local variable.
+    LODSW ES:          (  ax=n )        MOV BX, FPTR        \ bx=fptr
+    MOV CX, 0 [BX]     ( cx=fptr@ )     SUB CX, AX          \ cx=fptr@-n
+    MOV BX, CX         ( bx=fptr@-n )   MOV AX, 0 [BX]      \ ax=[fptr@-n]@
+    JMP AX             ( jump to cfa in AX. )   NEXT
+END-CODE
+
+: GO       \  name  ( --- )      compile call to vectored execution prefix.
+    ?COMP   COMPILE  (GO)  ?LOCAL  ;   IMMEDIATE
+
+/*
+Traditional first C program in Forth using vectored execution:
+: SAYHELLO      CR   ."  Hello World! " CR  ;
+: TESTHELLO    ' SAYHELLO   L(   GREET )   GO GREET    S() ;
+
+         Perhaps some other vectored execution forms would be of use.  For
+example, GOSUB and GODOS.  GOSUB will execute a non-code machine language
+subroutine and return to the Forth interpreter.  GODOS will do the same
+with an external system or library routine.  Maybe this is one way of
+hooking into precompiled libraries, imagine using Borland's BGI in Forth.
+*/
+
+
+ONLY    FORTH ALSO    DEFINITIONS    \ End of PFO system definitions.
+                                     \ New definitions now go in Forth vocab.
+
+\ ##########################################################################
+\ --------------------- E X A M P L E -----------------------------------
+\S
+\   QuickSort in F-PC using Parameter Stack Frames     by Jose Betancourt
+\   Based on algorithim written in C language.
+
+\ One way of defining the required array access words.
+
+CREATE  VECT@    ' NOOP ,  ' C@ ,  ' @ ,          \ array of @ vectors.
+CREATE  VECT!    ' NOOP ,  ' C! ,  ' ! ,          \ array of ! vectors.
+
+VARIABLE   TYPE[]                                 \ bytes per cell
+: V@     TYPE[] @  2*  VECT@ +  @ EXECUTE ;       \ vectored fetch.
+: V!     TYPE[] @  2*  VECT! +  @ EXECUTE ;       \ vectored store.
+
+VARIABLE A[0]                                     \ pointer to 0th cell.
+: A[&]    ( ndx -- adr)  TYPE[] @  *  A[0] @ + ;  \ array pointer.
+: A[@]    ( ndx -- m)    A[&]  V@ ;               \ array fetch.
+: A[!]    ( n  ndx)      A[&]  V! ;               \ array store.
+
+
+: EXCHANGE[]       ( i j ---  )     \ exchange elements i and j of array.
+\ try this using macho stack pumping!
+    L( i j )   L i  A[@]    L j  A[@]   L i  A[!]   L j  A[!]   S()  ;
+
+: QuickSort   (  adr.of.array, #elements )        \  recursive QuickSort.
+    DUP 2 <    \ Is #elements less than two?
+    IF      2DROP   \ exit sort, cannot be repartitioned.
+    ELSE       ( sort this partition. )
+      L(  adr ne \ i j temp nr pivot done )    \  create parameter frame.
+      A[0] @ is temp    L adr  A[0] !          \    point to array start.
+      L ne    2 /    A[@]   IS pivot           \     pick middle element.
+      -1 IS i  FALSE IS done   L ne IS j  \ initialize pointers and flag.
+      BEGIN      \ partition into two parts.
+         BEGIN                       \  find first element to move right.
+                 ++ i   L i A[@]   L pivot   <  WHILE
+         REPEAT
+         BEGIN                        \  find first element to move left.
+                 -- j   L j A[@]   L pivot   >  WHILE
+         REPEAT
+         L i  L j  >=    \  have the boundaries met ?
+         IF     TRUE IS done
+         ELSE     L i  L j    EXCHANGE[]    \ i and j elements.
+         THEN      L done   \ partitions made?
+      UNTIL    L ne  L i  -   IS nr   \ number of elements in right side.
+      L i  L ne   2 /  <    \ sort smallest partition first.
+      IF    ( first left side )       L adr   L i   RECURSE
+            ( then right )        L i  A[&]   L nr  RECURSE
+      ELSE    ( first right side )     L i  A[&]   L nr  RECURSE
+              ( then right )                L adr   L i  RECURSE
+      THEN
+      L temp   A[0] !   S()     \ reset array pointer and kill frame.
+    THEN    ;   \ End QuickSort
+
+\ -----------------------------------------------------------------------
+/*
+       Pre and post incrementing and decrementing local prefixes would
+   help here.  For example, L++ can fetch a local variable then increment
+   the value stored there, whereas, ++L, can increment then fetch the
+   value.  Thus, the phrase  "++ i L i A[@]"   can be written as
+   "++L i  A[@]".  This is more compact and parallels the original
+   language code.  These also parallel the other prefixes: ++ and --.
+*/
+/*     One way of factoring the cell testing:
+
+: ?MOVE     ( index, value, cfa.comparison, cfa.direction --- 'index )
+    L( index  part  compare  direction  )
+    BEGIN     AT index  GO direction
+              L index  ARRAY[@]   L part    GO compare    WHILE
+    REPEAT    L index     S( # 1 )   ;
+
+: ?MOVE_RIGHT   (  index value ---- 'index )  [']  <    [']  INCR   ?MOVE  ;
+: ?MOVE_LEFT    (  index value ---- 'index )  [']  >    [']  DECR   ?MOVE  ;
+*/
+\   testing QSORT words:  only a functional test.
+
+CREATE storage  1 , 15 , 8 , 2 , 3 , 5 , 10 , 4 , 7 , 9 , 6 ,   ( 11 cells)
+
+2 CONSTANT integer    \ this is an integer array.
+
+: showarray      11 0  DO   I  A[@]   3 .R    LOOP ;
+
+: TESTSORT   \  sort the array "storage" and print the result.
+        storage  A[0] !   integer  TYPE[] !
+        CR   showarray     0 A[&]  11  QuickSort    CR    showarray  ;
+
+\ End example.
+
+/*     Well, there it is.  Any improvements, comments, critiques would
+be appreciated.  Critiques should be gentle, I have enough stress in my life.
+Since I am only now learning 80x86 machine language, the present code is
+atrocious.  That can use a good programmer.  Also, the defining of new
+prefixes could be made more efficient; perhaps by using a create...does>
+method.
+        Are local variables needed?  If one only uses Forth, stack
+thrashing is not aggravating.  But, most people don't use Forth exclusively
+and jumping from a language that allows LVs to stack juggling is an instant
+turnoff.  When even BASIC now offers the ease of local variables, isn't it
+time Forth did better?  True, well written code that uses only short defini-
+tions does not require LVs, but shouldn't it be available?  Even a debugger
+is not really needed in Forth, but its expected in any language environment.
+     Another factor is the ease of learning Forth.  Stack thrashing is a
+distraction and a non-portable skill.  If Forth is to be used more widely
+in educational settings it must adapt and provide the same ease that BASIC
+or Pascal offer.  After familiarity with Forth and a computer is gained in
+a classroom, the further exploration of the stack can be made.  The reduced
+use of variables and long definitions should be a progressive learned skill
+not a dogmatic edict.  For example, certain Forth texts advocate blocks,
+short words, and even no blank lines to separate words in source code.  Is
+that neccessary to use Forth?
+*/
+
+/*
+------------------   Notes ------------------------------------------------
+4-16-89-----  tested system.  all seems to work.
+4-16-89-----  corrected bug in >SHOVE.  It could not use more than 9 lazies.
+4-16-89-----  added extensive stack comments.
+4-16-89-----  added syntax diagrams for L( and S(.
+4-30-89-----  added prefix GO for vectored execution.
+5- 1-89-----  Introduced GOSUB, GODOS.  No code yet.
+5- 3-89-----  A minor problem is the need to pass many parameters as part of
+                function calls.  Maybe there is a way to access a calling
+                words stack frame.  The Intel 80386 has a mechanism for that.
+                But, then the label array must be preserved.  Complications!
+5-03-89-----  Added S().  It saves source code space compared to S(    ).
+5-04-89-----  Cleaned up the appearence of code.  Streamed files sure are
+                an improvement over block source files!
+5-16-89-----  I got a copy of the Forth Dimensions Vol XI, No. 1.  The other
+two local variable approches are very good.  Scoping sounds like a good idea,
+but since Forth definitions should be short why would more than one set of
+local variables be needed? Another critique I have is the use of the return
+stack as a frame.  It takes time to move items there, why not just leave them
+where they are, on the parameter stack, as I did here?  Hawkin's approach for
+F-PC also moves the parameters to another stack.
+     Maybe what is needed is a good summary of what the approaches are and
+what are the goals.  Then different methods can be judged more objectively.
+For example:    1- The alternatives in locating the variables,
+                        a- return stack b- parameter stack c- new local stack
+                        d- transient words e- parameter field of word
+                        f- hidden variables g- in frames.
+                2- How are the labels stored?
+                        a- transient vocabulary or dictionary entries.
+                        b- stream parsing ( I used this method )
+                        c- no labels, direct numerical reference to item
+                3- Does it have to be compatible with old code?
+                4- What is the best syntax? a- braces, brackets, new word.
+                    I favor new word.  Braces and brackets have better uses.
+                5- Hardware implications?
+                        a- Do existing Forth Engines have to be able to
+                           use it?  The RTX2000 can use its streaming mode
+                           to move arguments to a ram stack.
+                        b- Which method can be most efficiently implemented
+                           in hardware?  Hardware stack frames?
+                        c- Wright State University (Ohio) was working on a
+                           stack frame computer for Forth, but it was with
+                           a shallow stack.  What happened to it?
+5-17-89----   One day I would like to get rid of the prefix L.  But, I would
+have to learn more of the internals of FPC.  So I guess I'll just leave L in.
+Then again, L, seems to add a kind of readability.  But, L, as with any use
+of prefixing, reduces functional transparency and portability.
+        When collasping the stack frame and returning parameters with
+S( label1....labeln ), it would be more convenient to be able to name these
+parameters directly with the same name used in the stack frame.  But, then
+S( would have to compile more complicated code and there must be some method
+to also maintain needed parameters that are already on the stack. Hmmmmmm....
+Perhaps, the way it is now is the best.
+5-18-89----   No speed tests where made yet to see how PFO fares against
+conventional Forth.  I would expect the most inefficiency to occur if items
+are returned to the stack when a frame is collasped: S( label1....labeln ).
+This is due to the use of CMOVE to move down the required parameters to the
+start of the stack frame and resetting the stack pointer.  But, if S() is
+used the run-time cost is minor. Creating the frame is also minimal since
+the arguments are not moved to another array, variable, return stack, or
+new local stack.  The loss of speed would be made up in any improvements in
+prototyping, readability, and accessability of Forth to non-fanatics.
+        I wonder if in a stack frame engine, items could be moved to a
+dedicated hardware stack that could retrive them parallel to the usual
+parameter stack?  Why stop there?  Make a chip that can handle a variable
+number of stacks.  That way each stack can be dedicated to diverse needs, as
+Ayman Abu-Mostafa wrote in FD.  The Harris RTX core may have enough hooks
+to do this, since the stack controllers are not part of the core cpu cell.
+6-13-89----   Added the source for QuickSort and some array words.
+              Added some more thoughts on learning Forth.
+              Can the use of local variables be the basis of a stackless
+              Forth?  If stack frames are made the means of parameter
+              passing, can all explicit stack operators such as DUP and ROT
+              be eliminated?  Why should this be done?  Well, on certain
+              processors multiple stacks can not be handled well, such as
+              the intel chips.  Thus, a subroutine threaded Forth is not
+              efficient; at least thats what people say.  So, a subroutine
+              threaded Forth with no parameter stack may be possible.
+              Would it be Forth?  It would seem to be a C like language thats
+              interactive.  ( in interpret mode a global stack can hold
+              parameters, in compile mode frames would be used. )
+                  Oops!  I neglected to use more precise language.
+              In the phrase L(  eeny meny \ miny moe ),  eeny, meny are
+              called arguments and miny, moe are called local variables.
+              But in actuality, my method treats them all as local variables.
+              I guess in the phrase   S(  heading velocity size ), the
+              labels can be called return arguments.  Note that in C,
+              their can be only one item in a return statement: return(   ).
+              See Forth is better!
+
+I quess thats enough of this.  I'm busy on a hardware research project.
+*/
+
+
+

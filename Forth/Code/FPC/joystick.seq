@@ -1,0 +1,44 @@
+
+\ F-PC JOYSTICK READ ROUTINEROUTINES
+\ FRANK CAPPELLE RINGOES, NJ SUMMER 1991
+\ SIMPLE READER FOR EACH JOYSTICK INDIVIDUALLY
+\ MIGHT CONSIDER USING TIMER TO PREVENT VARIANCES
+\ AMONG DIFFERENT SPEED MACHINES
+
+HEX
+
+
+CODE STICK ( n -- n )
+        MOV STICK-SELECT # $88          \ SET UP VARIABLE FOR ROTATION
+        POP CX                          \ GET STICK SLECTION FROM STACK
+   1 $: STICK-SELECT ROL                \ ROTATE TILL PROPER BIT IN PLACE
+        DEC CX
+        CMP CX, # $00
+        JNE 1 $
+        MOV CX, # $00                   \ ZERO COUNTER
+        MOV DX, # $201
+        OUT DX, AL                      \ START JOYSTICK TIMER
+   2 $: INC CX
+        CMP CX, # $FFF                  \ IF COUNTER EXCEEDS FFF, GET OUT
+        JE 3 $
+        IN AL, DX
+        MOV BL, STICK-SELECT
+        AND BL, # $0F
+        TEST AL, BL
+        JNE 2 $                         \ COUNT UNTIL JS TIMER IS DONE
+   3 $: PUSH CX                         \ PUSH COUNT ONTO STACK
+        NEXT
+        END-CODE
+
+: CHK-DEPTH                             \ CHECK TO BE SURE # IS ON STACK
+        DEPTH
+        0= IF
+                ABORT" PLEASE SELECT 1, 2, 3 OR 4 JOYSTICK "
+        THEN ;
+
+: READ-STICK ( stick# -- value )        \ READ THE JOYSTICK
+       CHK-DEPTH
+       STICK ;
+
+
+

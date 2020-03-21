@@ -1,0 +1,90 @@
+comment:
+
+Hi folks: someone was asking me about sound routines so here is
+something from MISC_IBM.BLK in the F83 collection .. jb 4/9/89
+
+                      ษออออออออออออออป
+                      บ  8253 notes  บ
+                      ศออออออออออออออผ
+
+output is a function of the system clock and 8284 which generates a
+1.193180 Mhz signal. ( I don't know if "turbo" boards have any effect on
+this value)
+ 
+Count = 1193180 / Frequency
+ 
+                    ** 8253 Ports **
+
+67 (H43)  send a decimal 182 here to notify count is coming
+66 (H42)  Count sent here Lo byte, Hi byte
+ 
+                      ** 8255 **
+             PPI - controls access to speaker
+ 
+97 (H61)  bits 0 & 1 on to allow 8253 access to speaker
+
+You can also directly access speaker with bit 0=0 and bit 1=pulsed. (this
+obviously ties up the processor)
+
+from Peter Norton's "Programmer's Guide to the IBM PC" an EXCELLENT text
+(opinion)
+
+SCOUNT ( Sound COUNT, count was used elsewhere) is a
+        function of frequency and the value 1,193,180 generated
+        by the timing circuitry. Count = 1193180/Frequency
+
+HILO      the count is sent as low and high bytes.              
+
+>TIMER    notify the 8253 that the count is coming then send    
+          low byte, high byte.                                  
+
+SPEAKERON(OFF) are self explainatory, controlled by the 8255.   
+
+DURATION       of note in ms, requires accurate Fudge variable! 
+
+FREQ       convert a frequency to count and send to timer.      
+
+NOTE       of specified frequency and duration.                 
+                                                                
+CLICK, BOOP, RING, etc. are a few examples
+                                                                
+*** NOTE *** FUDGE must be set reasonably close so that you have
+an accurate MS. See also FUDGE??.SEQ.
+
+comment:
+
+
+: scount  ( freq - count)  \     1193180 / frequency            
+          13532 18 rot  m/mod swap drop ;                       
+
+: hilo ( count -  hi lo)   \     send two bytes                 
+           256  /mod  swap   ;                                  
+
+: >timer  ( hi lo -)      \ 182 = here comes, send lo first !   
+           182 67 pc!   66 pc!   66 pc! ;   \ 8253 ports        
+
+: speakeron      97 pc@   3 or   97 pc! ;   \ 8255 ports        
+
+: speakeroff     97 pc@   252 and   97 pc! ;                    
+
+comment:
+
+I don't have any additional info on the 8253 and 8255 chips. The above
+words could be more legible with named constants for the port numbers. Please
+add them if you have them and repost this file .. thanx
+
+comment;
+
+: duration  ( duration in ms  - )   speakeron ms speakeroff ;   
+
+: freq      ( frequency --)         scount hilo >timer ;        
+
+: NOTE    ( duration frequency -- ) FREQ DURATION ;             
+                                                                
+: CLICK     3 3000 note ;                                       
+: BOOP      50 500 note ;
+                                                                
+: RING  5 0 DO  50 575 NOTE  50 750 NOTE  LOOP ;
+
+
+

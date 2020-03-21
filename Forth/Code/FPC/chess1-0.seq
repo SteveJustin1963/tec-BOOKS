@@ -1,0 +1,613 @@
+\ chess1-0.seq
+\ Schaakprogramma V1.0 in F-PC. by Lennart Benschop
+Comment:
+Hi,
+
+Here I have the chess program. It runs under F-PC (Checked with 3.55) under
+DOS.  Only problem: all comments are in Dutch.
+
+Pieces:
+
+King: Koning  K
+Queen; Dame   D
+Rook: Toren   T
+Bishop: Loper L
+Knight: Paard P
+Pawn:   Pion  B (P was already taken you know)
+
+Colors:
+White: Wit   W
+Black: Zwart Z
+
+Load the game, type the word CHESS for a real game or AUTO for an automatic
+game (machine plays against itself).
+First you have to press any key (to initialize random generator),
+then you have to say whethe you want to play white (J/N).
+next you have to slect a level (2--5).
+
+Moves are entered like E2-E4. Castling (Rocheren) is performed by moving the
+King to the desired position (e.g. E1-G1). When a pawn reaches the last row,
+you are asked for a piece it must promote to (e.g. D for Dame). I think the
+rules are implemented correctly, including the complex castling rules, en
+passant capture and minor promotion, but there are no checks for a forced
+draw (triple repetition of same situation, 50 moves rule). The program knows
+whether there is a 'check' (Schaak) and it detects checkmate (Schaakmat) and
+stalemate (Pat).
+
+Level 2 is fast on a Pentium, level 3 is usable. Level 4 is a bit slow and a
+bit buggy. It's no match for Gnu Chess.
+
+This is the translation of the large comment at the top:
+The game situation is administered with a stack of chess boards.
+It contains the board situation as well as extra variables.
+Every board takes 192 bytes (hex C0) and consists of 12 rows of 16 bytes.
+The top two rows and the bottom two rows contain hex 07 to indicate that the
+field is beyond the board. The fist two bytes of each row and also the 11th
+and the 12th byte contain 07 as well. The 13th to 16th byte of each row
+accommodate extra variables. The board position is registered at the 3rd to
+7th byte of the 3rd to 7th row. Empty field has value 0. Fields with a black
+piece have values 1 to 6. Fields with a white piece have values hex 81 to
+86.
+
+
+-- Cut here --
+Comment;
+
+\ Schaakprogramma V1.0 in F-PC.
+base @ hex
+
+comment:
+De spelsituatie wordt bijgehouden op een stack van schaakborden.
+Hierop zijn zowel de bordstelling als extra variabelen opgeslagen.
+Ieder bord beslaat 192 bytes ( hex C0 ) en bestaat uit 12 rijen van 16 bytes.
+De bovenste en onderste twee rijen bevatten hex 87, ter indicatie dat dit veld
+voorbij de rand van het bord ligt. De eerste twee alsmede de elfde en twaalfde
+van elke rij bevatten ook hex 87. De 13e tot en met 16e van elke rij bieden
+plaats aan extra variabelen. De bordstelling staat genoteerd op de 3e tot
+en met 10e plaats in de 3e tot en met 10e rij. Leeg veld heeft waarde 0.
+Velden met een zwart stuk hebben waarden 1 t/m 6. Velden met een wit
+stuk hebben waarde hex 81 t/m 86.
+comment;
+
+5 constant maxlevel \ maximum spelniveau.
+create bp0 maxlevel 1+ c0 * allot \ de stack bevat 1 splesituatie extra.
+
+variable bpv \ pointer naar het huidige schaakbord.
+: bp bpv @ ; ( ---  addr ) \ adres van huidig spelbord.
+: b@ bpv @ + c@ ;  ( offs --- byte) \ Lees byte van spelbord.
+: b! bpv @ + c! ;  ( byte offs ---) \ Schrijf byte op spelbord.
+
+: bordvar create c,  ( offs --- ) \ deffinieert een variabele op bord.
+  does> c@ bpv @ + ; ( --- addr ) \ geeft het adres in huidige bord.
+  0c bordvar aanzet   \ partij die aan zet is
+  0d bordvar rochw    \ kan wit nog rocheren?
+  0e bordvar rochz    \ kan zwart nog rocheren?
+  0f bordvar ep       \ kolom met pion die en passant geslagen kan worden of 0
+  1c bordvar vertr    \ vertrekveld.
+  1d bordvar stuk     \ stuk dat gespeeld wordt.
+  1e bordvar best     \ bestemmingsveld.
+  1f bordvar nogdoor  \ kan stuk nog verder bewegen ?
+  2c bordvar lrochw   \ kan wit nog lang rocheren?
+  2d bordvar lrochz   \ kan zwart nog lang rocheren?
+  2e bordvar schaak   \ staat de koning schaak?
+  2f bordvar ep1      \ kolom met pion die 2 vooruit gezet is of 0
+  3c bordvar koningw  \ positie witte koning.
+  3d bordvar koningz  \ positie zwarte koning.
+  3e bordvar ep2      \ is deze zet een en passant slag?
+  4c bordvar prom     \ promotiestuk.
+  6c bordvar waardw   \ waarde van materiaal wit.
+  6e bordvar alfa
+  7c bordvar beta
+  7e bordvar beoord
+  8c bordvar hoogst
+  8e bordvar cutoff
+  9c bordvar waardz   \ waarde van materiaal zwart.
+  9e bordvar gespeeld
+
+variable level \ niveau waarop het programma kijkt. 0=werkelijke stelling
+               \ 1=een halve zet vooruit enz.
+: +level \ denk een niveau dieper.
+  bp dup c0 + c0 cmove \ verplaats bord naar volgend niveau.
+  c0 bpv +!   1 level +! ;
+: -level \ ga een niveau terug.
+  -c0 bpv +!  -1 level +! ;
+
+create symbols \ symbolen van leeg veld en van de stukken
+  '.' C, 'B' C, 'P' C, 'L' C, 'T' C, 'D' C, 'K' C,
+create waardes \ waardes van leeg veld en van de stukken
+ 0 , 40 , c0 , c0 , 140 , 240 , 3000 ,
+
+: .bord ( druk schaakbord af.)
+  0 0 at 20 spaces
+  cr 2 spaces 'H' 1+  'A' do i emit 2 spaces loop \ letters van kolommen.
+  bp 20 + 8 0 do
+    cr 20 spaces
+    cr '8' i - emit                       \ cijfer van rij.
+    0a 2 do space
+     dup i + c@ dup
+     07 and symbols + 1 type               \ typ stuk.
+     dup 80 and if ." W" drop else         \ is stuk wit?
+      if ." Z" else ." ." then
+     then
+    loop
+    10 +                                  \ volgende rij.
+  loop cr drop ;                          \ gooi pointer naar bord weg.
+
+: .pos  ( offs ---) \ druk positie af.
+  10 /mod \ splits in rij en kolom.
+  swap 2- 'A' + emit   \ geef kolom
+  '8' 2+ swap - emit ; \ geef rij.
+
+\ constanten die de richtingen op het bord aangeven.
+-11 constant nw    -0f constant no
+ 0f constant zw     11 constant zo
+-10 constant n      10 constant z
+ -1 constant w       1 constant o
+
+create sprong \ paardesprongtabel
+-12 , -21 , -1f , -0e , 12 , 21 , 1f , 0e ,
+
+defer perzet \ actie die de zettengenerator per zet moet uitvoeren.
+
+defer aanvaltest ( offs --- f) \ test of veld aangevallen staat.
+
+: eigen ( offs --- f ) \ bevat veld stuk van eigen kleur?
+  b@ dup 0= 0= swap 80 and aanzet c@ = and ;
+
+: inricht ( richting ---) \ genereer zetten in bepaalde richting.
+  vertr c@ best c!   1 nogdoor c!
+  begin
+   best c@  over +  dup best c! \ schuif bestemmingsveld een op.
+   dup eigen over b@ 87 = or 0= \ niet naar eigen stuk of over de rand ?
+   nogdoor c@ and while         \ zolang je nog verder mag.
+    perzet                      \ genereer de zet.
+    b@ 0= nogdoor c!            \ was de zet naar leeg veld, dan mag je nog
+  repeat                        \ verder, had je een stuk geslagen dan niet.
+  drop drop ;
+
+: loper \ genereer loperzetten.
+  no nw zo zw  4 0 do inricht loop ;
+: toren \ genereer torenzetten.
+  n o z w  4 0 do inricht loop ;
+: dame  \ genereer damezetten.
+  n o z w no nw zo zw  8 0 do inricht loop ;
+: paard \ genereer paardesprongen.
+  10 0 do
+   i sprong + @ \ haal richting uit sprongtabel.
+   vertr c@ +  dup best c! \ bereken besteemingsveld.
+   dup eigen swap b@ 87 = or 0= \ niet naar eigen stuk of over de rand?
+   if perzet then               \ genereer dan zet.
+  2 +loop ;
+
+: ?roch ( --- f) \ kan er gerocheerd worden?
+  aanzet c@ 80 = if rochw else rochz then  c@  schaak c@ 0=  and ;
+: ?lroch ( --- f ) \ kan er lang gerocheerd worden?
+  aanzet c@ 80 = if lrochw else lrochz then  c@  schaak c@ 0=  and ;
+: koning \ genereer koningszetten.
+  n o z w no nw zo zw   8 0 do \ Elke kant een vakje verplaatsen.
+   vertr c@ + dup best c!        \ bereken bestemmingsveld.
+   dup eigen swap b@ 87 = or 0=  \ niet naar eigen stuk of over de rand?
+   if perzet then
+  loop
+  ?roch if 28 aanzet c@ if 70 + then \ rocheren?, bereken bestemming koning
+           dup bp + 1- @ 0=      \ tussenliggende velden leeg?
+           if
+            dup 1- aanvaltest 0=      \ tussenliggend veld niet aangevallen?
+            if
+             best c! perzet      \ dan rocheren
+            else drop then
+           else drop then
+        then
+  ?lroch if 24 aanzet c@ if 70 + then \ lange rochade?
+            dup bp + @ over bp + 1- @ or 0=
+            if
+             dup 1+ aanvaltest 0=
+             if
+              best c! perzet
+             else drop then
+            else drop then
+         then ;
+
+: pionr ( n1 -- n2) \ bereken richting waarin pion mag gaan afh van kleur.
+  aanzet c@ if negate then ;
+: pionz ( offs ---) \ genereer pionzet naar aangegeven veld.
+  dup best c!
+  f0 and aanzet c@ if 20 else 90 then = \ komt hij op laatste rij?
+  if  6 2 do i prom c! perzet loop    \ genereer promotie paard-dame.
+  else perzet then                      \ anders gewone zet.
+  0 ep1 c! 0 ep2 c! 0 prom c! ;
+: pion \ genereer pionzetten.
+  vertr c@ z pionr +   \ bereken bestemming 1 zet vooruit.
+  dup b@ if            \ Staat er iets op dat veld?
+   drop
+  else
+   dup pionz           \ genereer zet 1 veld vooruit.
+   z pionr + dup b@ if \ is veld 2 velden vooruit leeg?
+    drop
+   else
+    vertr c@ f0 and    \ bereken rij.
+    aanzet c@ if 80 else 30 then = \ is het de eerste rij?
+    if vertr c@ 0f and ep1 c!  \ geef kolom aan in variabele.
+       pionz           \ genereer de zet..
+    else drop
+    then
+   then
+  then
+  zw zo  2 0 do        \ probeer in twee richtingen slagzetten.
+   pionr vertr c@ +    \ bereken bestemming.
+   dup f0 and aanzet c@ if 40 else 70 then = \ naar juiste rij?
+   over 0f and ep c@ = and \ kan pion in die kolom en-passant geslagen?
+   if 1 ep2 c!         \ geef aan dat e.p. geslagen wordt.
+      dup pionz        \ genereer zet.
+   then
+   dup b@ dup 0= 2 pick eigen or \ is veld leeg of bevat eigen stuk?
+   swap 87 = or                  \ Is veld over de rand?
+   if drop else pionz then       \ genereer slagzet.
+  loop ;
+
+
+create stukken \ tabel met acties voor zettengenerator bij ieder stuk
+ ' noop , ' pion , ' paard , ' loper , ' toren , ' dame , ' koning ,
+
+: perveld \ genereer zetten voor stuk op veld aangegeven in vertr.
+  stuk c@ 2* stukken + perform ;
+
+: ?perveld \ genereer zetten vanaf veld in vertr als er eigen stuk staat.
+  vertr c@ dup eigen if \ eigen stuk ?
+   b@ 07 and stuk c!     \ zet het stuk in variabele STUK.
+   0 ep1 c! 0 ep2 c! 0 prom c!
+   perveld
+  else drop then ;
+
+: perbord \ genereer alle zetten op het bord.
+  aanzet c@ 0= if \ Is zwart aan zet?
+   22 vertr c!  \ start op veld A8 linksboven.
+   8 0 do       \ acht rijen
+    8 0 do      \ acht kolommen
+     ?perveld
+     vertr c@ 1+ vertr c! \ ga naar volgende veld.
+    loop
+    vertr c@ 8 + vertr c! \ ga naar volgende rij.
+   loop
+  else
+   92 vertr c!  \ start op veld A1 linksonder.
+   8 0 do       \ acht rijen.
+    8 0 do      \ acht kolommen.
+     ?perveld
+     vertr c@ 1+ vertr c! \ ga naar volgende veld.
+    loop
+    vertr c@ 18 - vertr c! \ ga naar vorige rij.
+   loop
+  then ;
+
+variable aanval \ staat veld aangevallen?
+: ?aangev \ actie die de zettengenerator onderneemt bij test op aanval.
+  best c@ dup eigen 0= \ staat er op bestemmingsveld een vreemd stuk?
+  swap b@ 07 and stuk c@ = and \ en is dat het goede stuk.
+  aanval @ or aanval ! \ dan kan dat stuk het vertrekveld bereiken en staat
+  ;                    \ dat veld aangevallen.
+: taanv ( --- f ) \ test of veld in VERTR aangevallen staat.
+  aanval off 0 7 1 do \ voer test uit voor alle aanvallende stukken.
+   i stuk c!
+   perveld             \ genereer alle zetten vanuit VERTR voor dat suk.
+   aanval @ if drop 1 leave then
+  loop ;
+
+variable vertr'
+variable best'
+variable aanzet'
+variable perzet' \ variabelen om waardes te bewaren bij test op aanval.
+: po! \ zet de variabelen voor test op aanval en bewaar oude waarden.
+  vertr c@ vertr' c!
+  best  c@ best'  c!
+  aanzet c@ aanzet' c!
+  ['] perzet >body @ perzet' !
+  ['] ?aangev is perzet ;
+: po@ \ herstel de variabelen na test op aanval.
+  vertr' c@ vertr c!
+  best' c@ best c!
+  aanzet' c@ aanzet c!
+  perzet' @ is perzet ;
+
+: zetom \ verander kleur die aan zet is.
+  aanzet c@ 80 xor aanzet c! ;
+
+variable endf \ is spel ten einde?
+variable playlevel \ spelniveau aantal plys vooruitkijken.
+variable zettel  \ teller aantal reglementaire zetten.
+variable keus    \ gekozen zet.
+variable compcol \ kleur die computer speelt.
+variable zet#    \ nummer van de zet in het spel.
+
+create bp1 c0 allot  \ bord om gespeelde zet te onthouden.
+
+: eindspel? ( --- f ) \ is speler bezig met matzetten in eindspel?
+  aanzet c@ if waardz else waardw then @ c1 < ;
+
+: eval \ evalueer zet.
+  waardz @ waardw @ - aanzet c@ if negate then \ materiaalverschil
+  55 eigen 1 and + 56 eigen 1 and + 65 eigen 1 and + 66 eigen 1 and +
+  zetom 55 eigen + 56 eigen + 65 eigen + 66 eigen + zetom
+  \ beheersing van de middenvelden.
+  eindspel? if
+   aanzet c@ if koningz else koningw then c@ \ vijandelijke koning.
+   dup f0 and dup 20 = swap 90 = or 7 and \ op bovenste of onderste rij?
+   swap 0f and dup 2 = swap 9 = or 7 and + + \ in linkse of rechtse kolom?
+  then
+;
+
+: ?schaak     \ kijk of koning schaak staat.
+  po!              \ bewaar variabelen zettengenerator.
+  aanzet c@ if koningw else koningz then c@ \ bepaal veld waar koning staat.
+  vertr c! taanv schaak c! \ kijk of dit staat aangevallen.
+  po@ ;            \ herstel variabelen.
+
+: (aanvaltest)  ( offs --- f) \ test of veld aangevallen staat.
+  ['] perzet >body @ ['] ?aangev <> if \ niet als zettengenerator aanval test
+   po!
+   vertr c!
+   taanv
+   po@
+  else drop true
+  then ;
+
+' (aanvaltest) is aanvaltest
+
+variable seed
+: rnd ( --- n) \ genereer toevalsgetal.
+  seed @ 743 * 43 + dup seed ! ;
+: rand cr  \ stel toevalsgenerator in.
+  ." Druk toets om verder te gaan."
+  begin rnd drop key? until key drop ;
+
+: doezet \ voer door zettengenerator gegenereerde zet uit.
+  best c@ b@ 7 and 2* waardes + @ negate aanzet c@
+  if waardz else waardw then +! \ verreken eventueel geslagen stuk.
+  vertr c@ b@ best c@ b!  \ verplaats stuk.
+  0 vertr c@ b!           \ maak vertrekveld leeg.
+  prom c@ if              \ wordt er gepromoveerd?
+   prom c@ dup 2* waardes + @ 40 - aanzet c@
+   if waardz else waardz then +! \ verreken de promotie.
+   aanzet c@ or best c@ b! \ verander stuk op het bord.
+  then
+  stuk c@ 4 = if          \ is het een toren?
+   vertr c@ 0f and 2 =    \ in linker kolom?
+   if
+    0 aanzet c@ if lrochw else lrochz then c! \ verbied lange rochade.
+   then
+   vertr c@ 0f and 9 =    \ in rechter kolom?
+   if
+    0 aanzet c@ if rochw else rochz then c! \ verbied korte rochade.
+   then
+  then
+  stuk c@ 6 = if          \ is het de koning?
+   0 0 aanzet c@ if rochw else rochz then dup >r c! \ rochade straks verboden
+   r> 1f + c!             \ evenals lange rochade.
+   best c@ vertr c@ - 2 = \ is korte rochade bedoeld?
+   if
+    4 aanzet c@ or best c@ 1- b! \ zet toren links naast koning.
+    0 best c@ 1+ b!           \ maak oorspronkelijke veld toren leeg.
+   then
+   best c@ vertr c@ - -2 = \ is lange rochade bedoeld?
+   if
+    4 aanzet c@ or best c@ 1+ b! \ zet toren rechts naast koning.
+    0 best c@ 2- b!          \ maak oorspronkelijke veld toren leeg.
+   then
+   best c@ aanzet c@ if koningw else koningz then c! \ werk positie bij.
+  then
+  ep2 c@ if                 \ is en passant slaan bedoeld?
+   0 best c@ n pionr + b!   \ verwijder geslagen pion.
+   -40 aanzet c@ if waardz else waardw then +! \ verreken slag.
+  then
+  ep1 c@ ep c! ;            \ nu een pion 2 vooruit = straks e.p. slaan.
+
+: dieper  \ bereken waarde zet en kijk eventueel niveau vooruit.
+  cutoff @ not if \ als geen cutoff is ontdekt.
+  +level
+   doezet         \ voer de zet uit.
+   ?schaak schaak c@ if -level exit then \ schaak mag niet.
+   gespeeld  c0 - on
+   level @ playlevel @ = if \ op hoogste niveau stelling evalueren.
+    eval beoord c0 - !
+   else                     \ op ander niveau nog verder kijken.
+    alfa @ hoogst !
+    alfa @ negate beta @ negate alfa ! beta !
+    zetom
+    gespeeld off
+    perbord                \ genereer zetten niveau dieper.
+    gespeeld @ 0= if       \ als geen zetten gegenereerd.
+     ?schaak schaak c@ if -2000 hoogst ! else 0 hoogst ! then
+    then
+    hoogst @ negate beoord c0 - !
+   then
+  -level
+   beoord @ hoogst @ max hoogst ! \ onthoud hoogste waarde.
+   hoogst @ beta @ > if cutoff on then
+   \ als zet voor tegenspeler beter is dan eerdere zet, staak verdere analyse
+   \ er onstaat een cutoff.
+  then ;
+
+: analyse \ analyseer iedere te spelen zet.
+  +level
+   doezet
+   ?schaak schaak c@ 0= if   \ schaak = geen reglementaire zet, vergeet hem.
+    1 zettel +!              \ tel de zet als reglementair.
+    zetom
+    ['] perzet >body @       \ onthoud huidige inhoud perzet.
+    ['] dieper is perzet
+    gespeeld off
+    perbord                  \ analyseer de zet dieper.
+    is perzet                \ herstel perzet
+    gespeeld @ 0= if       \ als geen zetten gegenereerd.
+     ?schaak schaak c@ if -2000 hoogst ! else 0 hoogst ! then
+    then
+     hoogst @ beta c0 - @ = if \ is de zet even goed als de beste.
+    rnd 2000 > if zettel @ keus ! then \ kies hem voorwaardelijk.
+    then
+    hoogst @ beta c0 - @ < if \ is de zet beter?
+     zettel @ keus !         \ kies hem.
+     hoogst @ beta c0 - ! \ stel alfa bij voor cutoffs.
+    then
+   then
+  -level ;
+
+: select \ voer de zet uit op het moment dat de zet KEUS gegenereerd wordt.
+  +level
+   doezet
+   ?schaak schaak c@ 0= if
+    1 zettel +!            \ tel de zet als reglementair.
+    zettel @ keus @ = if   \ is de goede zet gegenereerd?
+     bp bp1 c0 cmove       \ bewaar de stelling.
+     vertr c@ .pos ." -" best c@ .pos space \ druk zet af.
+    then
+   then
+  -level ;
+
+: tegen \ onderzoek of zet reglementair is.
+  +level
+   doezet
+   ?schaak schaak c@ 0= if
+    1 zettel +!            \ tel zet als reglementair.
+   then
+  -level ;
+
+: comp \ voer zet van de computer uit.
+  .bord
+  ['] analyse is perzet
+  0 zettel !               \ nog geen zetten gegenereerd.
+  -4000 alfa ! 4000 beta ! \ initialiseer variabelen voor zoekproces.
+  0 18 at cr 28 spaces     \ forceer scrolling.
+  aanzet c@ if 1 zet# +! zet# @ 3 .r else 3 spaces then
+  ?schaak schaak c@ if ." Schaak" then
+  1 keus !
+  perbord                  \ analyseer stelling en kies een zet.
+  zettel @ 0= if           \ geen zetten mogelijk?
+   schaak c@ if
+    ." mat"
+   else
+    ." Pat"
+   then
+   endf on                 \ was laatste zet.
+  else
+   ['] select is perzet
+   0 zettel !
+   perbord                 \ voer de gekozen zet uit.
+   bp1 bp0 c0 cmove        \ breng stelling naar geheugen.
+   zetom
+   ['] tegen is perzet
+   0 zettel !
+   perbord                 \ controleer of tegenspeler kan zetten.
+   ?schaak schaak c@ if ." Schaak" then
+   zettel @ 0= if           \ geen zetten mogelijk?
+    schaak c@ if
+     ." mat"
+    else
+     ." Pat"
+    then
+    endf on                 \ was laatste zet.
+   then
+  then
+  .bord ;
+
+variable vertrm
+variable bestm
+variable promm   \ gegevens van door mens ingevoerde zet.
+
+: legaal \ test of ingevoerde zet ook gegenereerd wordt en legaal is.
+  vertrm @ vertr c@ =
+  bestm @ best c@ = and
+  promm @ prom c@ = and \ Is deze zet bedoeld?
+  if
+  +level
+   doezet
+   ?schaak schaak c@ 0= if \ Is zet legaal?
+    1 zettel !
+    bp bp1 c0 cmove        \ bewaar stelling.
+   then
+  -level
+  then ;
+
+create input 6 allot \ buffer voor menselijke invoer.
+: inpos ( offs-in-input --- f offs-in-bord) \ bereken veldnr uit input.
+  dup input + c@ 'A' -    \ neem letter van veld.
+  dup 8 u<
+  rot input + 1+ c@ '1' - \ neem cijfer.
+  dup 8 u< rot and        \ kijk of veldnummer klopt.
+  swap 7 swap - 10 * rot + 22 + ; \ bereken offset.
+: zoekpr ( c --- c stuk)    \ bepaal promotiestuk.
+  0 6 2 do over symbols i + c@ = if drop i then loop ;
+
+: mens \ accepteer menselijke zet en voer die uit.
+  begin
+   .bord
+   0 18 at cr 28 spaces \ forceer scrolling.
+   aanzet c@ if 1 zet# +! zet# @ 3 .r else 3 spaces then
+   input 5 expect       \ vraag zet van speler.
+   input c@ 'Q' = if quit then
+   0 inpos vertrm !
+   2 input + c@ '-' = and \ controleer of tussen de velden - staat.
+   3 inpos bestm !
+   and                    \ is alle invoer correct? ( vlag op de stack.)
+   bestm @ f0 and aanzet c@ if 20 else 90 then =
+   vertrm b@ 07 and 1 =  and \ is het promotie zet?
+   if
+    ." Welk stuk? " 0 0 begin drop drop key zoekpr dup until
+    promm ! emit
+   else
+    0 promm !
+   then
+   if                     \ als alle invoer correct is
+    ['] legaal is perzet
+    0 zettel !            \ geen legale zetten gegenereerd.
+    vertrm c@ vertr c! ?perveld \ genereer de zetten van vertrekveld.
+    zettel @              \ als zet legaal, dan wordt hij gegenereerd.
+   else
+    0                     \ geen legale invoer=geen legale zet.
+   then
+   dup 0=  aanzet c@ and if -1 zet# +! then
+  until                   \ nu legale zet ingevoerd.
+  bp1 bp0 c0 cmove        \ zet stelling in geheugen.
+  zetom
+  .bord ;
+
+
+: zet \ voer een zet uit of accepteer een zet.
+  compcol @ 0<  aanzet c@ 80 =  = if comp else mens then ;
+
+: ?level \ vraag om spelniveau.
+  cr ." Spelniveau? 2-" maxlevel . key '0' - 2 max maxlevel min playlevel ! ;
+: ?kleur \ vraag om kleur
+  cr ." Wilt u met wit spelen J/N" key dup 'J' = swap ascii j = or
+  if 1 else -1 then compcol ! ;
+
+: init \ initialiseer een vers bord.
+  0 level !   bp0 bpv !
+  bp c0 87 fill \ breng randmarkering aan.
+  4 2 3 6 5 3 2 4   8 0 do bp 22 + i + c! loop  \ bovenste rij stukken.
+  bp 32 + 8 01 fill \ bovenste rij zwarte pionnen.
+  bp 42 + 8 00 fill   bp 52 + 8 00 fill
+  bp 62 + 8 00 fill   bp 72 + 8 00 fill \ middelste 4 rijen zijn leeg.
+  bp 82 + 8 81 fill \ onderste rij witte pionnen.
+  84 82 83 86 85 83 82 84   8 0 do bp 92 + i + c! loop \ onderste rij.
+  1 rochw c! 1 rochz c! 0 ep c! 1 lrochw c! 1 lrochz c! 0 prom c!
+  80 aanzet c! 96 koningw c! 26 koningz c! rand ?kleur ?level
+  cls 0 zet# ! endf off
+  0 schaak c! 9c0 waardw ! 9c0 waardz ! decimal ;
+
+: speel \ speel zetten.
+  begin zet endf @ until ;
+
+: chess \ het programma zelf.
+  init speel ;
+
+: autospeel \ speel automatisch.
+  begin zet compcol @ negate compcol ! key? if quit then endf @ until ;
+
+: auto \ automatisch schaken
+  init -1 compcol ! autospeel ;
+
+base !
+
+\ -- end of information --
+\ Lennart
+

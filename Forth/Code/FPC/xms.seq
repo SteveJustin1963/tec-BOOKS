@@ -1,0 +1,668 @@
+
+\ XMS words                                      10/06/90 15:45:03.15 mg
+\ Extended Memory Specification
+\ Based on the text XMS.TXT: Copyright (c) 1988, Microsoft Corporation
+
+comment:
+        This is an interface to an Extended Memory Manager(XMM), such as
+        QEMM-386(tm) and HIMEM.SYS.  I took the Extended Memory Specification
+        directly from the file XMS.TXT.  There was no sample code, but I
+        have tested these functions with one version of each of the memory
+        managers shown above, and they appear to work properly.
+
+        However, use these functions at your own risk.
+                                                Mike Garlock
+comment;
+
+anew xms
+
+\ default function in xmscontrol, to prevent hanging the system
+\ by attempting to call an xms function before the word SET_XMS_CONTROL
+\ is called.  This always returns a "FUNCTION NOT IMPLIMENTED" error.
+
+code xmm_notinitialized     \ not really intended for direct execution
+        sub ax, ax          \ this is default vector for XMSCONTROL
+        mov bl, # $80       \ until it is initialized
+        retf
+end-code
+
+\ xms functions are executed by making a far indirect call to the
+\ segment:offset pair stored in xmscontrol.
+
+create xmscontrol           \ will hold xmscontrol call address
+        ' xmm_notinitialized ,  \ right now it contains the far address
+        ?cs: ,                  \ of the above word
+
+ variable hma_exists        \ contains 0001 if hma exists after call to
+                            \ xms_version
+ variable xms_ext_version   \ holds version number after call to xms_version
+ variable xms_int_version   \ holds internal version number
+16 array xmmove_struct      \ default structure to be filled for xm_moves
+
+\ ExtMemMoveStruct offset contants
+ 0 constant xmmove_len          \ double word of bytes to move.  Must be even
+                                \ An F-PC double number length must have a
+                                \ SWAP performed on it before a 2! to this
+                                \ item.
+ 4 constant xmmove_src_hndl     \ 16-bit handle for source of move.  If 0000,
+                                \ then xmmove_src_off contains SEG:OFF of
+                                \ normal memory.  offset at low address.
+ 6 constant xmmove_src_off      \ double word offset.  see above.
+                                \ if this offset is taken from an F-PC double
+                                \ number, then the two words must be swapped.
+10 constant xmmove_dest_hndl    \ 16-bit destination handle.  See above
+12 constant xmmove_dest_off     \ double word offset.  see above
+
+
+\ We must first test for the Extended Memory Manager, before we attempt
+\ any functions.
+
+code xms? ( --- t/f )   \ Test for XMS driver
+        mov ax, # $4300         \ The function number
+        int $2f                 \ Do it
+        cmp al, # $80           \ did it return $80 in al
+0=      if                      \ yes, XMS driver present
+            mov ax, # $ffff     \ true flag
+            1push
+
+        then
+        sub ax, ax
+        1push
+end-code
+
+\ If the Extended Memory Manager exists, we must then set the indirect
+\ memory pointer so that we may call the functions.
+
+code set_xms_control ( --- )
+        push es                 \ save the es register
+        mov ax, # $4310         \ the function and subfunction
+        int $2f                 \ do it
+        mov xmscontrol bx       \ save the offset
+        mov xmscontrol 2+ es    \ and the seg
+        pop es
+        next
+end-code
+
+\ xms?
+\ #if
+\        set_xms_control
+\ #then
+
+\ NOTE: set_xms_control MUST be called before call any of the following
+\       also, of course we need to know that the xms driver exists
+
+code xms_version ( --- bcd )    \ fetch xms version, bcd number
+        sub ah, ah              \ function 0
+        call far [] xmscontrol  \ perform the call
+        mov hma_exists dx       \ dx = 0001 if hma exists
+        mov xms_int_version bx  \ bx contains internal revision number
+        mov xms_ext_version ax  \ we're saving it, as well as pushing it.
+        1push
+end-code
+
+comment:
+    ARGS:   AH = 00h
+    RETS:   AX = XMS version number
+            BX = Driver internal revision number
+            DX = 0001h if the HMA exists, 0000h otherwise
+    ERRS:   None
+comment;
+
+\ many of the following words have the same format, and could be written
+\ in a shorter, high level form.  I may do that.
+\ In my case, and for practice, it was actually easier to make each one
+\ a separate entity.
+
+code request_hma ( --- t/f )    \ request hma area
+        mov ah, # 01            \ function 01
+        mov dx, # $ffff         \ if tsr or device driver, dx to contain
+                                \ space requested.  This version requests
+                                \ all of the hma
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did we get it?
+0=      if                      \ yes
+            mov ax, # $ffff     \ leave the true
+            1push               \ assumes no error if successful
+                                \ i may be wrong
+
+        then
+        sub bh, bh              \ clear high byte of error code
+        push bx                 \ push it
+        1push                   \ it should be 0
+end-code
+
+comment:
+    ARGS:   AH = 01h
+            If the caller is a TSR or device driver,
+                DX = Space needed in the HMA by the caller in bytes
+            If the caller is an application program,
+                DX = FFFFh
+    RETS:   AX = 0001h if the HMA is assigned to the caller, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = 90h if the HMA does not exist
+            BL = 91h if the HMA is already in use
+            BL = 92h if DX is less than the /HMAMIN= parameter
+comment;
+
+code release_hma ( --- t | err f )  \ release the hma area
+        mov ah, # 2             \ function 2
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did it succeed
+0=      if                      \ yes, leave the true
+            mov ax, # $ffff     \ the true flag
+            1push
+
+        then
+        sub bh, bh              \ clear high byte of error code
+        push bx                 \ push the error code
+        1push                   \ it should be 0
+end-code
+
+comment:
+    ARGS:   AH = 02h
+    RETS:   AX = 0001h if the HMA is successfully released, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = 90h if the HMA does not exist
+            BL = 93h if the HMA was not allocated
+
+This is a VERY dangerous function to use.  You must only RELEASE_HMA if the
+task you're running has previously done a successful REQUEST_HMA.
+At least with QEMM.SYS, a RELEASE_HMA will release it, even if the process
+making the call doesn't own it.  With DESQview active, my system reset.
+I suppose if no other process owns the HMA, then a RELEASE_HMA is probably
+harmless.
+
+comment;
+
+code global_enable_a20 ( --- t | err f )
+        mov ah, # 03            \ function 03
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did it succeed
+0=      if                      \ yes, tell caller
+            mov ax, # $ffff     \ true
+            1push
+        then
+        sub bh, bh              \ clear the high byte
+        push bx                 \ push the error code
+        1push                   \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 03h
+    RETS:   AX = 0001h if the A20 line is enabled, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = 82h if an A20 error occurs
+comment;
+
+code global_disable_a20 ( --- t | err f )
+        mov ah, # 04            \ function 04
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did it succeed
+0=      if                      \ yes, tell caller
+            mov ax, # $ffff     \ true
+            1push
+        then
+        sub bh, bh              \ clear the high byte
+        push bx                 \ push the error code
+        1push                   \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 04h
+    RETS:   AX = 0001h if the A20 line is disabled, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = 82h if an A20 error occurs
+            BL = 94h if the A20 line is still enabled
+comment;
+
+code local_enable_a20 ( --- t | err f )
+        mov ah, # 05            \ function 05
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did it succeed
+0=      if                      \ yes, tell caller
+            mov ax, # $ffff     \ true
+            1push
+        then
+        sub bh, bh              \ clear the high byte
+        push bx                 \ push the error code
+        1push                   \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 05h
+    RETS:   AX = 0001h if the A20 line is enabled, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = 82h if an A20 error occurs
+comment;
+
+code local_disable_a20 ( --- t | err f )
+        mov ah, # 06            \ function 06
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did it succeed
+0=      if                      \ yes, tell caller
+            mov ax, # $ffff     \ true
+            1push
+        then
+        sub bh, bh              \ clear the high byte
+        push bx                 \ push the error code
+        1push                   \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 06h
+    RETS:   AX = 0001h if the function succeeds, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = 82h if an A20 error occurs
+            BL = 94h if the A20 line is still enabled
+comment;
+
+code query_a20 ( --- a20_status t | err f )
+        mov ah, # 7             \ function 7
+        call far [] xmscontrol  \ perform the function
+        or bl, bl               \ test bl this time for success
+0=      if                      \ yes, bl=0, according to the specs
+            push ax             \ push the value
+            mov ax, # $ffff     \ set the true flag
+            1push
+
+        then
+        sub bh, bh              \ clear high byte of the error
+        push bx                 \ and push it
+        sub ax, ax              \ might already be 0.  don't know
+        1push
+end-code
+
+comment:
+    ARGS:   AH = 07h
+    RETS:   AX = 0001h if the A20 line is physically enabled, 0000h otherwise
+    ERRS:   BL = 00h if the function succeeds
+            BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+comment;
+
+code query_free_xm ( --- total largest true | err false )
+        mov ah, # 8             \ function 8
+        sub bl, bl              \ do we need this, apparantly so
+                                \ apparantly bl is not altered unless error
+        call far [] xmscontrol  \ do it
+        or bl, bl               \ test bl, error if high bit set
+0<      if
+            sub bh, bh
+            push bx             \ push the error byte
+            sub ax, ax          \ and a false
+            1push
+        then
+        push dx                 \ push the total free
+        push ax                 \ push the largest free
+        mov ax, # $ffff         \ push the true
+        1push
+end-code
+
+comment:
+    ARGS:   AH = 08h
+    RETS:   AX = Size of the largest free extended memory block in K-bytes
+            DX = Total amount of free extended memory in K-bytes
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = A0h if all extended memory is allocated
+comment;
+
+code allocate_xmb ( k-bytes --- handle t | error f )
+        pop dx                  \ pop the k-byte parameter
+        mov ah, # 9             \ function 9
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did it succeed
+0=      if
+            mov ax, # $ffff     \ 0001 could be true also, but I like
+                                \ to use the real one
+            2push               \ push the flag and the handle
+        then
+        sub bh, bh              \ clear high byte of error code
+        push bx
+        1push                   \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 09h
+            DX = Amount of extended memory being requested in K-bytes
+    RETS:   AX = 0001h if the block is allocated, 0000h otherwise
+            DX = 16-bit handle to the allocated block
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = A0h if all available extended memory is allocated
+            BL = A1h if all available extended memory handles are in use
+comment;
+
+code free_xmb ( handle --- t | err f )
+        pop dx                  \ pop the handle to free
+        mov ah, # $0a           \ function $0a
+        call far [] xmscontrol  \ do it
+        cmp ax, # 1             \ did it succeed
+0=      if
+            mov ax, # $ffff     \ true flag
+            1push
+
+        then
+        sub bh, bh              \ clear high byte of error code
+        push bx
+        1push                   \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 0Ah
+            DX = Handle to the allocated block which should be freed
+    RETS:   AX = 0001h if the block is successfully freed, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = A2h if the handle is invalid
+            BL = ABh if the handle is locked
+comment;
+
+\ NOTE: The ExtMemMoveStruct pointed to by the segment:offset on the stack
+\       must be filled before calling this!
+\       See, or use, xmmove_struct and the offset constants at the start
+\       of this file
+
+code <move_xmb> ( xmb_struct_seg xmb_struct_offset --- t | err f )
+        pop ax                  \ pop the offset of ExtMemMoveStruct
+        pop bx                  \ pop segment of ExtMemMoveStruct
+        push ds                 \ save the important registers
+        push si
+        mov si, ax              \ offset to si
+        mov ds, bx              \ segment to ds
+        mov ah, # $0b           \ function $0b
+        call far [] xmscontrol  \ do it
+        pop si                  \ pop the registers here
+        pop ds
+        cmp ax, # 1             \ was it successful
+0=      if
+            mov ax, # $ffff     \ the true flag
+            1push
+        then
+
+        sub bh, bh              \ clear high byte of error flag
+        push bx                 \ push the error flag
+        1push                   \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 0Bh
+            DS:SI = Pointer to an Extended Memory Move Structure (see below)
+    RETS:   AX = 0001h if the move is successful, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = 82h if an A20 error occurs
+            BL = A3h if the SourceHandle is invalid
+            BL = A4h if the SourceOffset is invalid
+            BL = A5h if the DestHandle is invalid
+            BL = A6h if the DestOffset is invalid
+            BL = A7h if the Length is invalid
+            BL = A8h if the move has an invalid overlap
+            BL = A9h if a parity error occurs
+
+    Extended Memory Move Structure Definition:
+
+        ExtMemMoveStruct    struc
+            Length              dd  ?   ; 32-bit number of bytes to transfer
+            SourceHandle        dw  ?   ; Handle of source block
+            SourceOffset        dd  ?   ; 32-bit offset into source
+            DestHandle          dw  ?   ; Handle of destination block
+            DestOffset          dd  ?   ; 32-bit offset into destination block
+        ExtMemMoveStruct    ends
+
+    NOTE: In the above structure, the XMS driver expects the data in the 'DD'
+        portions to be in the INTEL DWORD format.  This is just the opposite
+        of the way double number data is stored in F-PC.  A 'DD' value is
+        stored with the low 16-bit word at the low address.  'SourceOffset'
+        and 'DestOffset' may either be a 32-bit value stored in this manner,
+        or, if the appropriate handle is 0, they may be a SEGMENT:OFFSET
+        pair stored with the OFFSET at the low address.  Since the normal
+        stack representation in F-PC is offset at the top of the stack, a
+        2! will work fine.  F-PC double number offsets, however, require a
+        SWAP to be performed on the value for a 2! to work properly.
+        The following word performs these swaps.
+        In other words, parameters DSRC_OFF and DDEST_OFF may have one of the
+        following stack maps:
+                ( double_offset --- )
+                ( offset segment --- )
+        Example: You have a 6000 byte array named TESTING that you want
+                to move into your extended memory block at address 0.  The
+                handle returned to you by ALLOCATE_XMB is in the variable
+                TEST_HNDL.  Use the following to perform the move:
+
+                    TESTING ?CS: 0 0. TEST_HNDL @ 6000. MOVE_XMB
+
+                To retrieve the data from the extended memory:
+
+                    0. TEST_HNDL @ TESTING ?CS: 0 6000. MOVE_XMB
+comment;
+
+: move_xmb ( dsrc_off src_hndl ddest_off dest_hndl dlength --- t | err f )
+        swap
+        xmmove_struct 2!                    \ store the double length
+                                            \ doesn't check for even
+                                            \ no need to add the len
+                                            \ offset because it's 0.
+        xmmove_struct xmmove_dest_hndl + !  \ store dest handle
+        swap
+        xmmove_struct xmmove_dest_off + 2!  \ store dest offset
+        xmmove_struct xmmove_src_hndl + !   \ store the source handle
+        swap
+        xmmove_struct xmmove_src_off + 2!   \ store the source offset
+        ?cs:                                \ get the segment
+        xmmove_struct                       \ and the offset of the struct
+        <move_xmb> ;                        \ do it
+
+code lock_xmb ( handle --- dpointer t | err f )
+        pop dx                              \ fetch the handle
+        mov ah, # $0c                       \ function $0c
+        call far [] xmscontrol              \ do it
+        cmp ax, # 1                         \ did it work?
+0=      if
+            push bx                         \ push the number
+            push dx
+            mov ax, # $ffff                 \ leave the true
+            1push
+        then
+        sub bh, bh                          \ clear high byte of error
+        push bx
+        1push                               \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 0Ch
+            DX = Extended memory block handle to lock
+    RETS:   AX = 0001h if the block is locked, 0000h otherwise
+            DX:BX = 32-bit linear address of the locked block
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = A2h if the handle is invalid
+            BL = ACh if the block's lock count overflows
+            BL = ADh if the lock fails
+
+    The 32 bit linear address is good until the block is unlocked.  A block
+    should not be kept locked too long.
+comment;
+
+code unlock_xmb ( handle --- t | err f )
+        pop dx                              \ pop the handle
+        mov ah, # $0d                       \ function $0d
+        call far [] xmscontrol
+        cmp ax, # 1                         \ success?
+0=      if                                  \ yes
+            mov ax, # $ffff                 \ leave true
+            1push
+        then
+        sub bh, bh
+        push bx
+        1push                               \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 0Dh
+            DX = Extended memory block handle to unlock
+    RETS:   AX = 0001h if the block is unlocked, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = A2h if the handle is invalid
+            BL = AAh if the block is not locked
+comment;
+
+code get_xmb_info ( handle --- free_hndls lock_cnt xmb_kb   t | err f )
+            pop dx                          \ pop the handle
+            mov ah, # $0e                   \ function $0e
+            call far [] xmscontrol
+            cmp ax, # 1
+0=          if                              \ we succeeded
+                mov al, bh                  \ lock count to separate word
+                sub bh, bh                  \ clear the high bytes
+                sub ah, ah
+                push bx                     \ push number of free handles
+                push ax                     \ push lock count
+                mov ax, # $ffff             \ setup the true
+                2push                       \ push kilo-bytes and true
+            then
+            sub bh, bh
+            push bx
+            1push                           \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 0Eh
+            DX = Extended memory block handle
+    RETS:   AX = 0001h if the block's information is found, 0000h otherwise
+            BH = The block's lock count
+            BL = Number of free EMB handles in the system
+            DX = The block's length in K-bytes
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = A2h if the handle is invalid
+comment;
+
+code reallocate_xmb ( size handle --- t | err f )
+        pop dx                              \ get the handle
+        pop bx                              \ get the size in kilo-bytes
+        mov ah, # $0f                       \ function $0f
+        call far [] xmscontrol              \ do it
+        cmp ax, # 1                         \ did it succeed?
+0=      if
+            mov ax, # $ffff                 \ the true flag
+            1push
+
+        then
+        sub bh, bh                          \ clear high byte of error
+        push bx                             \ push it
+        1push                               \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 0Fh
+            BX = New size for the extended memory block in K-bytes
+            DX = Unlocked extended memory block handle to reallocate
+    RETS:   AX = 0001h if the block is reallocated, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = 81h if a VDISK device is detected
+            BL = A0h if all available extended memory is allocated
+            BL = A1h if all available extended memory handles are in use
+            BL = A2h if the handle is invalid
+            BL = ABh if the block is locked
+
+    NOTE:  QEMM-386 returned an error code of 80h on a call to this function.
+comment;
+
+code request_umb ( paragraphs --- segment t | size_avail err f )
+        pop dx                              \ fetch paragraph count requested
+        mov ah, # $10                       \ function $10
+        call far [] xmscontrol              \ do it
+        cmp ax, # 1                         \ success?
+0=      if                                  \ yes
+            push bx                         \ push the segment
+            mov ax, # $ffff                 \ and the true
+            1push
+        then
+        push dx                             \ push size available
+                                            \ probably only valid for
+                                            \ error $b0, smaller UMB available
+        sub bh, bh                          \ clear hi byte of error
+        push bx                             \ push it
+        1push                               \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 10h
+            DX = Size of requested memory block in paragraphs
+    RETS:   AX = 0001h if the request is granted, 0000h otherwise
+            BX = Segment number of the upper memory block
+                   If the request is granted,
+            DX = Actual size of the allocated block in paragraphs
+                    otherwise,
+            DX = Size of the largest available UMB in paragraphs
+    ERRS:   BL = 80h if the function is not implemented
+            BL = B0h if a smaller UMB is available
+            BL = B1h if no UMBs are available
+    NOTE:   HIMEM.SYS indicates that this function is not implimented.
+comment;
+
+code release_umb ( segment --- t | err f )
+        pop dx                              \ the segment to release
+        mov ah, # $11                       \ the function number
+        call far [] xmscontrol              \ do it
+        cmp ax, # 1                         \ successful?
+0=      if
+            mov ax, # $ffff                 \ success, so leave true
+            1push
+        then
+
+        sub bh, bh                          \ clear high byte of error
+        push bx                             \ push it
+        1push                               \ ax should be 0
+end-code
+
+comment:
+    ARGS:   AH = 11h
+            DX = Segment number of the upper memory block
+    RETS:   AX = 0001h if the block was released, 0000h otherwise
+    ERRS:   BL = 80h if the function is not implemented
+            BL = B2h if the UMB segment number is invalid
+comment;
+
+
+: .xms_error ( err --- )
+        case
+            $80 of ." The function is not implemented" endof
+            $81 of ." A VDISK device is detected" endof
+            $82 of ." An A20 error occurs" endof
+            $8E of ." A general driver error occurs" endof
+            $8F of ." An unrecoverable driver error occurs" endof
+            $90 of ." The HMA does not exist" endof
+            $91 of ." The HMA is already in use" endof
+            $92 of ." DX is less than the /HMAMIN= parameter" endof
+            $93 of ." The HMA is not allocated" endof
+            $94 of ." The A20 line is still enabled" endof
+            $A0 of ." All extended memory is allocated" endof
+            $A1 of ." All available extended memory handles are in use" endof
+            $A2 of ." The handle is invalid" endof
+            $A3 of ." The SourceHandle is invalid" endof
+            $A4 of ." The SourceOffset is invalid" endof
+            $A5 of ." The DestHandle is invalid" endof
+            $A6 of ." The DestOffset is invalid" endof
+            $A7 of ." The Length is invalid" endof
+            $A8 of ." The move has an invalid overlap" endof
+            $A9 of ." A parity error occurs" endof
+            $AA of ." The block is not locked" endof
+            $AB of ." The block is locked" endof
+            $AC of ." The block's lock count overflows" endof
+            $AD of ." The lock fails" endof
+            $B0 of ." A smaller UMB is available" endof
+            $B1 of ." No UMBs are available" endof
+            $B2 of ." The UMB segment number is invalid" endof
+        endcase ;
+
+
+

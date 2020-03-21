@@ -1,0 +1,72 @@
+
+\ AUTHOR:   Jack W. Brown
+\ Date:     June 2, 1988
+\ Subject:  Object orientated programming.  Variables that act on
+\           multiple messages. Originally part of CREATE..DOES>
+\           tutorial.
+
+
+\ From smart variables we move on to MAGIC-VARIABLEs.  All you AI type
+\ people who are waiting for an affordable SMALLTALK can now switch to
+\ Forth and implement your own data structures and objects that pass and
+\ receive messages.  This is actually a primitive implementation but the
+\ idea is simple.  We simply extend the meaning of the STORE? variable of
+\ the preceding example.  We might as well change its name at the same
+\ time, let's call the variable MESSAGE .   What is going to happen is
+\ that our MAGIC-VARIABLES runtime routine will examine the contents of
+\ MESSAGE and then do the appropriate thing.  Here is the code for
+\ Magic Variables.
+
+   VARIABLE  MESSAGE
+
+: FETCH    0 MESSAGE ! ;
+: =>       1 MESSAGE ! ;
+: DISPLAY  2 MESSAGE ! ;
+: SOUND    3 MESSAGE ! ;
+: PLOT     4 MESSAGE ! ;
+: CLEAR    5 MESSAGE ! ;
+: INC      6 MESSAGE ! ;
+: DEC      7 MESSAGE ! ;
+
+: WAIT     5000 0 DO I DROP LOOP ;
+
+:  COMPILE-MAGIC-VARIABLE  ( --  -- )
+        0 ,  ;
+
+
+:  RUN-MAGIC-VARIABLE   ( val|--  val|-- )
+        MESSAGE @  MESSAGE OFF
+        CASE
+        0 OF  @         ENDOF
+        1 OF  !         ENDOF
+        2 OF  @ .       ENDOF
+        3 OF     @ 0 ?DO BEEP    WAIT  LOOP  ENDOF
+        5 OF  OFF       ENDOF
+        6 OF  1 SWAP +! ENDOF
+        7 OF  -1 SWAP +! ENDOF
+        4 OF  CR @ 0 ?DO ASCII * EMIT  LOOP  ENDOF ENDCASE ;
+
+: MAGIC-VARIABLE
+        CREATE  COMPILE-MAGIC-VARIABLE
+        DOES>   RUN-MAGIC-VARIABLE ;
+
+: MVAR MAGIC-VARIABLE ;  \ Short name for poor typists.
+
+\ Note if you dont have a CASE statement in you FORTH you will have to
+\ use nested IF statements or write your own CASE statement.
+\ MAGIC-VARIABLE examples:
+
+\    MAGIC-VARIABLE PIG  ok
+\    DISPLAY PIG 0  ok
+\    45 => PIG  ok
+\    DISPLAY PIG 45  ok
+\    5 => PIG PIG . 5  ok
+\    PLOT PIG
+\    ***** ok
+\    INC PIG DISPLAY PIG 6  ok
+\    CLEAR PIG DISPLAY PIG 0  ok
+
+\ Well I think that's enough CREATE ... DOES> for awhile.
+\ Good luck with your next FORTH  creation.
+
+

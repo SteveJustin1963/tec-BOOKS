@@ -1,0 +1,88 @@
+
+comment:
+
+    The following is Mike Sperl's original NEW-EXPECT
+modified for prefix assembler.  Mike's comments follow:
+
+------------------------------------------------------------
+
+This word uses dos interrupt 21h for all keyboard input except
+where KEY is explicitly called by another word.  It doesn't
+replace KEY.  It simply doesn't call KEY.  This gives PF the
+use of keypad and function keys on the PC and allows DOSEDIT,
+CED and similar programs to work within PF, thus bringing more
+of the power of the PC to PF.
+    This shouldn't interfere with any word that uses KEY.
+Don't try to expect to a variable, like "tag 4 expect" - only use !
+
+NOTE: SED will work with this expect if you first open the file
+and then use ED to call up the editor.  The word SED in the editor
+will force you to exit to DOS with a CTL-C when done editing, and
+would be easy to modify to work properly with this expect, but I
+haven't found a need to do this yet.
+
+------------------------------------------------------------
+
+comment;
+
+only forth also definitions
+
+hex
+
+code _new-expect  ( addr +n -- )
+    \ Read input via DOS buffered keyboard input
+   CLEAR_LABELS
+    mov bx, sp
+    sub bx, # 0100      \ buffer 256 bytes below stack
+    pop ax              \ ax = count
+    mov 0 [bx], al      \ 1st byte buffer = chars to read
+    mov dx, bx          \ dx = ^buffer
+    mov ah, # 0A        \ buffered keyboard input
+    int 021             \ DOS function call
+    xor cx, cx          \ zero out cx
+    inc bx              \ bx = ^#chars read
+    mov cl, 0 [bx]      \ cx = #chars read
+    mov #) span cx      \ update SPAN
+    \ Move input to where Forth wants it:
+    pop di              \ di = Forth address
+    inc bx              \ bx = ^buffer
+    mov dx, si          \ dx saves si
+    mov ax, es          \ ax saves es
+    mov si, bx          \ si = DOS address
+    mov bx, ds
+    mov es, bx          \ set es = ds
+    cld                 \ move down
+    repnz movsb         \ move it
+    mov si, dx          \ restore si
+    mov es, ax          \ restore es
+    \ Take care of #out, #line, & spacing
+    mov #) #out cx      \ cx = 0 after move!
+    cmp #) #line # 24   \ are we on line 24?
+    JZ 1 $
+\    go:0= 1             \ yes - bypass bump
+    inc #) #line        \ no  - bump line
+1 $:
+    mov dl, # 0A        \ LF char
+    mov ah, # 02        \ character output
+    int 021             \ DOS function call
+    next    end-code
+
+decimal
+
+\ Switches colon defs - can switch back as well!
+\ A Forth double transplant operation - takes two words and
+\ switches heads and bodies!!
+code switch  ( cfa1 cfa2 -- )
+    pop bx              \ bx = cfa2
+    pop di              \ di = cfa1
+    mov ax, 3 [bx]      \ ax = value of body of cfa2
+    mov cx, 3 [di]      \ cx = value of body of cfa1
+    mov 3 [di], ax      \ cfa1 has cfa2's body
+    mov 3 [bx], cx      \ cfa2 has cfa1's body
+    next    end-code
+
+: new-expect _new-expect ;  \ make colon def for switch
+
+' expect ' new-expect switch    \ now using buffered input
+
+

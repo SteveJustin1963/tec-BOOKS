@@ -1,0 +1,155 @@
+
+\ *************************************************************
+\ **
+\ **      Benchmark Programs
+\ **
+\ **      a. Sieve Benchmark
+\ **      b. Fibonacci Benchmmark
+\ **      c. Interface Age Benchmark
+\ **
+\ **        This version of Forth uses register BX as the
+\ **     top of the Forth data stack.  When defining new
+\ **     "code" words, or modifying existing words, ensure
+\ **     that the BX register is set accordingly.
+\ **
+\ **      Last update   1/07/87
+\ **      Don Care
+\ **
+\ **    Updated Gene Czarcinski, 10/7/88
+\ **            Change (S to ( and remove assembler.  This
+\ **            was changed so that benchmarks could be run
+\ **            between Don Care's TIL87 and Tom Zimmer's F-PC.
+\ **
+\ **    Some results (AT Clone @ 10MHz):
+\ **
+\ **            TIL87           F-PC
+\ **            25 sec          12 sec          sieve_bench
+\ **            28 sec           6 sec          INTAGE_BENCH
+\ **            12 sec           7 sec          FIB_BENCH
+\ **
+\ *************************************************************
+
+ CR .( Loading benchmark programs )
+
+
+ONLY FORTH  ALSO DEFINITIONS
+
+DECIMAL
+
+\         Sieve Benchmark
+\         1899 is the correct answer.
+\
+
+8190 CONSTANT SIZE
+
+VARIABLE FLAGS SIZE ALLOT
+
+\ DO-PRIME  (  ---  )
+\   Perform the Erastosthenes Sieve prime number
+\   benchmark.
+: DO-PRIME  (  ---  )
+  FLAGS SIZE 1 FILL  ( set array )
+  0  SIZE  0
+  DO FLAGS I + C@
+     IF I DUP + 3 + DUP I +
+        BEGIN DUP SIZE <
+        WHILE 0 OVER FLAGS + C!  OVER +
+        REPEAT DROP DROP 1+
+     THEN
+  LOOP . ." Primes" CR ;
+
+
+\ SIEVE_BENCH  (  ---  )
+\  Perform the prime number calculation 10 times.
+: SIEVE_BENCH  (  ---  )
+  10 0
+  DO DO-PRIME
+  LOOP BEEP ;
+
+
+\
+\        Fibonacci Benchmark
+\
+\        Fib(n) = 0 if n=0
+\               = 1 if n=1
+\               = Fib(n-1)+Fib(n-2) otherwise
+\
+\        Fib(24) = 46368 (maximum 16 bit number)
+\
+\
+
+
+\ FIB   (  N  ---  RESULT )
+\     Return the Fibanacci of number N. ( N=24 max )
+: FIB   (  N  ---  RESULT )
+  RECURSIVE
+  DUP 1 >
+  IF DUP  1- FIB         ( FIB<n-1>   )
+     SWAP 2- FIB         ( FIB<n-2>   )
+     +
+  THEN ;
+
+
+\ FIB_BENCH  (  ---  )
+\  Calculate the FIB(24).
+: FIB_BENCH  (  ---  )
+  24 DUP FIB
+  BEEP
+  CR ." FIB( " SWAP . ." ) = " U. ;
+
+
+
+\
+\         Interface Age Benchmark
+\
+
+\ INTAGE  (  N  ---  )
+\  Perform the Interface Age benchmark.  Loop N times.
+: INTAGE  (  N  ---  )
+  DUP U2/ 1+ SWAP
+  1
+  DO DUP I 1 ROT
+     2
+     DO DROP DUP I /MOD
+        DUP 0=
+        IF DROP DROP 1 LEAVE
+        ELSE 1 =
+             IF DROP 1
+             ELSE DUP 0 >
+                  IF DROP 1
+                  ELSE 0=
+                       IF 0 LEAVE
+                       THEN
+                  THEN
+             THEN
+        THEN
+     LOOP
+     IF 4 .R
+     ELSE DROP
+     THEN
+  LOOP
+  DROP ;
+
+
+\ INTAGE_BENCH  (  ---  )
+\  Perform the Interface Age benchmark.
+: INTAGE_BENCH  (  ---  )
+  1000 INTAGE
+  BEEP ;
+
+
+ CR .( Benchmark programs loaded )
+
+\ Original BENCHMRK.4TH creator
+\ ***********************************
+\ ***********************************
+\ ***                             ***
+\ ***    Don Care                 ***
+\ ***    1405 Woodcreek Drive     ***
+\ ***    Richardson, Texas        ***
+\ ***    75081                    ***
+\ ***                             ***
+\ ***********************************
+\ ***********************************
+
+
