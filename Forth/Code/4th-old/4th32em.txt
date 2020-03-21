@@ -1,0 +1,13 @@
+4tH version 3.2e PostScript manual                      '98-01-12
+
+This is the official 4tH version 3.2e PostScript manual, which
+refers to archive "4th-32e.zip" and "4th-32e.tgz".
+
+This manual has been created by Craig P. Earls.
+
+If you find any mistakes please report them to
+
+                        hansoft@visitweb.com
+and
+                        cpearls@mit.edu
+
