@@ -1,0 +1,3 @@
+Setup utility for Epson FX86 or compatible printer.
+
+Includes MSDOS executable and F83 Forth source.

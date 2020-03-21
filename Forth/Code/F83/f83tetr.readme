@@ -1,0 +1,27 @@
+TETRIS FOR LAXEN & PERRY'S F83
+
+Ported by L.C. Benschop. (benschop@ics.ele.tue.nl)
+
+In a fit of nostalgia I ported the infamous ANSI Forth Tetris by Dirk Zoller
+to Laxen & Perry's F83. I'ts a quick and dirty hack though and the original
+is not very elegant or efficient code either.
+
+I'ts known to run on the MSDOS version and the CP/M version.
+
+To run it on the CP/M version you should enable the right terminal control,
+e.g. 
+  
+EDITOR ANSI FORTH
+
+If you have an 'ANSI' terminal or anything that looks like a vt100. There's
+also HEATH and TELEVIDEO to select in F83. The MSDOS version already has
+teminal control for the IBM PC enabled.
+
+Further you should play with the value of the FUDGE variable until 5000 MS
+takes 5 seconds. On a typical 4MHz Z80 system 25 FUDGE ! should be OK. On a
+Pentium-90 running MSDOS, it should rather be 2500 FUDGE !
+
+On the typical CP/M80 system it is probably too slow to be enjoyable.
+
+
+

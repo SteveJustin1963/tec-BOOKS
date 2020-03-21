@@ -1,0 +1,52 @@
+Some utilities for MSDOS F83 2.1.0
+
+EDITOR.BLK      Simple full-screen editor
+F83.COM         F83 compiler with editor loaded
+F83-APP.COM     A cut-down F83 intended for compiling apps
+
+
+Using F83-APP and making turnkey applications
+---------------------------------------------
+F83-APP is intended for compiling turnkey applications.
+Because most of the utilities normally included with F83
+have been stripped out, your turnkey apps will be smaller!
+
+Note that F83-APP doesn't do anything special - it simply
+loads your application and performs "1 LOAD".
+
+Your source screens must do the actual turnkey process
+i.e. revector BOOT and ?ERROR then do a SAVE-SYSTEM and
+BYE.  Here's an example of what you might put on screen
+1 of your application:
+
+   FORTH DEFINITIONS DECIMAL
+   \ Load the application
+   CR .( loading PSET )   2 11 THRU
+   \ Set application boot word and error handling
+   ' PSET IS BOOT  ' (?APPLICATION-ERROR) IS ?ERROR
+   \ Save the executable and exit to DOS
+   SAVE-SYSTEM PSET.COM  BYE
+
+Somewhere in your application you should include a new
+version of ?ERROR so that if ABORT is executed in your
+application, you will exit to DOS rather than drop back
+to the forth interpreter e.g.
+
+   \ Error handling routine for applications.
+   \ Replaces (?ERROR) in ABORT
+   : (?APPLICATION-ERROR)  ( adr len flag -- )
+     IF  >R >R  SP0 @ SP!  PRINTING OFF  R> R>
+     SPACE TYPE SPACE  0 0 BDOS  ELSE  2DROP  THEN ;
+
+Your main application word (PSET in the example above)
+should end with a '0 0 BDOS'  so that it exits to DOS
+after it completes e.g.
+
+   : PSET  ...  0 0 BDOS ;
+
+That's it.
+
+Using F83-APP is then simply:
+
+   A:\> F83-APP <sourcefilename>
+

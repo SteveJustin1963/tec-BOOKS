@@ -1,0 +1,7 @@
+SCRAMBLE 1.0
+
+MSDOS file encryption program compatible with
+the CP/M program of the same name.  Includes
+F83 source.
+
+03-Jul-92
