@@ -1,6 +1,6 @@
 # tec-TOOLS
 
-many links
+extras;
 
 http://k1.spdns.de/Develop/Projects/zasm/Distributions/
 
