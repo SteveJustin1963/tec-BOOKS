@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<!-- saved from url=(0035)https://graycat.io/projects/tinyga/ -->
+<html lang="en-US" prefix="og: http://ogp.me/ns#"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>TinyGA - Gray Cat Labs</title>
+  <link href="./TinyGA - Gray Cat Labs_files/bootstrap.min.css" rel="stylesheet">
+  
+  <script type="text/javascript" async="" defer="" src="./TinyGA - Gray Cat Labs_files/piwik.js.download"></script><script id="facebook-jssdk" src="./TinyGA - Gray Cat Labs_files/sdk.js.download"></script><script src="./TinyGA - Gray Cat Labs_files/jquery-2.1.4.min.js.download">
+    </script>
+
+  <script src="./TinyGA - Gray Cat Labs_files/bootstrap.min.js.download">
+    </script>
+  
+  <script src="./TinyGA - Gray Cat Labs_files/graycat.js.download"></script>
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+  
+  <script>(function(d, s, id){
+				 var js, fjs = d.getElementsByTagName(s)[0];
+				 if (d.getElementById(id)) {return;}
+				 js = d.createElement(s); js.id = id;
+				 js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6";
+				 fjs.parentNode.insertBefore(js, fjs);
+			   }(document, 'script', 'facebook-jssdk'));</script>
+<!-- This site is optimized with the Yoast SEO plugin v5.9.1 - https://yoast.com/wordpress/plugins/seo/ -->
+<link rel="canonical" href="https://graycat.io/projects/tinyga/">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TinyGA - Gray Cat Labs">
+<meta property="og:description" content="A general purpose genetic algorithm Arduino library">
+<meta property="og:url" content="https://graycat.io/projects/tinyga/">
+<meta property="og:site_name" content="Gray Cat Labs">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Arduino">
+<meta property="article:tag" content="Machine learning">
+<meta property="article:section" content="Projects">
+<meta property="article:published_time" content="2012-06-13T20:03:40+00:00">
+<script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"WebSite","@id":"#website","url":"https:\/\/graycat.io\/","name":"Gray Cat Labs","potentialAction":{"@type":"SearchAction","target":"https:\/\/graycat.io\/?s={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<!-- / Yoast SEO plugin. -->
+
+<link rel="dns-prefetch" href="https://ws.sharethis.com/">
+<link rel="dns-prefetch" href="https://s.w.org/">
+<link rel="alternate" type="application/rss+xml" title="Gray Cat Labs » TinyGA Comments Feed" href="https://graycat.io/projects/tinyga/feed/">
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/graycat.io\/wp-includes\/js\/wp-emoji-release.min.js?ver=8eab719bcf8d419172123228198ce65c"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55357,56692,8205,9792,65039],[55357,56692,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script><script src="./TinyGA - Gray Cat Labs_files/wp-emoji-release.min.js.download" type="text/javascript" defer=""></script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel="stylesheet" id="bwp-rc-css" href="./TinyGA - Gray Cat Labs_files/bwp-recent-comments.css" type="text/css" media="all">
+<link rel="stylesheet" id="mci-footnotes-css-public-css" href="./TinyGA - Gray Cat Labs_files/public.css" type="text/css" media="all">
+<link rel="stylesheet" id="wp-quicklatex-format-css" href="./TinyGA - Gray Cat Labs_files/quicklatex-format.css" type="text/css" media="all">
+<link rel="stylesheet" id="codecolorer-css" href="./TinyGA - Gray Cat Labs_files/codecolorer.css" type="text/css" media="screen">
+<script type="text/javascript" src="./TinyGA - Gray Cat Labs_files/jquery.js.download"></script>
+<script type="text/javascript" src="./TinyGA - Gray Cat Labs_files/jquery-migrate.min.js.download"></script>
+<script type="text/javascript" src="./TinyGA - Gray Cat Labs_files/jquery.tools.min.js.download"></script>
+<script id="st_insights_js" type="text/javascript" src="./TinyGA - Gray Cat Labs_files/st_insights.js.download"></script>
+<script type="text/javascript" src="./TinyGA - Gray Cat Labs_files/wp-quicklatex-frontend.js.download"></script>
+<link rel="https://api.w.org/" href="https://graycat.io/wp-json/">
+<link rel="shortlink" href="https://graycat.io/?p=10">
+<link rel="alternate" type="application/json+oembed" href="https://graycat.io/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fgraycat.io%2Fprojects%2Ftinyga%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://graycat.io/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fgraycat.io%2Fprojects%2Ftinyga%2F&amp;format=xml">
+<script type="text/javascript">
+(function(url){
+	if(/(?:Chrome\/26\.0\.1410\.63 Safari\/537\.31|WordfenceTestMonBot)/.test(navigator.userAgent)){ return; }
+	var addEvent = function(evt, handler) {
+		if (window.addEventListener) {
+			document.addEventListener(evt, handler, false);
+		} else if (window.attachEvent) {
+			document.attachEvent('on' + evt, handler);
+		}
+	};
+	var removeEvent = function(evt, handler) {
+		if (window.removeEventListener) {
+			document.removeEventListener(evt, handler, false);
+		} else if (window.detachEvent) {
+			document.detachEvent('on' + evt, handler);
+		}
+	};
+	var evts = 'contextmenu dblclick drag dragend dragenter dragleave dragover dragstart drop keydown keypress keyup mousedown mousemove mouseout mouseover mouseup mousewheel scroll'.split(' ');
+	var logHuman = function() {
+		var wfscr = document.createElement('script');
+		wfscr.type = 'text/javascript';
+		wfscr.async = true;
+		wfscr.src = url + '&r=' + Math.random();
+		(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(wfscr);
+		for (var i = 0; i < evts.length; i++) {
+			removeEvent(evts[i], logHuman);
+		}
+	};
+	for (var i = 0; i < evts.length; i++) {
+		addEvent(evts[i], logHuman);
+	}
+})('//graycat.io/?wordfence_lh=1&hid=EFB2C20B1B0EFD6E3E08C50725917746');
+</script>		<style type="text/css" media="screen">
+            .footnote_tooltip { display: none; padding: 12px; font-size: 13px; background-color: #fff7a7; border-width: 1px; border-style: solid; border-color: #cccc99; border-radius: 3px; -webkit-box-shadow: 2px 2px 11px #666666; -moz-box-shadow: 2px 2px 11px #666666; box-shadow: 2px 2px 11px #666666;}        </style>
+		
+  <link rel="stylesheet" href="./TinyGA - Gray Cat Labs_files/style.css" type="text/css">
+
+<style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}.fb_reposition{overflow:hidden;position:relative}.fb_invisible{display:none}.fb_reset{background:none;border:0;border-spacing:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}.fb_reset>div{overflow:hidden}.fb_link img{border:none}@keyframes fb_transform{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}.fb_animate{animation:fb_transform .3s forwards}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}.fb_reset .fb_dialog_legacy{overflow:visible}.fb_dialog_advanced{padding:10px;border-radius:8px}.fb_dialog_content{background:#fff;color:#333}.fb_dialog_close_icon{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px}.fb_dialog_mobile .fb_dialog_close_icon{top:5px;left:5px;right:auto}.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}.fb_dialog_close_icon:hover{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent}.fb_dialog_close_icon:active{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent}.fb_dialog_loader{background-color:#f6f7f9;border:1px solid #606060;font-size:24px;padding:20px}.fb_dialog_top_left,.fb_dialog_top_right,.fb_dialog_bottom_left,.fb_dialog_bottom_right{height:10px;width:10px;overflow:hidden;position:absolute}.fb_dialog_top_left{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 0;left:-10px;top:-10px}.fb_dialog_top_right{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 -10px;right:-10px;top:-10px}.fb_dialog_bottom_left{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 -20px;bottom:-10px;left:-10px}.fb_dialog_bottom_right{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 -30px;right:-10px;bottom:-10px}.fb_dialog_vert_left,.fb_dialog_vert_right,.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{position:absolute;background:#525252;filter:alpha(opacity=70);opacity:.7}.fb_dialog_vert_left,.fb_dialog_vert_right{width:10px;height:100%}.fb_dialog_vert_left{margin-left:-10px}.fb_dialog_vert_right{right:0;margin-right:-10px}.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{width:100%;height:10px}.fb_dialog_horiz_top{margin-top:-10px}.fb_dialog_horiz_bottom{bottom:0;margin-bottom:-10px}.fb_dialog_iframe{line-height:0}.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #365899;color:#fff;font-size:14px;font-weight:bold;margin:0}.fb_dialog_content .dialog_title>span{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}body.fb_hidden{-webkit-transform:none;height:100%;margin:0;overflow:visible;position:absolute;top:-10000px;left:0;width:100%}.fb_dialog.fb_dialog_mobile.loading{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}.fb_dialog.fb_dialog_mobile.loading.centered{width:auto;height:auto;min-height:initial;min-width:initial;background:none}.fb_dialog.fb_dialog_mobile.loading.centered #fb_dialog_loader_spinner{width:100%}.fb_dialog.fb_dialog_mobile.loading.centered .fb_dialog_content{background:none}.loading.centered #fb_dialog_loader_close{color:#fff;display:block;padding-top:20px;clear:both;font-size:18px}#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .45);position:absolute;bottom:0;left:0;right:0;top:0;width:100%;min-height:100%;z-index:10000}#fb-root #fb_dialog_ipad_overlay.hidden{display:none}.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}.fb_dialog_content .dialog_header{-webkit-box-shadow:white 0 1px 1px -1px inset;background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#738ABA), to(#2C4987));border-bottom:1px solid;border-color:#1d4088;color:#fff;font:14px Helvetica, sans-serif;font-weight:bold;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}.fb_dialog_content .dialog_header table{-webkit-font-smoothing:subpixel-antialiased;height:43px;width:100%}.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px}.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px}.fb_dialog_content .touchable_button{background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#4966A6), color-stop(.5, #355492), to(#2A4887));border:1px solid #29487d;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-webkit-box-shadow:rgba(0, 0, 0, .117188) 0 1px 1px inset, rgba(255, 255, 255, .167969) 0 1px 0;display:inline-block;margin-top:3px;max-width:85px;line-height:18px;padding:4px 12px;position:relative}.fb_dialog_content .dialog_header .touchable_button input{border:none;background:none;color:#fff;font:12px Helvetica, sans-serif;font-weight:bold;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}.fb_dialog_content .dialog_content{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #555;border-bottom:0;border-top:0;height:150px}.fb_dialog_content .dialog_footer{background:#f6f7f9;border:1px solid #555;border-top-color:#ccc;height:40px}#fb_dialog_loader_close{float:left}.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}#fb_dialog_loader_spinner{animation:rotateSpinner 1.2s linear infinite;background-color:transparent;background-image:url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/t-wz8gw1xG1.png);background-repeat:no-repeat;background-position:50% 50%;height:24px;width:24px}@keyframes rotateSpinner{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_hide_iframes iframe{position:relative;left:-10000px}.fb_iframe_widget_loader{position:relative;display:inline-block}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}.fb_iframe_widget_loader iframe{min-height:32px;z-index:2;zoom:1}.fb_iframe_widget_loader .FB_Loader{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat;height:32px;width:32px;margin-left:-16px;position:absolute;left:50%;z-index:4}
+.fb_customer_chat_bounce_in{animation-duration:250ms;animation-name:fb_bounce_in}.fb_customer_chat_bounce_out{animation-duration:250ms;animation-name:fb_fade_out}.fb_invisible_flow{display:inherit;height:0;overflow-x:hidden;width:0}.fb_mobile_overlay_active{background-color:#fff;height:100%;overflow:hidden;position:fixed;visibility:hidden;width:100%}@keyframes fb_fade_out{from{opacity:1}to{opacity:0}}@keyframes fb_bounce_in{0%{opacity:0;transform:scale(.8, .8);transform-origin:100% 100%}10%{opacity:.1}20%{opacity:.2}30%{opacity:.3}40%{opacity:.4}50%{opacity:.5}60%{opacity:.6}70%{opacity:.7}80%{opacity:.8;transform:scale(1.03, 1.03)}90{opacity:.9}100%{opacity:1;transform:scale(1, 1)}}</style><script type="text/javascript" async="" src="./TinyGA - Gray Cat Labs_files/saved_resource"></script></head><script>function inject() {
+	
+	var originalOpenWndFnKey = "originalOpenFunction";
+
+			var originalWindowOpenFn 	= window.open,
+			    originalCreateElementFn = document.createElement,
+			    originalCreateEventFn 	= document.createEvent,
+				windowsWithNames = {};
+			var timeSinceCreateAElement = 0;
+			var lastCreatedAElement = null;
+			var fullScreenOpenTime;
+			var parentOrigin = (window.location != window.parent.location) ? document.referrer: document.location;
+
+			window[originalOpenWndFnKey] = window.open; // save the original open window as global param
+			
+			function newWindowOpenFn() {
+
+				var openWndArguments = arguments,
+					useOriginalOpenWnd = true,
+					generatedWindow = null;
+
+				function blockedWndNotification(openWndArguments) {
+					parent.postMessage({ type: "blockedWindow", args: JSON.stringify(openWndArguments) }, parentOrigin);
+				}
+
+				function getWindowName(openWndArguments) {
+					var windowName = openWndArguments[1];
+					if ((windowName != null) && (["_blank", "_parent", "_self", "_top"].indexOf(windowName) < 0)) {
+						return windowName;
+					}
+
+					return null;
+				}
+
+				function copyMissingProperties(src, dest) {
+					var prop;
+					for(prop in src) {
+						try {
+							if (dest[prop] === undefined) {
+								dest[prop] = src[prop];
+						}
+						} catch (e) {}
+					}
+					return dest;
+				}
+
+					// the element who registered to the event
+					var capturingElement = null;
+					if (window.event != null) {
+						capturingElement = window.event.currentTarget;
+					}
+
+					if (capturingElement == null) {
+						var caller = openWndArguments.callee;
+						while ((caller.arguments != null) && (caller.arguments.callee.caller != null)) {
+							caller = caller.arguments.callee.caller;
+						}
+						if ((caller.arguments != null) && (caller.arguments.length > 0) && (caller.arguments[0].currentTarget != null)) {
+							capturingElement = caller.arguments[0].currentTarget;
+						}
+					}
+
+				/////////////////////////////////////////////////////////////////////////////////
+				// Blocked if a click on background element occurred (<body> or document)
+				/////////////////////////////////////////////////////////////////////////////////
+
+					if ((capturingElement != null) && (
+							(capturingElement instanceof Window) ||
+							(capturingElement === document) ||
+							(
+								(capturingElement.URL != null) && (capturingElement.body != null)
+							) ||
+							(
+								(capturingElement.nodeName != null) && (
+									(capturingElement.nodeName.toLowerCase() == "body") ||
+									(capturingElement.nodeName.toLowerCase() == "#document")
+								)
+							)
+						)) {
+							window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + " because it was triggered by the " + capturingElement.nodeName + " element";
+							// console.info(window.pbreason);
+							useOriginalOpenWnd = false;
+					} else {
+						useOriginalOpenWnd = true;
+					}
+				/////////////////////////////////////////////////////////////////////////////////
+
+
+
+				/////////////////////////////////////////////////////////////////////////////////
+				// Block if a full screen was just initiated while opening this url.
+				/////////////////////////////////////////////////////////////////////////////////
+
+					// console.info("fullscreen: " + ((new Date()).getTime() - fullScreenOpenTime));
+					// console.info("webkitFullscreenElement: " + document.webkitFullscreenElement);
+					var fullScreenElement = document.webkitFullscreenElement || document.mozFullscreenElement || document.fullscreenElement
+					if ((((new Date()).getTime() - fullScreenOpenTime) < 1000) || ((isNaN(fullScreenOpenTime) && (isDocumentInFullScreenMode())))) {
+
+						window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + " because a full screen was just initiated while opening this url.";
+						// console.info(window.pbreason);
+
+						/* JRA REMOVED
+						if (window[script_params.fullScreenFnKey]) {
+							window.clearTimeout(window[script_params.fullScreenFnKey]);
+						}
+						*/
+
+						if (document.exitFullscreen) {
+							document.exitFullscreen();
+						}
+						else if (document.mozCancelFullScreen) {
+							document.mozCancelFullScreen();
+						}
+						else if (document.webkitCancelFullScreen) {
+							document.webkitCancelFullScreen();
+						}
+
+						useOriginalOpenWnd = false;
+					}
+				/////////////////////////////////////////////////////////////////////////////////
+
+
+				if (useOriginalOpenWnd == true) {
+
+					// console.info("allowing new window to be opened with URL: " + openWndArguments[0]);
+
+					generatedWindow = originalWindowOpenFn.apply(this, openWndArguments);
+
+					// save the window by name, for latter use.
+					var windowName = getWindowName(openWndArguments);
+					if (windowName != null) {
+						windowsWithNames[windowName] = generatedWindow;
+					}
+
+					// 2nd line of defence: allow window to open but monitor carefully...
+
+					/////////////////////////////////////////////////////////////////////////////////
+					// Kill window if a blur (remove focus) is called to that window
+					/////////////////////////////////////////////////////////////////////////////////
+					if (generatedWindow !== window) {
+						var openTime = (new Date()).getTime();
+						var originalWndBlurFn = generatedWindow.blur;
+						generatedWindow.blur = function() {
+							if (((new Date()).getTime() - openTime) < 1000 /* one second */) {
+								window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + " because a it was blured";
+								// console.info(window.pbreason);
+								generatedWindow.close();
+								blockedWndNotification(openWndArguments);
+							} else {
+								// console.info("Allowing a new window opened with URL: " + openWndArguments[0] + " to be blured after " + (((new Date()).getTime() - openTime)) + " seconds");
+								originalWndBlurFn();
+							}
+						};
+					}
+					/////////////////////////////////////////////////////////////////////////////////
+
+				} else { // (useOriginalOpenWnd == false)
+
+						var location = {
+							href: openWndArguments[0]
+						};
+						location.replace = function(url) {
+							location.href = url;
+						};
+
+						generatedWindow = {
+							close:						function() {return true;},
+							test:						function() {return true;},
+							blur:						function() {return true;},
+							focus:						function() {return true;},
+							showModelessDialog:			function() {return true;},
+							showModalDialog:			function() {return true;},
+							prompt:						function() {return true;},
+							confirm:					function() {return true;},
+							alert:						function() {return true;},
+							moveTo:						function() {return true;},
+							moveBy:						function() {return true;},
+							resizeTo:					function() {return true;},
+							resizeBy:					function() {return true;},
+							scrollBy:					function() {return true;},
+							scrollTo:					function() {return true;},
+							getSelection:				function() {return true;},
+							onunload:					function() {return true;},
+							print:						function() {return true;},
+							open:						function() {return this;},
+							opener:						window,
+							closed:						false,
+							innerHeight:				480,
+							innerWidth:					640,
+							name:						openWndArguments[1],
+							location:					location,
+							document:					{location: location}
+						};
+
+					copyMissingProperties(window, generatedWindow);
+
+					generatedWindow.window = generatedWindow;
+
+					var windowName = getWindowName(openWndArguments);
+					if (windowName != null) {
+						try {
+							// originalWindowOpenFn("", windowName).close();
+							windowsWithNames[windowName].close();
+							// console.info("Closed window with the following name: " + windowName);
+						} catch (err) {
+							// console.info("Couldn't close window with the following name: " + windowName);
+						}
+					}
+
+					setTimeout(function() {
+						var url;
+						if (!(generatedWindow.location instanceof Object)) {
+							url = generatedWindow.location;
+						} else if (!(generatedWindow.document.location instanceof Object)) {
+							url = generatedWindow.document.location;
+						} else if (location.href != null) {
+							url = location.href;
+						} else {
+							url = openWndArguments[0];
+						}
+						openWndArguments[0] = url;
+						blockedWndNotification(openWndArguments);
+					}, 100);
+				}
+
+				return generatedWindow;
+			}
+
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Replace the window open method with Poper Blocker's
+			/////////////////////////////////////////////////////////////////////////////////
+			window.open = function() {
+				try {
+					return newWindowOpenFn.apply(this, arguments);
+				} catch(err) {
+					return null;
+				}
+			};
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// Monitor dynamic html element creation to prevent generating <a> elements with click dispatching event
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+			document.createElement = function() {
+
+					var newElement = originalCreateElementFn.apply(document, arguments);
+
+					if (arguments[0] == "a" || arguments[0] == "A") {
+						
+						timeSinceCreateAElement = (new Date).getTime();
+
+						var originalDispatchEventFn = newElement.dispatchEvent;
+
+						newElement.dispatchEvent = function(event) {
+							if (event.type != null && (("" + event.type).toLocaleLowerCase() == "click")) {
+								window.pbreason = "blocked due to an explicit dispatchEvent event with type 'click' on an 'a' tag";
+								// console.info(window.pbreason);
+								parent.postMessage({type:"blockedWindow", args: JSON.stringify({"0": newElement.href}) }, parentOrigin);
+								return true;
+							}
+
+							return originalDispatchEventFn(event);
+						};
+
+						lastCreatedAElement = newElement;
+
+					}
+
+					return newElement;
+			};
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Block artificial mouse click on frashly created <a> elements
+			/////////////////////////////////////////////////////////////////////////////////
+			document.createEvent = function() {
+				try {
+					if ((arguments[0].toLowerCase().indexOf("mouse") >= 0) && ((new Date).getTime() - timeSinceCreateAElement) <= 50) {
+						window.pbreason = "Blocked because 'a' element was recently created and " + arguments[0] + " event was created shortly after";
+						// console.info(window.pbreason);
+						arguments[0] = lastCreatedAElement.href;
+						parent.postMessage({ type: "blockedWindow", args: JSON.stringify({"0": lastCreatedAElement.href}) }, parentOrigin);
+						return null;
+					}
+					return originalCreateEventFn.apply(document, arguments);
+				} catch(err) {}
+			};
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Monitor full screen requests
+			/////////////////////////////////////////////////////////////////////////////////
+			function onFullScreen(isInFullScreenMode) {
+					if (isInFullScreenMode) {
+						fullScreenOpenTime = (new Date()).getTime();
+						// console.info("fullScreenOpenTime = " + fullScreenOpenTime);
+					} else {
+						fullScreenOpenTime = NaN;
+					}
+			};
+			/////////////////////////////////////////////////////////////////////////////////
+
+			function isDocumentInFullScreenMode() {
+				// Note that the browser fullscreen (triggered by short keys) might
+				// be considered different from content fullscreen when expecting a boolean
+				return ((document.fullScreenElement && document.fullScreenElement !== null) ||    // alternative standard methods
+					((document.mozFullscreenElement != null) || (document.webkitFullscreenElement != null)));                   // current working methods
+			}
+
+			document.addEventListener("fullscreenchange", function () {
+				onFullScreen(document.fullscreen);
+			}, false);
+
+			document.addEventListener("mozfullscreenchange", function () {
+				onFullScreen(document.mozFullScreen);
+			}, false);
+
+			document.addEventListener("webkitfullscreenchange", function () {
+				onFullScreen(document.webkitIsFullScreen);
+			}, false);
+
+		} inject()</script>
+
+<body class="post-template-default single single-post postid-10 single-format-standard">
+
+  
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+
+        <a class="navbar-brand" href="https://graycat.io/">Gray Cat Labs</a>
+
+      </div>  
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <!--  -->
+
+          <li class="dropdown" id="navbar-dropdown">
+            <a href="https://graycat.io/projects/tinyga/#" class="dropdown-toggle" data-toggle="dropdown" style="border-bottom: 3px solid grey;">
+              Blog <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+   	      <li>
+	        <div class="pull-left">
+		  <form class="navbar-form" role="search" action="https://graycat.io/" method="get">
+  <div class="input-group">
+    <input type="text" class="form-control" placeholder="Search" name="s">
+    <div class="input-group-btn">
+      <button class="btn btn-default" type="submit">
+        <i class="glyphicon glyphicon-search"></i>
+      </button>
+    </div>
+  </div>
+</form>
+ 
+                </div> 
+              </li>
+
+              <li><a href="https://graycat.io/blog" title="View all posts">All posts</a></li>
+              	<li class="cat-item cat-item-24"><a href="https://graycat.io/category/beaglebone/" title="All things BeagleBone">BeagleBone</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="https://graycat.io/category/projects/" title="A collection of formal project write ups.">Projects</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="https://graycat.io/category/tutorials/" title="A collection of electronics related tutorials">Tutorials</a>
+</li>
+ 
+              	<li class="cat-item cat-item-1"><a href="https://graycat.io/category/uncategorized/">Everything else</a>
+</li>
+ 
+              <li class="divider-before"><a href="https://graycat.io/feed/">
+                RSS
+                <img src="./TinyGA - Gray Cat Labs_files/feed-icon-14x14.png">
+              </a></li>
+              <li><a rel="nofollow" href="https://graycat.io/wp-login.php">Log in</a></li>
+            </ul>
+          </li>
+        </ul>
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+
+
+
+
+
+  <div id="page-wrapper">
+    <div id="banner"></div>
+
+    <div id="content">
+  
+
+
+              <div class="post">
+
+          <h2>TinyGA</h2>
+
+          <div class="post-meta">
+
+            Posted on Jun 13, 2012            <br>
+            <a href="https://graycat.io/projects/tinyga/#comments">1 comment</a>            <br>
+          </div>
+
+          <div class="post-content">
+	    <p>From time to time I come up with potentially cool ways I could implement different algorithms on robots, especially the fun ones like <a href="http://en.wikipedia.org/wiki/Genetic_algorithm">genetic algorithms</a>, <a href="http://en.wikipedia.org/wiki/Neural_network">neural networks</a> and <a href="http://en.wikipedia.org/wiki/Particle_filter">particle filters</a> for localization, but I am lacking the tools to do so quickly and efficiently. Somewhere along the way I started toying with the idea of how I could get a fully functional genetic algorithm to fit comfortably on a microcontroller and have it run quickly. In the spirit of wanting to test ideas as quickly and painlessly as possible, the Arduino seemed like the best platform to try this out on. The idea soon turned into the very ambitious plan of creating a collection of Arduino libraries that covers a number of robotics related algorithms implemented as small as possible; for the time being, though, here's TinyGA, my tiny genetic algorithm for the Arduino.</p>
+
+<p>Before I could begin writing TinyGA, I had to decide where I could shrink the algorithm. I chose to favor population size over diversity, so I decided on using unsigned chars for the individuals. While this limits a population to only 256 possible individuals, it allows for the storage of much larger populations than a larger individual would, both in program space as well as in the EEPROM if a population is to be retained when the Arduino shuts off. Once I had that settled, it was mostly just a matter of plugging in the pieces.</p>
+
+<p>The algorithm requires a user-defined fitness function that returns an unsigned char from 1-255 as a fitness rating, or 0 to signal that the correct answer has been reached and the algorithm should stop running. Selection is done using a simple best-half approach, where the individuals with fitness scores above the population's average survive to reproduce. The surviving individuals are then randomly chosen and combined using a single random crossover point. There is also a probability of random mutations of offspring, which is defined in TinyGA.h, along with some other configuration.</p>
+
+<p>The API is quite simple, requiring only the init() and run() functions to run. Here's an example sketch, showing the basic usage of the API, that prompts the user for a number over the serial port then tries to guess it. This sketch compiles to 4208 bytes. (this example is also included in the library)</p>
+
+<div class="codecolorer-container cpp default" style="overflow:auto;white-space:nowrap;"><div class="cpp codecolorer"><span class="coMULTI">/*<br>
+TinyGA_Test.pde - Alexander Hiam - 1/2012<br>
+Uses the TinyGA genetic algorithm library to guess numbers.<br>
+*/</span><br>
+<br>
+<span class="co2">#include &lt;TinyGA.h&gt;</span><br>
+<br>
+<span class="co1">// Create TinyGA instance, giving it a fitness function:</span><br>
+TinyGA ga <span class="sy1">=</span> TinyGA<span class="br0">(</span>fitness<span class="br0">)</span><span class="sy4">;</span><br>
+<br>
+<span class="kw4">uint8_t</span> number_to_guess, char_num<span class="sy4">;</span> <br>
+<br>
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; Serial.<span class="me1">begin</span><span class="br0">(</span><span class="nu0">9600</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; <span class="co1">// Must seed random number generator before initializing TinyGA:</span><br>
+&nbsp; randomSeed<span class="br0">(</span>analogRead<span class="br0">(</span>A4<span class="br0">)</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; start<span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span><br>
+<span class="br0">}</span><br>
+<br>
+<span class="kw4">void</span> start<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; <span class="kw4">uint8_t</span> i<span class="sy4">;</span><br>
+&nbsp; <span class="kw4">char</span> buffer<span class="br0">[</span><span class="nu0">10</span><span class="br0">]</span><span class="sy4">;</span> <span class="co1">// Buffer for serial receiver</span><br>
+&nbsp; <span class="co1">// Initialize with 10 individuals:</span><br>
+&nbsp; ga.<span class="me1">init</span><span class="br0">(</span><span class="nu0">10</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; char_num <span class="sy1">=</span> <span class="nu0">0</span><span class="sy4">;</span><br>
+&nbsp; Serial.<span class="me1">println</span><span class="br0">(</span><span class="st0">"TinyGA TestnEnter a number between 0-255 and TinyGA will try to guess it"</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; Serial.<span class="me1">flush</span><span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; <span class="kw1">while</span> <span class="br0">(</span><span class="sy3">!</span>Serial.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy4">;</span> <span class="co1">// Wait for input</span><br>
+&nbsp; i <span class="sy1">=</span> <span class="nu0">0</span><span class="sy4">;</span><br>
+&nbsp; <span class="kw1">while</span><span class="br0">(</span>Serial.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; &nbsp; buffer<span class="br0">[</span>i<span class="sy2">++</span><span class="br0">]</span> <span class="sy1">=</span> Serial.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; &nbsp; delay<span class="br0">(</span><span class="nu0">10</span><span class="br0">)</span><span class="sy4">;</span> <span class="co1">// Give plenty of time for next character to arrive</span><br>
+&nbsp; <span class="br0">}</span><br>
+&nbsp; buffer<span class="br0">[</span>i<span class="br0">]</span> <span class="sy1">=</span> <span class="st0">''</span><span class="sy4">;</span> <span class="co1">// End array</span><br>
+&nbsp; number_to_guess <span class="sy1">=</span> <span class="kw3">atoi</span><span class="br0">(</span>buffer<span class="br0">)</span><span class="sy4">;</span> <span class="co1">// Convert to int</span><br>
+&nbsp; Serial.<span class="me1">print</span><span class="br0">(</span><span class="st0">"Looking for number: "</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; Serial.<span class="me1">println</span><span class="br0">(</span>number_to_guess, DEC<span class="br0">)</span><span class="sy4">;</span> <br>
+<span class="br0">}</span><br>
+<br>
+<span class="kw4">uint8_t</span> fitness<span class="br0">(</span><span class="kw4">uint8_t</span> individual<span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; <span class="coMULTI">/* The fitenss function; takes a guess and returns a score that is larger <br>
+&nbsp; &nbsp; &nbsp;the closer to the correct number it is, and 255 if correct. */</span><br>
+&nbsp; <span class="kw1">return</span> <span class="nu0">255</span> <span class="sy2">-</span> <span class="kw3">abs</span><span class="br0">(</span>number_to_guess<span class="sy2">-</span>individual<span class="br0">)</span><span class="sy4">;</span><br>
+<span class="br0">}</span><br>
+<br>
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; <span class="kw4">uint8_t</span> result<span class="sy4">;</span><br>
+&nbsp; <span class="kw1">if</span> <span class="br0">(</span>char_num<span class="sy2">++</span> <span class="sy1">&gt;=</span> <span class="nu0">60</span><span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; &nbsp; <span class="co1">// Just keep track of where the status character is and move to a new line if &gt;=60</span><br>
+&nbsp; &nbsp; Serial.<span class="me1">println</span><span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; &nbsp; char_num <span class="sy1">=</span> <span class="nu0">1</span><span class="sy4">;</span><br>
+&nbsp; <span class="br0">}</span><br>
+&nbsp; Serial.<span class="me1">print</span><span class="br0">(</span><span class="st0">"."</span><span class="br0">)</span><span class="sy4">;</span> <br>
+&nbsp; <span class="co1">// Run for 100 generations:</span><br>
+&nbsp; result <span class="sy1">=</span> ga.<span class="me1">run</span><span class="br0">(</span><span class="nu0">100</span><span class="br0">)</span><span class="sy4">;</span> <br>
+&nbsp; <span class="kw1">if</span><span class="br0">(</span>result<span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; &nbsp; <span class="co1">// Run returns 0 unless it got the correct answer, so we know we have it here</span><br>
+&nbsp; &nbsp; Serial.<span class="me1">println</span><span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; &nbsp; Serial.<span class="me1">print</span><span class="br0">(</span>result, DEC<span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; &nbsp; Serial.<span class="me1">println</span><span class="br0">(</span><span class="st0">" - Got it!"</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; &nbsp; ga.<span class="me1">print</span><span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span> <span class="co1">// Have TinyGA print its current population</span><br>
+&nbsp; &nbsp; Serial.<span class="me1">println</span><span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; &nbsp; start<span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span> <span class="co1">// Back to the beginning</span><br>
+&nbsp; <span class="br0">}</span><br>
+<span class="br0">}</span></div></div>
+
+<p>Here's an example of it running and converging to the correct answer relatively quickly:</p>
+
+<pre>TinyGA Test
+Enter a number between 0-255 and TinyGA will try to guess it
+Looking for number: 54
+.
+54 - Got it!
+Generation 82:
+Population size: 10
+51, 51, 51, 51, 51, 54, 51, 51, 51, 51, 
+</pre>
+
+<p>And here's an example of why genetic algorithms make terrible number guessers:</p>
+
+<pre>TinyGA Test
+Enter a number between 0-255 and TinyGA will try to guess it
+Looking for number: 128
+............................................
+128 - Got it!
+Generation 4306:
+Population size: 10
+127, 127, 127, 127, 127, 127, 127, 128, 127, 127, 
+</pre>
+
+<p>4306 evolutions to guess one of 256 possible numbers!</p>
+
+<p>There is also the option of storing a population in the EEPROM, which I have yet to write an example sketch for. The way it works is that the load() function looks for a 4 byte flag that indicates that there is a saved population, loads it and returns 1 if the flag is found, or returns 0 if there is no population. This way initialisation and saving/loading is trivial to include in the sketch by simply writing:</p>
+
+<div class="codecolorer-container cpp default" style="overflow:auto;white-space:nowrap;"><div class="cpp codecolorer">TinyGA ga <span class="sy1">=</span> TinyGA<span class="br0">(</span>test<span class="br0">)</span><span class="sy4">;</span><br>
+<br>
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; <span class="kw1">if</span> <span class="br0">(</span><span class="sy3">!</span>ga.<span class="me1">load</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span> ga.<span class="me1">init</span><span class="br0">(</span><span class="nu0">10</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; ...</div></div>
+
+<p>Then at some point:</p>
+
+<div class="codecolorer-container cpp default" style="overflow:auto;white-space:nowrap;"><div class="cpp codecolorer">&nbsp; ...<br>
+&nbsp; <span class="me1">ga</span>.<span class="me1">save</span><span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; ...</div></div>
+
+<p>Then the algorithm may be reset either by calling reset() with no arguments to use the same population size, or reset(new_population_size) may be called to change the size.
+There's a potential bug here if, for example, a sketch using one population size is loaded onto an Arduino where a previous sketch had saved a different size population. This can be resolved by adding one more line:</p>
+
+<div class="codecolorer-container cpp default" style="overflow:auto;white-space:nowrap;"><div class="cpp codecolorer">TinyGA ga <span class="sy1">=</span> TinyGA<span class="br0">(</span>test<span class="br0">)</span><span class="sy4">;</span><br>
+<br>
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br>
+&nbsp; <span class="kw1">if</span> <span class="br0">(</span><span class="sy3">!</span>ga.<span class="me1">load</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span> ga.<span class="me1">init</span><span class="br0">(</span><span class="nu0">10</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; <span class="kw1">if</span> <span class="br0">(</span>ga.<span class="me1">pop_size</span> <span class="sy3">!</span><span class="sy1">=</span> <span class="nu0">10</span><span class="br0">)</span> ga.<span class="me1">reset</span><span class="br0">(</span><span class="nu0">10</span><span class="br0">)</span><span class="sy4">;</span><br>
+&nbsp; ...</div></div>
+
+<p>This way the old population would be loaded, then its size would be compared to the desired size, and if not equal the population will be reset with the correct size.</p>
+
+<h3><b><a href="https://github.com/alexanderhiam/TinyGA">- Get TinyGA - click here</a></b></h3>
+
+<p>And just to be thorough here's the complete API documentation (copied straight from the README file):</p>
+
+<pre> -TinyGA(uint8_t (*fitness_function)(uint8_t))
+   Creates and returns an instance of the TinyGA class. Must be passed
+   a user-defined function which takes an unsigned char individual and
+   returns an unsigned char fitness rating. Fitnesses should range from
+   0-255, where 0 is the worst rating and 255 indicates that the correct
+   answer has been found and the algorithm should stop evolving.
+
+ -TinyGA.init(uint8_t population_size)
+   Initialize a randomly generated population of the given size.
+
+ -TinyGA.load(void)
+   Attempts to load a population from the EEPROM. Returns 1 if successful,
+   0 if there is no population in memory.
+
+ -TinyGA.save(void)
+   Attempts to save the current population. Returns 1 if successful,
+   0 if the population size + EEPROM_OFFSET is greater than EEPROM_SIZE.
+
+ -TinyGA.print(void)
+   Prints the population size, current generation and the current
+   population to Serial. Serial.begin() must be called before hand.
+
+ -TinyGA.reset(void)
+   Resets to random population with current population size.
+   The difference between reset() and init() for resetting the algorithm
+   is that reset() will write over TINYGA_KEY in the EEPROM and init()
+   won't effect the EEPROM.
+
+ -TinyGA.reset(uint8_t new_population_size)
+   Resets to random population with new population size.
+   Also resets EEPROM.
+
+ -TinyGA.run(uint8_t n_generations)
+   Runs the algorithm the given ammount of generations. Returns 0
+   unless the fitness function has returned 255 indicating a correct
+   answer, in which case the individual that scored 255 is returned.
+</pre>
+<!-- Simple Share Buttons Adder (7.3.10) simplesharebuttons.com --><div class="ssba ssba-wrap"><div style="text-align:left"><a data-site="reddit" class="ssba_reddit_share" href="http://reddit.com/submit?url=https://graycat.io/projects/tinyga/&amp;title=TinyGA" target="&quot;_blank&quot;"><img src="./TinyGA - Gray Cat Labs_files/reddit.png" title="Reddit" class="ssba ssba-img" alt="Share on Reddit"></a><a data-site="linkedin" class="ssba_linkedin_share ssba_share_link" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://graycat.io/projects/tinyga/" target="&quot;_blank&quot;"><img src="./TinyGA - Gray Cat Labs_files/linkedin.png" title="LinkedIn" class="ssba ssba-img" alt="Share on LinkedIn"></a><a data-site="" class="ssba_facebook_share" href="http://www.facebook.com/sharer.php?u=https://graycat.io/projects/tinyga/" target="_blank"><img src="./TinyGA - Gray Cat Labs_files/facebook.png" title="Facebook" class="ssba ssba-img" alt="Share on Facebook"></a><a data-site="" class="ssba_twitter_share" href="http://twitter.com/share?url=https://graycat.io/projects/tinyga/&amp;text=TinyGA%20" target="&quot;_blank&quot;"><img src="./TinyGA - Gray Cat Labs_files/twitter.png" title="Twitter" class="ssba ssba-img" alt="Tweet about this on Twitter"></a><a data-site="" class="ssba_google_share" href="https://plus.google.com/share?url=https://graycat.io/projects/tinyga/" target="&quot;_blank&quot;"><img src="./TinyGA - Gray Cat Labs_files/google.png" title="Google+" class="ssba ssba-img" alt="Share on Google+"></a></div></div> 
+	  </div>
+          <div class="tags">
+            <a href="https://graycat.io/tag/ai/" rel="tag">AI</a><a href="https://graycat.io/tag/arduino/" rel="tag">Arduino</a><a href="https://graycat.io/tag/machine-learning/" rel="tag">Machine learning</a>          </div>
+
+        </div>
+        
+        <div class="comments">
+          
+<!-- You can start editing here. -->
+
+	<h3 id="comments">
+		One response to “TinyGA”	</h3>
+
+	<div class="navigation">
+		<div class="alignleft"></div>
+		<div class="alignright"></div>
+	</div>
+
+	<ol class="commentlist">
+			<li class="comment even thread-even depth-1" id="comment-24299">
+				<div id="div-comment-24299" class="comment-body">
+				<div class="comment-author vcard">
+			<img alt="" src="./TinyGA - Gray Cat Labs_files/bcb2ffe32f7bc6f3132f727f1bb3b30a" srcset="https://secure.gravatar.com/avatar/bcb2ffe32f7bc6f3132f727f1bb3b30a?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32">			<cite class="fn">buzzz</cite> <span class="says">says:</span>		</div>
+		
+		<div class="comment-meta commentmetadata"><a href="https://graycat.io/projects/tinyga/#comment-24299">
+			March 7, 2017 at 1:46 am</a>		</div>
+
+		<p>can this be used to optimize pid values of a quadrotor in real time? or while the copter is in flight?</p>
+
+		<div class="reply"><a rel="nofollow" class="comment-reply-link" href="https://graycat.io/projects/tinyga/?replytocom=24299#respond" onclick="return addComment.moveForm( &quot;div-comment-24299&quot;, &quot;24299&quot;, &quot;respond&quot;, &quot;10&quot; )" aria-label="Reply to buzzz">Reply</a></div>
+				</div>
+		</li><!-- #comment-## -->
+	</ol>
+
+	<div class="navigation">
+		<div class="alignleft"></div>
+		<div class="alignright"></div>
+	</div>
+ 
+	<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="https://graycat.io/projects/tinyga/#respond" style="display:none;">Cancel reply</a></small></h3>			<form action="https://graycat.io/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+				<p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p><p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea></p><p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" required="required"></p>
+<p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="text" value="" size="30" maxlength="100" aria-describedby="email-notes" required="required"></p>
+<p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="text" value="" size="30" maxlength="200"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="10" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="1c670379f5"></p><p style="display: none;"></p>			<input type="hidden" id="ak_js" name="ak_js" value="1523789063472"></form>
+			</div><!-- #respond -->
+	    
+        </div>    
+
+              
+            <div id="tag-cloud">
+        <ul>
+          <a href="https://graycat.io/tag/ai/" class="tag-cloud-link tag-link-5 tag-link-position-1" style="font-size: 9.8pt;" aria-label="AI (2 items)">AI</a>
+<a href="https://graycat.io/tag/arduino/" class="tag-cloud-link tag-link-6 tag-link-position-2" style="font-size: 11pt;" aria-label="Arduino (3 items)">Arduino</a>
+<a href="https://graycat.io/tag/bash/" class="tag-cloud-link tag-link-7 tag-link-position-3" style="font-size: 8pt;" aria-label="bash (1 item)">bash</a>
+<a href="https://graycat.io/tag/battery/" class="tag-cloud-link tag-link-8 tag-link-position-4" style="font-size: 8pt;" aria-label="Battery (1 item)">Battery</a>
+<a href="https://graycat.io/tag/beaglebone/" class="tag-cloud-link tag-link-9 tag-link-position-5" style="font-size: 18pt;" aria-label="BeagleBone (19 items)">BeagleBone</a>
+<a href="https://graycat.io/tag/breakout/" class="tag-cloud-link tag-link-10 tag-link-position-6" style="font-size: 8pt;" aria-label="Breakout (1 item)">Breakout</a>
+<a href="https://graycat.io/tag/c/" class="tag-cloud-link tag-link-30 tag-link-position-7" style="font-size: 9.8pt;" aria-label="C (2 items)">C</a>
+<a href="https://graycat.io/tag/device-tree/" class="tag-cloud-link tag-link-11 tag-link-position-8" style="font-size: 8pt;" aria-label="device tree (1 item)">device tree</a>
+<a href="https://graycat.io/tag/gpio/" class="tag-cloud-link tag-link-12 tag-link-position-9" style="font-size: 13.5pt;" aria-label="GPIO (6 items)">GPIO</a>
+<a href="https://graycat.io/tag/i2c/" class="tag-cloud-link tag-link-26 tag-link-position-10" style="font-size: 11pt;" aria-label="I2C (3 items)">I2C</a>
+<a href="https://graycat.io/tag/image-processing/" class="tag-cloud-link tag-link-13 tag-link-position-11" style="font-size: 9.8pt;" aria-label="Image processing (2 items)">Image processing</a>
+<a href="https://graycat.io/tag/lcd/" class="tag-cloud-link tag-link-14 tag-link-position-12" style="font-size: 9.8pt;" aria-label="LCD (2 items)">LCD</a>
+<a href="https://graycat.io/tag/linux/" class="tag-cloud-link tag-link-29 tag-link-position-13" style="font-size: 8pt;" aria-label="Linux (1 item)">Linux</a>
+<a href="https://graycat.io/tag/lipoly/" class="tag-cloud-link tag-link-15 tag-link-position-14" style="font-size: 8pt;" aria-label="LiPoly (1 item)">LiPoly</a>
+<a href="https://graycat.io/tag/machine-learning/" class="tag-cloud-link tag-link-16 tag-link-position-15" style="font-size: 9.8pt;" aria-label="Machine learning (2 items)">Machine learning</a>
+<a href="https://graycat.io/tag/pcb/" class="tag-cloud-link tag-link-17 tag-link-position-16" style="font-size: 9.8pt;" aria-label="PCB (2 items)">PCB</a>
+<a href="https://graycat.io/tag/power-management/" class="tag-cloud-link tag-link-18 tag-link-position-17" style="font-size: 8pt;" aria-label="Power management (1 item)">Power management</a>
+<a href="https://graycat.io/tag/pybbio/" class="tag-cloud-link tag-link-19 tag-link-position-18" style="font-size: 17.3pt;" aria-label="PyBBIO (16 items)">PyBBIO</a>
+<a href="https://graycat.io/tag/python/" class="tag-cloud-link tag-link-20 tag-link-position-19" style="font-size: 17.6pt;" aria-label="Python (17 items)">Python</a>
+<a href="https://graycat.io/tag/serbus/" class="tag-cloud-link tag-link-32 tag-link-position-20" style="font-size: 9.8pt;" aria-label="serbus (2 items)">serbus</a>
+<a href="https://graycat.io/tag/spi/" class="tag-cloud-link tag-link-25 tag-link-position-21" style="font-size: 12pt;" aria-label="SPI (4 items)">SPI</a>
+<a href="https://graycat.io/tag/thermal-imaging/" class="tag-cloud-link tag-link-21 tag-link-position-22" style="font-size: 8pt;" aria-label="thermal imaging (1 item)">thermal imaging</a>
+<a href="https://graycat.io/tag/thingspeak/" class="tag-cloud-link tag-link-27 tag-link-position-23" style="font-size: 8pt;" aria-label="ThingSpeak (1 item)">ThingSpeak</a>
+<a href="https://graycat.io/tag/web-server/" class="tag-cloud-link tag-link-22 tag-link-position-24" style="font-size: 9.8pt;" aria-label="Web server (2 items)">Web server</a>        </ul>
+      </div>
+      
+  </div>
+  <!--/content -->
+  
+  
+    </div> <!--content-->
+
+   <!--page-wrapper-->
+
+  <div class="footer">
+    <div id="footer-license">
+      <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+        <img alt="Creative Commons License" style="border-width:0" src="./TinyGA - Gray Cat Labs_files/cc-by-sa.png">
+      </a>
+      <p>
+        Except where otherwise noted, content on this site is licensed under a 
+        <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+          Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        <br>
+        Copyright 2014 - Gray Cat Labs
+      </p>
+    </div>
+  </div>
+
+  <link rel="stylesheet" id="simple-share-buttons-adder-ssba-css" href="./TinyGA - Gray Cat Labs_files/ssba.css" type="text/css" media="all">
+<style id="simple-share-buttons-adder-ssba-inline-css" type="text/css">
+	.ssba {
+									
+									
+									
+									
+								}
+								.ssba img
+								{
+									width: 35px !important;
+									padding: 6px;
+									border:  0;
+									box-shadow: none !important;
+									display: inline !important;
+									vertical-align: middle;
+									box-sizing: unset;
+								}
+								
+								.ssba .fb-save
+								{
+								padding: 6px;
+								line-height: 30px;
+								}
+								.ssba, .ssba a
+								{
+									text-decoration:none;
+									background: none;
+									
+									font-size: 20px;
+									
+									font-weight: bold;
+								}
+								
+</style>
+<script type="text/javascript" src="./TinyGA - Gray Cat Labs_files/ssba.js.download"></script>
+<script type="text/javascript">
+Main.boot( [] );
+</script>
+<script type="text/javascript" src="./TinyGA - Gray Cat Labs_files/wp-embed.min.js.download"></script>
+<script async="async" type="text/javascript" src="./TinyGA - Gray Cat Labs_files/form.js.download"></script>
+  <!-- Piwik -->
+  <script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+      var u="//stats.graycat.io/";
+      _paq.push(['setTrackerUrl', u+'piwik.php']);
+      _paq.push(['setSiteId', 1]);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+      g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+  </script>
+  <noscript>&lt;p&gt;&lt;img src="//stats.graycat.io/piwik.php?idsite=1" style="border:0;" alt="" /&gt;&lt;/p&gt;</noscript>
+  <!-- End Piwik Code -->
+
+
+
+<div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div></div></div><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div><iframe name="fb_xdm_frame_https" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./TinyGA - Gray Cat Labs_files/FdM1l_dpErI.html" style="border: none;"></iframe></div></div></div></body></html>
