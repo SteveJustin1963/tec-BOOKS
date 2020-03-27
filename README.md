@@ -1,5 +1,7 @@
 # tec-TOOLS
 
+https://github.com/SteveJustin1963/tec-MAGAZINES
+
 http://k1.spdns.de/Develop/Projects/zasm/Distributions/
 
 http://www.kswichit.com/
