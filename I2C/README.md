@@ -4,3 +4,5 @@ https://howtomechatronics.com/tutorials/arduino/how-i2c-communication-works-and-
 
 https://learn.sparkfun.com/tutorials/i2c/all
 
+https://www.i2c-bus.org/
+
