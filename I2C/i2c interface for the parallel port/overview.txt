@@ -1,0 +1,77 @@
+how to get into the monitor: 
+
+Hi Glen!
+
+I read your mail, and I must admit, that the documentation given
+on the website is pretty hard to read if your not really into it.
+
+In fact I had written the program and thought about how to build a
+prommer afterwards and during the coding, and both worked from scratch :-)
+
+I've made some photos of the hardware part after screwing it apart,
+however I forgot them at home, so you will have to wait till
+tomorrow. I will put everything needed and the photos on the
+homepage, you can download them from there.
+
+however, until then, there are some things you could as well do
+as preperation. you have to open the monitor to get to the chip.
+there is a backside plate, where you can find a round connector, this
+most likely allows one to plug in a cable going to the eprom, but
+not knowing the connetions or having a connector I prefered to take
+out the chip, where every pin is documented on the internet, I took
+it from fairchilds website as far as I remember.
+to open the monitor you have to put it onto the front and unscrew the
+large screws which are quite obvious to see. afterwards its no use
+poking around with the round top or the backward plate (took me a year
+of occasional attempts to get it), one has to press in some small
+nibbles in about 4x4mm large holes on the side. one of them
+was stuck at mine, and as I didnt dare to damage anything I failed to
+get them pressed inside correctly for a long time. you somehow have to
+get the backcover away, try sticking some screwdrivers inside and moving
+them.
+
+after you'll finally will have opened it, you have to locate the chip.
+this is quite simple, one can reach it easyly with the monitor standing
+in normal position again. with the front side of the monitor facing
+towards you, there is a large pcb board on the left side in the back.
+on this board you find an 8 pin socket, with a chip inserted, this
+is the 93c66 containing the display configuration. carefully remove it 
+by sticking in a screwdriver and pulling the chip out. remember how
+its inserted, just in case the socket would be inserted the wrong way,
+but this is unlikely, both were oriented correctly at mine.
+
+now you have to build yourself an eprommer. this is really simple,
+as most work is done by the program I wrote, you just have to get
+the chips pins connected to the parallel port, as discribed in
+the c source. I took an 8 pin socket and solderd its pins with
+small cables to the pins of a parallel port plug. the only problem
+was getting a 5v supply to one pin, you can take it with a wire from
+your pcs power connectors (the red one) or, as I did just make a connector
+to the joystick ports pin 1 on your soundcard.
+
+voila. all you have to do now is put the parallel plug into
+your parallel port, figure out its port adress and run the
+program. the version on the site is compiled for lpt1 which is port
+0x378, you can switch your port to it using your computers system
+setup at bootup time.
+
+first make a backup of whats inside the eeprom:
+
+93c66 s backup.bin
+
+then write a dump of a working configuration to the eeprom:
+
+93c66 l magmxp17f.bin
+
+this may nearly take a minute, this is because of many writing
+timeouts the program waits for to be sure.
+
+then put the chip back in its place and turn on the monitor, no
+need to put the cover on already.
+hopefully he will be back working again.
+
+I will proably put this mail onto the homepage too, as its proably
+quite useful for anyone with the same problem.
+
+ru,
+Franz
