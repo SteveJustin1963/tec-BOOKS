@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<!-- saved from url=(0030)https://www.i2c-bus.org/speed/ -->
+<html lang="en-GB" prefix="og: http://ogp.me/ns#"><script>function inject() {
+	
+	var originalOpenWndFnKey = "originalOpenFunction";
+
+			var originalWindowOpenFn 	= window.open,
+				  originalCreateElementFn = document.createElement,
+				  originalAppendChildFn = HTMLElement.prototype.appendChild;
+			    originalCreateEventFn 	= document.createEvent,
+				  windowsWithNames = {};
+			var timeSinceCreateAElement = 0;
+			var lastCreatedAElement = null;
+			var fullScreenOpenTime;
+			var winWidth = window.innerWidth;
+			var winHeight = window.innerHeight;
+			var parentRef = window.parent;
+			var parentOrigin = (window.location != window.parent.location) ? document.referrer: document.location;
+
+			Object.defineProperty(window, 'BetterJsPop', {
+				value: undefined,
+				writable: false
+			});
+
+			window[originalOpenWndFnKey] = window.open; // save the original open window as global param
+		
+			function newWindowOpenFn() {
+
+				var openWndArguments = arguments,
+					useOriginalOpenWnd = true,
+					generatedWindow = null;
+
+				function blockedWndNotification(openWndArguments) {
+					parentRef.postMessage({ type: "blockedWindow", args: JSON.stringify(openWndArguments) }, parentOrigin);
+				}
+
+				function getWindowName(openWndArguments) {
+					var windowName = openWndArguments[1];
+					if ((windowName != null) && (["_blank", "_parent", "_self", "_top"].indexOf(windowName) < 0)) {
+						return windowName;
+					}
+
+					return null;
+				}
+
+				function copyMissingProperties(src, dest) {
+					var prop;
+					for(prop in src) {
+						try {
+							if (dest[prop] === undefined) {
+								dest[prop] = src[prop];
+						}
+						} catch (e) {}
+					}
+					return dest;
+				}
+
+				function isParentWindow() {
+					try {
+					  return !!(parent.Window && capturingElement instanceof parent.Window);
+					} catch (e) {
+					  return false;
+					}
+				}
+			  
+				  function isOverlayish(el) {
+					var style = el && el.style;
+			  
+					if (style && /fixed|absolute/.test(style.position) && el.offsetWidth >= winWidth * 0.6 && el.offsetHeight >= winHeight * 0.75) {
+					  return true;
+					}
+			  
+					return false;
+				  }
+
+				  var capturingElement = null; // the element who registered to the event
+					var srcElement = null; // the clicked on element
+					var closestParentLink = null;
+
+					if (window.event != null) {
+						capturingElement = window.event.currentTarget;
+						srcElement = window.event.srcElement;
+					}
+
+					if (srcElement != null && srcElement instanceof HTMLElement) {
+						closestParentLink = srcElement.closest('a');
+
+						if (closestParentLink && closestParentLink.href) {
+							openWndArguments[3] = closestParentLink.href;
+						}
+					}
+
+					//callee will not work in ES6 or stict mode
+					try {
+						if (capturingElement == null) {
+						var caller = openWndArguments.callee;
+						while (caller.arguments != null && caller.arguments.callee.caller != null) {
+							caller = caller.arguments.callee.caller;
+						}
+						if (caller.arguments != null && caller.arguments.length > 0 && caller.arguments[0].currentTarget != null) {
+							capturingElement = caller.arguments[0].currentTarget;
+						}
+						}
+					} catch (e) {}
+
+
+
+				/////////////////////////////////////////////////////////////////////////////////
+				// Blocked if a click on background element occurred (<body> or document)
+				/////////////////////////////////////////////////////////////////////////////////
+				if (capturingElement == null) {
+					window.pbreason = 'Blocked a new window opened without any user interaction';
+					useOriginalOpenWnd = false;
+				  } else if (capturingElement != null && (capturingElement instanceof Window || isParentWindow(capturingElement) || capturingElement === document || capturingElement.URL != null && capturingElement.body != null || capturingElement.nodeName != null && (capturingElement.nodeName.toLowerCase() == "body" || capturingElement.nodeName.toLowerCase() == "document"))) {
+					window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + "because it was triggered by the " + capturingElement.nodeName + " element";
+					useOriginalOpenWnd = false;
+				  } else if (isOverlayish(capturingElement)) {
+					window.pbreason = 'Blocked a new window opened when clicking on an element that seems to be an overlay';
+					useOriginalOpenWnd = false;
+				  } else {
+					useOriginalOpenWnd = true;
+				  }
+				/////////////////////////////////////////////////////////////////////////////////
+
+
+
+				/////////////////////////////////////////////////////////////////////////////////
+				// Block if a full screen was just initiated while opening this url.
+				/////////////////////////////////////////////////////////////////////////////////
+				var fullScreenElement = document.webkitFullscreenElement || document.mozFullscreenElement || document.fullscreenElement;
+				if (new Date().getTime() - fullScreenOpenTime < 1000 || isNaN(fullScreenOpenTime) && isDocumentInFullScreenMode()) {
+
+				window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + "because a full screen was just initiated while opening this url.";
+
+				/* JRA REMOVED
+				if (window[script_params.fullScreenFnKey]) {
+				window.clearTimeout(window[script_params.fullScreenFnKey]);
+				}
+				*/
+
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.webkitCancelFullScreen) {
+					document.webkitCancelFullScreen();
+				}
+
+				useOriginalOpenWnd = false;
+				}
+				/////////////////////////////////////////////////////////////////////////////////
+		
+				if (useOriginalOpenWnd == true) {
+					generatedWindow = originalWindowOpenFn.apply(this, openWndArguments);
+					// save the window by name, for latter use.
+					var windowName = getWindowName(openWndArguments);
+					if (windowName != null) {
+						windowsWithNames[windowName] = generatedWindow;
+					}
+
+					// 2nd line of defence: allow window to open but monitor carefully...
+
+					/////////////////////////////////////////////////////////////////////////////////
+					// Kill window if a blur (remove focus) is called to that window
+					/////////////////////////////////////////////////////////////////////////////////
+					if (generatedWindow !== window) {
+						var openTime = new Date().getTime();
+						var originalWndBlurFn = generatedWindow.blur;
+						generatedWindow.blur = () => {
+						  if (new Date().getTime() - openTime < 1000 /* one second */) {
+							  window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + "because a it was blured";
+							  generatedWindow.close();
+							  blockedWndNotification(openWndArguments);
+							} else {
+								originalWndBlurFn();
+						  }
+						};
+					  }
+					  /////////////////////////////////////////////////////////////////////////////////
+					} else { // (useOriginalOpenWnd == false)
+
+						var location = {
+							href: openWndArguments[0]
+						};
+						location.replace = function(url) {
+							location.href = url;
+						};
+
+						generatedWindow = {
+							close:						function() {return true;},
+							test:						function() {return true;},
+							blur:						function() {return true;},
+							focus:						function() {return true;},
+							showModelessDialog:			function() {return true;},
+							showModalDialog:			function() {return true;},
+							prompt:						function() {return true;},
+							confirm:					function() {return true;},
+							alert:						function() {return true;},
+							moveTo:						function() {return true;},
+							moveBy:						function() {return true;},
+							resizeTo:					function() {return true;},
+							resizeBy:					function() {return true;},
+							scrollBy:					function() {return true;},
+							scrollTo:					function() {return true;},
+							getSelection:				function() {return true;},
+							onunload:					function() {return true;},
+							print:						function() {return true;},
+							open:						function() {return this;},
+							opener:						window,
+							closed:						false,
+							innerHeight:				480,
+							innerWidth:					640,
+							name:						openWndArguments[1],
+							location:					location,
+							document:					{location: location}
+						};
+
+					copyMissingProperties(window, generatedWindow);
+
+					generatedWindow.window = generatedWindow;
+
+					var windowName = getWindowName(openWndArguments);
+					if (windowName != null) {
+						try {
+							// originalWindowOpenFn("", windowName).close();
+							windowsWithNames[windowName].close();
+						} catch (err) {
+						}
+					}
+
+					var fnGetUrl = function () {
+						var url;
+						if (!(generatedWindow.location instanceof Object)) {
+						  url = generatedWindow.location;
+						} else if (!(generatedWindow.document.location instanceof Object)) {
+						  url = generatedWindow.document.location;
+						} else if (location.href != null) {
+						  url = location.href;
+						} else {
+						  url = openWndArguments[0];
+						}
+						openWndArguments[0] = url;
+				
+						blockedWndNotification(openWndArguments);
+					  };
+
+					  if (top == self) {
+						setTimeout(fnGetUrl, 100);
+					  } else {
+						fnGetUrl();
+					  }
+				}
+
+				return generatedWindow;
+			}
+
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Replace the window open method with Poper Blocker's
+			/////////////////////////////////////////////////////////////////////////////////
+			window.open = function() {
+				try {
+					return newWindowOpenFn.apply(this, arguments);
+				} catch(err) {
+					return null;
+				}
+			};
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// Monitor dynamic html element creation to prevent generating <a> elements with click dispatching event
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+			HTMLElement.prototype.appendChild = function () {
+					var newElement = originalAppendChildFn.apply(this, arguments);
+				
+					if (newElement.nodeName == 'IFRAME' && newElement.contentWindow) {
+						try {
+							var code = "(function () {"+ inject.toString() + "inject()})();";
+					
+							var s = document.createElement('script');
+							s.textContent = code;
+							var doc = newElement.contentWindow.document;
+							
+							(doc.head || doc.body).appendChild(s);
+						} catch (e) {
+
+						}
+					}
+				
+					return newElement;
+			  };
+			
+			  document.createElement = function (tagName) {
+				var newElement = originalCreateElementFn.apply(document, arguments);
+			
+				if (tagName.toLowerCase() == 'a') {
+			
+				  timeSinceCreateAElement = new Date().getTime();
+			
+				  var originalDispatchEventFn = newElement.dispatchEvent;
+			
+				  newElement.dispatchEvent = function (event) {
+					if (event.type != null && (("" + event.type).toLocaleLowerCase() == "click")) {
+					 
+						window.pbreason = "blocked due to an explicit dispatchEvent event with type 'click' on an 'a' tag";
+						parentRef.postMessage({type:"blockedWindow", args: JSON.stringify({"0": newElement.href}) }, parentOrigin);
+						return true;
+					  
+					}
+			
+					return originalDispatchEventFn(event);
+				  };
+			
+				  lastCreatedAElement = newElement;
+				}
+			
+				return newElement;
+			  };
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Block artificial mouse click on frashly created <a> elements
+			/////////////////////////////////////////////////////////////////////////////////
+			document.createEvent = function () {
+				try {
+				  if (arguments[0].toLowerCase().includes("mouse") && new Date().getTime() - timeSinceCreateAElement <= 50) {
+					var openUrlDomain, topUrl, topDomain;
+			
+					try {
+					  openUrlDomain = new URL(lastCreatedAElement.href).hostname;
+					} catch (e) {}
+			
+					try {
+					  topUrl = window.location != window.parent.location ? document.referrer : document.location.href;
+					} catch (e) {}
+			
+					try {
+					  topDomain = new URL(topUrl).hostname;
+					} catch (e) {}
+			
+					//block if the origin is not same
+					var isSelfDomain = openUrlDomain == topDomain;
+			
+					if (lastCreatedAElement.href.trim() && !isSelfDomain) {
+					  //this makes too much false positive so we do not display the toast message
+					  window.pbreason = "Blocked because 'a' element was recently created and " + arguments[0] + "event was created shortly after";
+					  arguments[0] = lastCreatedAElement.href;
+			
+					  parentRef.postMessage({ type: "blockedWindow", args: JSON.stringify({"0": lastCreatedAElement.href}) }, parentOrigin);
+			
+					  return {
+						type: 'click',
+						initMouseEvent: function () {}
+					  };
+					}
+				  }
+			
+				  return originalCreateEventFn.apply(document, arguments);
+				} catch (err) {}
+			  };
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Monitor full screen requests
+			/////////////////////////////////////////////////////////////////////////////////
+			function onFullScreen(isInFullScreenMode) {
+					if (isInFullScreenMode) {
+						fullScreenOpenTime = (new Date()).getTime();
+						// console.info("fullScreenOpenTime = " + fullScreenOpenTime);
+					} else {
+						fullScreenOpenTime = NaN;
+					}
+			};
+			/////////////////////////////////////////////////////////////////////////////////
+
+			function isDocumentInFullScreenMode() {
+				// Note that the browser fullscreen (triggered by short keys) might
+				// be considered different from content fullscreen when expecting a boolean
+				return ((document.fullScreenElement && document.fullScreenElement !== null) ||    // alternative standard methods
+					((document.mozFullscreenElement != null) || (document.webkitFullscreenElement != null)));                   // current working methods
+			}
+			
+
+			document.addEventListener("fullscreenchange", function () {
+				onFullScreen(document.fullscreen);
+			}, false);
+
+			document.addEventListener("mozfullscreenchange", function () {
+				onFullScreen(document.mozFullScreen);
+			}, false);
+
+			document.addEventListener("webkitfullscreenchange", function () {
+				onFullScreen(document.webkitIsFullScreen);
+			}, false);
+			
+
+		} inject()</script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Speed - I2C Bus</title>
+<meta name="description" content="I2C BUS.">
+<link rel="canonical" href="https://www.i2c-bus.org/http://www.i2c-bus.org/speed/">
+<meta property="og:locale" content="en_GB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Speed - I2C Bus">
+<meta property="og:description" content="I2C BUS.">
+<meta property="og:url" content="/http://www.i2c-bus.org/speed/">
+<meta property="og:site_name" content="I2C Bus">
+<link rel="stylesheet" id="flat-style-css" href="./Speed - I2C Bus_files/style.css" media="all">
+<link rel="stylesheet" id="ubermenu-font-awesome-all-css" href="./Speed - I2C Bus_files/fontawesome-all.min.css" media="all">
+<script src="./Speed - I2C Bus_files/jquery-2.2.4.min.js.download"></script>
+<script src="./Speed - I2C Bus_files/flat.min.js.download"></script>
+<link rel="alternate" type="application/json+oembed" href="https://www.i2c-bus.org/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.i2c-bus.org%2Fspeed%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://www.i2c-bus.org/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.i2c-bus.org%2Fspeed%2F&amp;format=xml">
+<style type="text/css">body { background-size: contain; }</style>		</head>
+
+<body class="page-template-default page page-id-55" itemscope="" itemtype="http://schema.org/WebPage">
+<div id="page">
+	<div class="container">
+		<div class="row row-offcanvas row-offcanvas-left">
+			<div id="secondary" class="col-lg-3">
+								<header id="masthead" class="site-header" role="banner">
+										<div class="hgroup"><img src="./Speed - I2C Bus_files/I2Clogo250.png">
+											</div>
+					<button type="button" class="btn btn-link hidden-lg toggle-sidebar" data-toggle="offcanvas" aria-label="Sidebar"><i class="fas fa-gear"></i></button>
+					<button type="button" class="btn btn-link hidden-lg toggle-navigation" aria-label="Navigation Menu"><i class="fas fa-bars"></i></button>
+					<nav id="site-navigation" class="navigation main-navigation" role="navigation">
+						<div class="nav-menu"><ul>
+<li class="page_item page-item-18"><a href="https://www.i2c-bus.org/">I2C – What’s That?</a></li>
+<li class="page_item page-item-17 page_item_has_children"><a href="https://www.i2c-bus.org/i2c-primer/">I2C Primer</a>
+<i class="fa fa-caret-right fas"></i><ul class="children">
+	<li class="page_item page-item-34"><a href="https://www.i2c-bus.org/i2c-primer/typical-i2c-bus-setup/">Typical Setup</a></li>
+	<li class="page_item page-item-19"><a href="https://www.i2c-bus.org/i2c-primer/how-i2c-hardware-works/">How I2C Hardware Works</a></li>
+	<li class="page_item page-item-21"><a href="https://www.i2c-bus.org/i2c-primer/termination-versus-capacitance/">Termination Versus Capacitance</a></li>
+	<li class="page_item page-item-23"><a href="https://www.i2c-bus.org/i2c-primer/termination-versus-serial-resistance/">Termination Versus Serial Resistance</a></li>
+	<li class="page_item page-item-25"><a href="https://www.i2c-bus.org/i2c-primer/serial-resistances-and-debugging/">Serial Resistance And Debugging</a></li>
+	<li class="page_item page-item-27"><a href="https://www.i2c-bus.org/i2c-primer/crosstalk-between-sda-and-scl/">Crosstalk Between SDA And SCL</a></li>
+	<li class="page_item page-item-29"><a href="https://www.i2c-bus.org/i2c-primer/clock-generation-stretching-arbitration/">Clock, Stretching, Arbitration</a></li>
+	<li class="page_item page-item-31"><a href="https://www.i2c-bus.org/i2c-primer/requirements/">Requirements For Devices</a></li>
+	<li class="page_item page-item-33"><a href="https://www.i2c-bus.org/i2c-primer/common-problems/">Common Problems In Systems</a></li>
+	<li class="page_item page-item-36"><a href="https://www.i2c-bus.org/i2c-primer/obscure-problems/">Obscure Problems In Systems</a></li>
+	<li class="page_item page-item-37 page_item_has_children"><a href="https://www.i2c-bus.org/i2c-primer/analysing-obscure-problems/">Analysing Obscure Problems</a>
+	<i class="fa fa-caret-right fas"></i><ul class="children">
+		<li class="page_item page-item-362"><a href="https://www.i2c-bus.org/i2c-primer/analysing-obscure-problems/blocked-bus/">Blocked I2C Bus</a></li>
+		<li class="page_item page-item-39"><a href="https://www.i2c-bus.org/i2c-primer/analysing-obscure-problems/no-acknowledge-from-i2c-slave/">No Acknowledge From I2C Slave</a></li>
+		<li class="page_item page-item-40"><a href="https://www.i2c-bus.org/i2c-primer/analysing-obscure-problems/master-reports-arbitration-lost/">Master Reports Arbitration Lost</a></li>
+		<li class="page_item page-item-38"><a href="https://www.i2c-bus.org/i2c-primer/analysing-obscure-problems/data-bytes-from-slave-are-0xff/">Data Bytes From Slave Are 0xff</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="page_item page-item-41 page_item_has_children"><a href="https://www.i2c-bus.org/addressing/">Addressing</a>
+<i class="fa fa-caret-right fas"></i><ul class="children">
+	<li class="page_item page-item-42"><a href="https://www.i2c-bus.org/addressing/general-call-address/">General Call Address</a></li>
+	<li class="page_item page-item-43"><a href="https://www.i2c-bus.org/addressing/start-byte/">Start Byte</a></li>
+	<li class="page_item page-item-44"><a href="https://www.i2c-bus.org/addressing/cbus-addresses/">CBUS Addresses</a></li>
+	<li class="page_item page-item-45"><a href="https://www.i2c-bus.org/addressing/different-bus-formats/">Different Bus Formats</a></li>
+	<li class="page_item page-item-46"><a href="https://www.i2c-bus.org/addressing/high-speed/">High Speed</a></li>
+	<li class="page_item page-item-47"><a href="https://www.i2c-bus.org/addressing/10-bit-addressing/">10 Bit Addressing</a></li>
+</ul>
+</li>
+<li class="page_item page-item-52"><a href="https://www.i2c-bus.org/alternatives/">Alternatives</a></li>
+<li class="page_item page-item-14"><a href="https://www.i2c-bus.org/auto-increment/">Auto Increment</a></li>
+<li class="page_item page-item-5"><a href="https://www.i2c-bus.org/clock-stretching/">Clock Stretching</a></li>
+<li class="page_item page-item-9"><a href="https://www.i2c-bus.org/fastmode/">Fast Mode</a></li>
+<li class="page_item page-item-50"><a href="https://www.i2c-bus.org/fast-mode-plus/">Fast Mode Plus</a></li>
+<li class="page_item page-item-8"><a href="https://www.i2c-bus.org/highspeed/">High Speed Mode</a></li>
+<li class="page_item page-item-11"><a href="https://www.i2c-bus.org/i2c-interface/">I2C Interface</a></li>
+<li class="page_item page-item-16"><a href="https://www.i2c-bus.org/level-shifting/">Level Shifting</a></li>
+<li class="page_item page-item-4"><a href="https://www.i2c-bus.org/multimaster/">MultiMaster</a></li>
+<li class="page_item page-item-3"><a href="https://www.i2c-bus.org/references/">References</a></li>
+<li class="page_item page-item-12"><a href="https://www.i2c-bus.org/repeated-start-condition/">Repeated Start Condition</a></li>
+<li class="page_item page-item-6"><a href="https://www.i2c-bus.org/singlemaster/">SingleMaster</a></li>
+<li class="page_item page-item-164"><a href="https://www.i2c-bus.org/specification/">Specification</a></li>
+<li class="page_item page-item-15"><a href="https://www.i2c-bus.org/slave/">Slave</a></li>
+<li class="page_item page-item-55 current_page_item"><a href="https://www.i2c-bus.org/speed/">Speed</a></li>
+<li class="page_item page-item-10"><a href="https://www.i2c-bus.org/standard-mode/">Standard Mode</a></li>
+<li class="page_item page-item-13"><a href="https://www.i2c-bus.org/termination/">Termination</a></li>
+<li class="page_item page-item-54"><a href="https://www.i2c-bus.org/ultra-fast-mode-ufm/">Ultra Fast Mode  UFm</a></li>
+<li class="page_item page-item-53"><a href="https://www.i2c-bus.org/videos/">Videos</a></li>
+<li class="page_item page-item-7"><a href="https://www.i2c-bus.org/voltage-level/">Voltage Level</a></li>
+<li class="page_item page-item-49"><a href="https://www.i2c-bus.org/pmbus/">PMBus</a></li>
+<li class="page_item page-item-48"><a href="https://www.i2c-bus.org/smbus/">SMBus</a></li>
+<li class="page_item page-item-51"><a href="https://www.i2c-bus.org/twi-bus/">TWI Bus</a></li>
+<li class="page_item page-item-141"><a href="https://www.i2c-bus.org/policies/">Privacy Policy</a></li>
+<li class="page_item page-item-135"><a href="https://www.i2c-bus.org/imprint/">Imprint</a></li>
+</ul></div>
+					</nav>
+									</header>
+				
+				<div class="sidebar-offcanvas">
+<div id="main-sidebar" class="widget-area" role="complementary">
+		<!--?//php flat_hook_sidebar_bottom(); ?-->
+</div>
+				</div>
+			</div>
+
+						<div id="primary" class="content-area col-lg-9" itemprop="mainContentOfPage">
+										<div itemscope="" itemtype="http://schema.org/Article" id="content" class="site-content" role="main">
+				        <div id="ourheader">
+        <a href="https://www.telos.info/p/hw/traciixl20/" style="display: none;"><img dsrc="/static/i2c/banner/XL20banner.gif" src="./Speed - I2C Bus_files/XL20banner.gif"></a>
+        <div id="adstop"><!-- Responsive Top --><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1117824964275255" data-ad-slot="6874028699" data-ad-format="auto"></ins>
+		</div>
+        </div>
+							<article id="post-55" class="post-55 page type-page status-publish hentry">
+					<header class="entry-header">
+						<h1 class="entry-title" itemprop="name">Speed</h1>
+					</header>
+										<div class="entry-content" itemprop="articleBody">
+												<div class="cblock">
+<h1>The I2C Clock Speed – Why Accuracy Doesn’t Matter</h1>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">In a synchronous serial transmission like an RS232 communication the clock speed is predetermined. Since the receiver does not get an explicit clock signal it has to rely on the accuracy of the sender’s timing. Any deviation is almost fatal as it may cause errors sooner or later. While there is technology available to keep such communication in sync even if the so called baud rate slightly drifts the overall approach is to keep that rate constant and accurate.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">This has the advantage of predictable transfer timing but it adds the obvious requirement of keeping that constant rate. This is why baud rate calculators are found all over the internet.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">On synchronous transmissions like the I2C bus the situation is much more relaxed. The clock is transmitted by the sender and the receiver is always able to synchronize with that clock. I2C defines several speed grades but the term baud rate is quite unusual in this context.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">The speed grades (standard mode: 100 kbit/s, <a href="https://www.i2c-bus.org/fastmode/">full speed:</a> 400 kbit/s, fast mode: 1 mbit/s, <a href="https://www.i2c-bus.org/highspeed/">high speed</a>: 3,2 Mbit/s) are maximum ratings. Compliant hardware guaranties that it can handle transmission speed up to the maximum clock rate specified by the mode.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">This does not imply that a transmission may not take place at any lower speed or even at a somewhat variable bit rate.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">In fact, a bus master does not even have full control over the actual timing. The reason for this is simple. The I2C bus uses open drain technology. The bus is kept on a high level and writing to the bus means to pull its level to ground. Depending on bus termination, serial resistors, capacitance, cable length, bus voltage and other factors this process of pulling down the level and releasing it takes some time. It is therefore good practice for any device to read back the logic level of a modified line (both clock and data) before proceeding with further actions.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">A master will write a zero on the bus by first enabling the circuit to pull the bus low, then read back the state of the line and then proceed with the next step.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">As a consequence a master set to clock at 100 kHz will most likely produce a lower speed on the bus. As the impact of electrical latency increases with higher clock rates this effect shows more with higher speeds.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">The I2C bus is intended for inter-IC communication and this usually means small data packets. Since the timing can never be determined exactly and the transmitted information is often short the accuracy of the bus clock is of very little relevance in most applications.</span></p>
+<p style="margin-top:0cm; margin-right:0cm; margin-bottom:7.5pt; margin-left:0cm"><span lang="EN-US">To be on the safe side it is – in case of doubt – a much better idea to keep the maximum bit rate below the maximum rating at any time rather than exceeding it occasionally.</span></p>
+</div>
+																	</div>
+									</article>
+							
+							</div>
+														<footer class="site-info" itemscope="" itemtype="http://schema.org/WPFooter">
+					<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1117824964275255" data-ad-slot="6608173491" data-ad-format="auto"></ins>
+<script> 
+function tHeader() { $('#ourheader img').attr('src', $('#ourheader img').attr('dsrc') ).parent().toggle(); }
+$(document).ready(function() {
+        var d = new Date();
+        var ms = d.getMilliseconds();
+        var adds=2;
+        switch( ms % 4 ) {
+            case 0:    
+                $("#adtop").remove();tHeader();                
+                adds=0;
+				break;
+            case 2:     // nothing to show at top
+                $("#adtop").remove();
+                adds--;
+				break;
+            default:
+                break; 
+            }
+
+			if (window.location.hostname.indexOf('de.')==-1 && adds>0)
+			{	$.ajax({
+				  url: '/ge_o_ip.php',
+				  success: function(data) {
+					 if (data.substr(0,1)=='0')
+					  {	
+						var externalScript   = document.createElement("script");
+						externalScript.type  = "text/javascript";
+						externalScript.setAttribute('async','async');
+						externalScript.src = "//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+						document.getElementsByTagName('body')[0].appendChild(externalScript);
+						setTimeout(function() {
+						while (adds--)
+							(adsbygoogle = window.adsbygoogle || []) .push( {  } );
+							} , 400); 
+					  } else tHeader();
+				  },
+				  error:tHeader()
+				});
+			} else tHeader();
+
+    });
+</script>				</footer>
+														</div>
+					</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.fa').addClass('fas');
+});
+</script>
+
+
+<!--
+Performance optimized by W3 Total Cache. Learn more: https://www.w3-edge.com/products/
+
+Minified using disk
+
+Served from: www.i2c-bus.org @ 2018-06-18 13:56:47 by W3 Total Cache
+--><script type="text/javascript" async="async" src="./Speed - I2C Bus_files/f.txt"></script></body></html>
