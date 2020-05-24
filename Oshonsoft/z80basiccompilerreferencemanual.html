@@ -1,0 +1,427 @@
+<html>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'>
+<title>Z80 Simulator IDE BASIC Compiler Reference Manual</title>
+</head>
+<body>
+<center>
+<table width='600' border='0' cellpadding='5' cellspacing='0' cols='1'>
+<tr><td valign='top'>
+
+<p align='center'>
+<font face='Microsoft Sans Serif' size=+2><b>
+<br>Z80 Simulator IDE
+<br>BASIC Compiler Reference Manual
+</b></font>
+</p>
+
+<p align='left'>
+<font face='Microsoft Sans Serif' size=-1>
+<br><b>Table Of Contents:</b>
+<br><br><a href='#0'><font color='#0000C8'><b>General info</b></font></a>
+<br><a href='#8'><font color='#0000E6'>Show Warnings</font></a>,
+<a href='#11'><font color='#0000E6'>Do Not Compile Unused Code</font></a>,
+<a href='#14'><font color='#0000E6'>Initialize Variables On Declaration</font></a>,
+<a href='#17'><font color='#0000E6'>Optimize Variables Declaration</font></a>,
+<br><br><a href='#20'><font color='#0000C8'><b>About variables</b></font></a>
+<br><a href='#20'><font color='#0000E6'>Dim</font></a>,
+<a href='#20'><font color='#0000E6'>As</font></a>,
+<a href='#20'><font color='#0000E6'>Boolean</font></a>,
+<a href='#20'><font color='#0000E6'>Short</font></a>,
+<a href='#20'><font color='#0000E6'>Integer</font></a>,
+<a href='#20'><font color='#0000E6'>Long</font></a>,
+<a href='#20'><font color='#0000E6'>Single</font></a>,
+<a href='#47'><font color='#0000E6'>True</font></a>,
+<a href='#47'><font color='#0000E6'>False</font></a>,
+<a href='#56'><font color='#0000E6'>Const</font></a>,
+<a href='#63'><font color='#0000E6'>ASM</font></a>,
+<a href='#73'><font color='#0000E6'>IncludeASM</font></a>,
+<br><br><a href='#75'><font color='#0000C8'><b>Mathematical and logical operations</b></font></a>
+<br><a href='#75'><font color='#0000E6'>Mod</font></a>,
+<a href='#86'><font color='#0000E6'>Sqr</font></a>,
+<a href='#86'><font color='#0000E6'>Sin</font></a>,
+<a href='#86'><font color='#0000E6'>Cos</font></a>,
+<a href='#86'><font color='#0000E6'>Tan</font></a>,
+<a href='#86'><font color='#0000E6'>Exp</font></a>,
+<a href='#86'><font color='#0000E6'>Ln</font></a>,
+<a href='#86'><font color='#0000E6'>Log</font></a>,
+<a href='#91'><font color='#0000E6'>Not</font></a>,
+<a href='#91'><font color='#0000E6'>And</font></a>,
+<a href='#91'><font color='#0000E6'>Or</font></a>,
+<a href='#91'><font color='#0000E6'>Xor</font></a>,
+<a href='#91'><font color='#0000E6'>Nand</font></a>,
+<a href='#91'><font color='#0000E6'>Nor</font></a>,
+<a href='#91'><font color='#0000E6'>Nxor</font></a>,
+<br><br><a href='#111'><font color='#0000C8'><b>Standard Basic language elements</b></font></a>
+<br><a href='#111'><font color='#0000E6'>Goto</font></a>,
+<a href='#119'><font color='#0000E6'>For</font></a>,
+<a href='#119'><font color='#0000E6'>To</font></a>,
+<a href='#119'><font color='#0000E6'>Step</font></a>,
+<a href='#119'><font color='#0000E6'>Next</font></a>,
+<a href='#119'><font color='#0000E6'>Exit For</font></a>,
+<a href='#119'><font color='#0000E6'>While</font></a>,
+<a href='#119'><font color='#0000E6'>Wend</font></a>,
+<a href='#119'><font color='#0000E6'>If</font></a>,
+<a href='#119'><font color='#0000E6'>Then</font></a>,
+<a href='#119'><font color='#0000E6'>Else</font></a>,
+<a href='#119'><font color='#0000E6'>Endif</font></a>,
+<br><br><a href='#149'><font color='#0000C8'><b>Memory access</b></font></a>
+<br><a href='#149'><font color='#0000E6'>Poke</font></a>,
+<a href='#149'><font color='#0000E6'>Peek</font></a>,
+<br><br><a href='#161'><font color='#0000C8'><b>Subroutines</b></font></a>
+<br><a href='#161'><font color='#0000E6'>End</font></a>,
+<a href='#161'><font color='#0000E6'>Gosub</font></a>,
+<a href='#161'><font color='#0000E6'>Return</font></a>,
+<br><br><a href='#179'><font color='#0000C8'><b>Bit-oriented language elements</b></font></a>
+<br><a href='#179'><font color='#0000E6'>SetBit</font></a>,
+<a href='#179'><font color='#0000E6'>ResetBit</font></a>,
+<a href='#187'><font color='#0000E6'>TestBit</font></a>,
+<a href='#187'><font color='#0000E6'>MakeBit</font></a>,
+<br><br><a href='#193'><font color='#0000C8'><b>Communication with I/O ports</b></font></a>
+<br><a href='#193'><font color='#0000E6'>Get</font></a>,
+<a href='#199'><font color='#0000E6'>Put</font></a>,
+<a href='#204'><font color='#0000E6'>Print</font></a>,
+<a href='#204'><font color='#0000E6'>Qt</font></a>,
+<a href='#204'><font color='#0000E6'>CrLf</font></a>,
+<a href='#204'><font color='#0000E6'>Lf</font></a>,
+<br><br><a href='#216'><font color='#0000C8'><b>Structured language support (procedures and functions)</b></font></a>
+<br><a href='#216'><font color='#0000E6'>Proc</font></a>,
+<a href='#216'><font color='#0000E6'>End Proc</font></a>,
+<a href='#216'><font color='#0000E6'>Call</font></a>,
+<a href='#216'><font color='#0000E6'>Exit</font></a>,
+<a href='#229'><font color='#0000E6'>Function</font></a>,
+<a href='#229'><font color='#0000E6'>End Function</font></a>,
+<a href='#241'><font color='#0000E6'>ByVal</font></a>,
+<a href='#241'><font color='#0000E6'>ByRef</font></a>,
+<a href='#241'><font color='#0000E6'>ByRefOut</font></a>,
+<a href='#265'><font color='#0000E6'>Include</font></a>,
+</font>
+</p>
+
+<p align='left'>
+<font face='Microsoft Sans Serif' size=-1>
+<a name='0'></a>
+<br><font color='#0000C8'><b>&#9679; <u>General info</u></b></font>
+<br>
+<br>Basic compiler editor is composed of editor panel (for user program editing) and source explorer (for easy navigation through all elements of user program - variables, symbols, constants, subroutines, procedures and functions). Editor formats and colorizes entered lines of user program, that simplifies the debugging process.
+<br>
+<br>In all the user-defined program element names, that is in all the variable names, names of the procedures, functions, subroutines, constants, symbols and labels, both lower-case and upper-case characters can be used, along with the underscore and numeric characters. A numeric character will not be accepted by the compiler to be the leading character in the element name.
+<br>
+<br>The primary output of the compiler is an assembler source file. However, with an appropriate command from the menu it can be assembled and even loaded in the simulator with a single click. Menu commands and options are rich, as well as the commands from the right-click popup menus for the editor and source explorer. Basic compiler's assembler output contains many useful comment lines, that makes it very helpful for educational purposes, also.
+<br>
+<a name='8'></a>
+<br><font color='#0000E6'>Show Warnings</font>
+<br>If Show Warnings option is enabled, in the Warnings window Basic compiler will show information about unused declarations, subroutines, procedures and functions in the user basic program.
+<br>
+<a name='11'></a>
+<br><font color='#0000E6'>Do Not Compile Unused Code</font>
+<br>If this option is enabled, Basic compiler will not compile unused declarations, subroutines, procedures and functions, in order to save memory resources.
+<br>
+<a name='14'></a>
+<br><font color='#0000E6'>Initialize Variables On Declaration</font>
+<br>If this option is enabled, Basic compiler will reset to zero all memory locations allocated for variables, at the position of their declaration in the basic program. This option is useful for beginners, because RAM memory is filled with random values at device power-up, and it is easy to make a mistake to assume that all variables are reset to zero at power-up. Experienced users can save some program memory, by disabling this option and taking control of variable initial values by user program where necessary.
+<br>
+<a name='17'></a>
+<br><font color='#0000E6'>Optimize Variables Declaration</font>
+<br>This option will turn on the compiler internal routine that will optimize the variables declaration order based on the usage frequency of the variables. In this way, the most frequently used variables will be stored in higher RAM memory locations, resulting in possibly smaller size of the generated code.
+<br>
+<a name='20'></a>
+<br><font color='#0000C8'><b>&#9679; <u>About variables</u></b></font>
+<br>
+<br>Five data types are supported:
+<br><font color='#6400C8'><u>Boolean</u></font> - 1-byte, True or False
+<br><font color='#6400C8'><u>Short</u></font> - 1-byte integers in the range -128 to 127
+<br><font color='#6400C8'><u>Integer</u></font> - 2-byte integers in the range -32,768 to 32,767
+<br><font color='#6400C8'><u>Long</u></font> - 4-byte integers in the range -2,147,483,648 to 2,147,483,647
+<br><font color='#6400C8'><u>Single</u></font> - 4-byte single precision floating point numbers, 7 digits precision, IEEE754 standard
+<br>
+<br>Variables can be global (declared in the main program, before the End statement) or local (declared in subroutines, procedures and functions). Variable name used for a variable with global scope can be used again for local variable names. The compiler will reserve separate memory locations for them. There are no other limits for the total number of variables, but 64K RAM memory. Variables are declared using DIM statement:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Boolean</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim c As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim d As Long</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim e As Single</font>
+<br>
+<br>It is possible to use one-dimensional arrays for all variable types. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a(100) As Integer</font>
+<br>declares an array of 100 Integer variables with array index in the range [0-99].
+<br>
+<br>It is possible to make conversions between all data types (except Boolean) by simple assignment statements:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Long</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Single</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = 123.456</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = b</font>
+<br>This will result in variable A holding integer value 123.
+<br>
+<a name='47'></a>
+<br>Constants can be used in decimal number system with no special marks, in hexadecimal number system with leading 0x or leading $ notation (or with H at the end) and in binary system with leading % mark (or with B at the end). ASCII value of a character can be expressed in string format (e.g. "A"). Keywords True and False are also available for Boolean type constants. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Boolean</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim c As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = True</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = %01010101</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = 0x55aa</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = "C"</font>
+<br>
+<a name='56'></a>
+<br>Constants can be assigned to symbolic names using CONST directive. Constants can be global or local. One example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Single</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Const pi = 3.14159</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = pi</font>
+<br>
+<br>It is possible to use comments in basic source programs. The comments must begin with single quote symbol (') and may be placed anywhere in the program.
+<br>
+<a name='63'></a>
+<br>Lines of assembler source code may be placed anywhere in basic source program and must begin with ASM: prefix. If labels are used, no space should be left between the ASM: prefix and the label. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;ASM:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NOP</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;ASM:LABEL1: LD A,(BC)</font>
+<br>
+<br>Symbolic names of all variables and constants (global and local) can be used as arguments of assembler statements. The compiler will replace that symbolic name with the proper variable address or constant value:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim varname As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;varname = 0</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;ASM:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LD A,55H</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;ASM:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LD (VARNAME),A</font>
+<br>
+<a name='73'></a>
+<br>If large amount of assembler code should be used, it can be loaded from an external assembler file and included to the current program by using IncludeASM directive. Its only argument is a string containing the path to the external .ASM file. This can be the full path or only the file name, if the external file is located in the same folder as the current basic program file. During the compilation process the external assembler code will be appended to the current program at its end, and not at the position of the directive. Multiple files can be included with separate IncludeASM directives. External assembler files should not contain ASM: prefix used for inline assembler code. It is also strongly suggested not to use ORG directives in the external assembler code.
+<br>
+<a name='75'></a>
+<br><font color='#0000C8'><b>&#9679; <u>Mathematical and logical operations</u></b></font>
+<br>
+<br>Five arithmetic operations (+, -, *, /, MOD) are available for integer data types. MOD operation is not applicable for Single data type variables. The compiler is able to compile all possible complex arithmetic expressions, including those containing math functions and user defined functions. Arithmetic operations are allowed only in assignment statements and all variables in one such statement must be of the same data type. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Long</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Long</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim c As Long</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 1234</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = 2345</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = a * b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = a * 100 - (a + b)</font>
+<br>
+<a name='86'></a>
+<br>There are seven single precision mathematical functions (SQR, SIN, COS, TAN, EXP, LN, LOG) that can be used with Single data type variables. All math functions can also be used in complex math expressions. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Single</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 2</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = Sqr(a)</font>
+<br>
+<a name='91'></a>
+<br>For Boolean and Short data type variables seven basic logical operations are supported. It is possible to make only one logical operation in one single statement. Logical operations are allowed only in assignment statements. For example:
+<br><font color='#009600'>Example 1:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Boolean</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Boolean</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim c As Boolean</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = True</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = False</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = Not a</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = a And b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = a Or b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = a Xor b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = a Nand b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = a Nor b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;c = a Nxor b</font>
+<br>
+<br><font color='#009600'>Example 2:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 0x55</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = Not a</font>
+<br>
+<a name='111'></a>
+<br><font color='#0000C8'><b>&#9679; <u>Standard Basic language elements</u></b></font>
+<br>
+<br>Unconditional jumps are performed by GOTO statement. It uses line label name as argument. Line labels can be global or local. Line labels must be followed by colon mark ':'. Here is one example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Long</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 0</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;loop: a = a + 1</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Goto loop</font>
+<br>
+<a name='119'></a>
+<br>Three standard BASIC statements are supported: FOR-TO-STEP-NEXT, WHILE-WEND and IF-THEN-ELSE-ENDIF. In FOR-TO-STEP-NEXT statement all variables must be Integer data type. Here are several examples:
+<br><font color='#009600'>Example 1:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b(100) As Single</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;For a = 0 To 99</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b(a) = a</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Next a</font>
+<br>
+<br><font color='#009600'>Example 2:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Long</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 100000</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;While a > 0</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a = a - 1</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Wend</font>
+<br>
+<br><font color='#009600'>Example 3:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;For a = 0 To 10000</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If a < 1000 Then</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b = a</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Else</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b = 1000</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Endif</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Next a</font>
+<br>
+<br>For statement will accept all available variable types for the running variable. Exit For statement provides a way to exit a For-Next loop. It transfers control to the statement following the Next statement.
+<br>
+<br>After IF-THEN statement in the same line can be placed almost every other possible statement and then ENDIF is not used. Six standard comparison operators are available: =, <>, >, >=, <, <=. There are no limits for the number of nested statements of any kind.
+<br>
+<a name='149'></a>
+<br><font color='#0000C8'><b>&#9679; <u>Memory access</u></b></font>
+<br>
+<br>Standard BASIC elements for accessing memory are available: POKE statement and PEEK function. They can be used with integer constants and also with variables of Short, Integer or Long data type. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim c As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;For a = 0 To 15</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b = Peek(a)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c = 240 + a</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Poke c, b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Next a</font>
+<br>
+<a name='161'></a>
+<br><font color='#0000C8'><b>&#9679; <u>Subroutines</u></b></font>
+<br>
+<br>Structured programs can be written using subroutine calls with GOSUB statements that use line label names as arguments. Return from a subroutine is performed by a RETURN statement. Users need to take care that the program structure is consistent. When using subroutines, the main routine must end with an END statement. The END statement is compiled as a HALT instruction. Here is an example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Integer</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = 100</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Gosub fillmemory</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = 101</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Gosub fillmemory</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;fillmemory:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;For a = 20000 To 21000</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Poke a, b</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Next a</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Return</font>
+<br>
+<a name='179'></a>
+<br><font color='#0000C8'><b>&#9679; <u>Bit-oriented language elements</u></b></font>
+<br>
+<br>SETBIT and RESETBIT statements can be used to set or reset the individual bits in Short data type variables. The first argument is a Short variable that will be the target of the operation, and the second argument is target bit number and it must be a constant in the range 0-7.
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 0xf0</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;SetBit a, 0</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;ResetBit a, 7</font>
+<br>
+<a name='187'></a>
+<br>By using TESTBIT and MAKEBIT functions it is possible to assign a Boolean data type variable the value contained in the specific bit of a Short data type variable, and vice versa, to copy the value of a Boolean data type variable to the specific bit of a Short data type variable. The first argument of these functions is target bit number and it must be a constant in the range 0-7. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Boolean</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim b As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = TestBit(0, b)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;b = MakeBit(7, a)</font>
+<br>
+<a name='193'></a>
+<br><font color='#0000C8'><b>&#9679; <u>Communication with I/O ports</u></b></font>
+<br>
+<br>The communication with the outside world is done using GET function and PUT and PRINT statements. The argument of the GET function is port number and must be a constant value in the range [0-255]. It can be used to assign the value received on the port to a variable of Short, Integer or Long data type. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = Get(10)</font>
+<br>
+<a name='199'></a>
+<br>PUT statement can be used to send data to the specified port. The data can be a constant value in the range [0-255] or contained in a variable of Short, Integer or Long data type. Only the lowest byte of the variable is sent to the port. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 200</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Put 10, a</font>
+<br>
+<a name='204'></a>
+<br>PRINT statement can be used to send string constants and decimal string representations of any supported data type variables to the specified port.
+<br>String constants should begin and end with the opening and closing double quotation mark. There are three symbolic string constants available: Qt (or """") for the double quotation mark (ASCII code 34), CrLf for the carriage return - line feed sequence (ASCII codes 13-10) and Lf for the line feed character (ASCII code 10).
+<br>Here is an example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim a As Single</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;a = 123.456</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Print 10, "THE NUMBER IS "</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Print 10, a</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Print 10, CrLf</font>
+<br>
+<br>This can also be done using only one PRINT statement:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Print 10, "THE NUMBER IS ", a, CrLf</font>
+<br>
+<a name='216'></a>
+<br><font color='#0000C8'><b>&#9679; <u>Structured language support (procedures and functions)</u></b></font>
+<br>
+<br>Procedures can be declared with PROC statement. They can contain up to 5 arguments (comma separated list) and all available data types can be used for argument variables. Argument variables are declared locally, so they do not need to have unique names in relation to the rest of user basic program, that makes very easy to re-use once written procedures in other basic programs. The procedures can be exited with EXIT statement. They must be ended with END PROC statement and must be placed after the END statement in program. Calls to procedures are implemented with CALL statement. The list of passed arguments can contain both variables and numeric constants. For example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim x As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;For x = 0 To 255</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Call port_display(x)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Next x</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Proc port_display(arg1 As Integer)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Print 10, "THE NUMBER IS ", arg1, CrLf</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End Proc</font>
+<br>
+<a name='229'></a>
+<br>All facts stated for procedures are valid for functions, also. Functions can be declared with FUNCTION statement. They can contain up to 5 arguments and argument variables are declared locally. Functions can be exited with EXIT statement and must be ended with END FUNCTION. The name of the function is declared as a global variable, so if the function is called with CALL statement, after its execution the function variable will contain the result. Standard way of function calls in assignment statements can be used, also. One simple example:
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim x As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim y As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;For x = 0 To 100</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y = square(x) + 1</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Next x</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Function square(arg1 As Integer) As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;square = arg1 * arg1</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End Function</font>
+<br>
+<a name='241'></a>
+<br>The default mechanism is to pass an argument to a procedure by value. Either no prefix or ByVal prefix can be used for that argument. The procedure will use the argument value and will not change the input value of the calling variable. There are two passing mechanisms for passing arguments to procedures by reference - ByRef and ByRefOut. When ByRef prefix is used to pass a variable argument to a procedure, the procedure will use the input variable value, but it can also change the value of the variable during the procedure execution. The calling variable will be exposed to change. When ByRefOut prefix is used for the procedure argument, the input value of the calling variable will not be passed to the procedure at all. The procedure will only return an output value to the calling code through that argument. So, ByRefOut mechanism should be used when the procedure has a genuine need to output only a value to the calling code, and in that way the result will be a more optimized code compared to the use of the standard ByRef mechanism.
+<br><font color='#009600'>One test example:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim in_only As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim inc_me As Short</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim add_inc_me_and_in_only As Short</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;in_only = 5</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;inc_me = 10</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Call testbyref(in_only, inc_me, add_inc_me_and_in_only)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;'after this call</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;'inc_me = 11</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;'add_inc_me_and_in_only = 16</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Proc testbyref(arg1 As Short, ByRef arg2 As Short, ByRefOut arg3 As Short)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arg2 = arg2 + 1</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arg3 = arg1 + arg2</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End Proc</font>
+<br>
+<br>Procedures (and functions) can also be called without the Call statement. In that case, the procedure name should be followed by the comma-separated list of arguments.
+<br><font color='#009600'>The lines of code with the same effect:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Call port_display(x)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;port_display x</font>
+<br>
+<a name='265'></a>
+<br>Basic source code from an external file can be included to the current program by using INCLUDE directive. Its only argument is a string containing the path to the external .BAS file. This can be the full path or only the file name, if the external file is located in the same folder as the current basic program file. During the compilation process the external basic source will be appended to the current program. Multiple files can be included with separate INCLUDE directives. To maintain the overall basic code structure, it is strongly suggested that the external file contains global declarations, subroutines, procedures and functions, only. Here is one very simple example for the demonstration:
+<br><font color='#009600'>main.bas:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim i As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim j As Integer</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Include "inc1.bas"</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Include "inc2.bas"</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;For i = 1 To 10</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j = func1(i, 100)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Call proc1(j)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Next i</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End</font>
+<br>
+<br><font color='#009600'>inc1.bas:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Dim total As Integer</font>
+<br>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Proc proc1(i As Integer)</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;total = total + i</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End Proc</font>
+<br>
+<br><font color='#009600'>inc2.bas:</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;Function func1(i As Integer, j As Integer) As Integer</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;func1 = i + j</font>
+<br><font face='Lucida Console' color='#0096C8'>&nbsp;&nbsp;&nbsp;End Function</font>
+<br>
+</font>
+</p>
+
+</td></tr>
+</table>
+</center>
+</body>
+</html>
