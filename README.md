@@ -1,6 +1,5 @@
 # tec-BOOKS
 
-https://github.com/SteveJustin1963/tec-MAGAZINES
 
 http://k1.spdns.de/Develop/Projects/zasm/Distributions/
 
