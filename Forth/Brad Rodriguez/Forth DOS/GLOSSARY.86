@@ -1,0 +1,306 @@
+      TABLE 1.  GLOSSARY OF CAMELFORTH/8086
+
+NAME   stack in -- stack out          description
+
+  Guide to stack diagrams:  R: = return stack,
+  c = 8-bit character, flag = boolean (0 or -1), 
+  n = signed 16-bit, u = unsigned 16-bit,
+  d = signed 32-bit, ud = unsigned 32-bit,
+  +n = unsigned 15-bit, x = any cell value, 
+  i*x j*x = any number of cell values,
+  a-addr = aligned adrs, c-addr = character adrs
+  p-addr = I/O port adrs, sys = system-specific.
+  Refer to ANS Forth document for more details.
+
+               ANS Forth Core words
+These are required words whose definitions are 
+specified by the ANS Forth document.
+
+!        x a-addr --   store cell in memory
+#     ud1 -- ud2     convert 1 digit of output
+#>    ud1 -- c-addr u    end conv., get string
+#S    ud1 -- ud2     convert remaining digits
+'    -- xt           find word in dictionary
+(    --                     skip input until )
+*      n1 n2 -- n3       signed multiply
+*/     n1 n2 n3 -- n4        n1*n2/n3
+*/MOD  n1 n2 n3 -- n4 n5    n1*n2/n3, rem&quot
++       n1/u1 n2/u2 -- n3/u3     add n1+n2
++!     n/u a-addr --       add cell to memory
++LOOP   adrs --   L: 0 a1 a2 .. aN --
+,    x --           append cell to dict
+-      n1/u1 n2/u2 -- n3/u3    subtract n1-n2
+.     n --           display n signed
+."       --         compile string to print
+/      n1 n2 -- n3       signed divide
+/MOD   n1 n2 -- n3 n4    signed divide/rem'dr
+0<     n -- flag      true if TOS negative
+0=     n/u -- flag    return true if TOS=0
+1+      n1/u1 -- n2/u2       add 1 to TOS
+1-      n1/u1 -- n2/u2     subtract 1 from TOS
+2!    x1 x2 a-addr --    store 2 cells
+2*      x1 -- x2         arithmetic left shift
+2/      x1 -- x2        arithmetic right shift
+2@    a-addr -- x1 x2    fetch 2 cells
+2DROP  x1 x2 --          drop 2 cells
+2DUP   x1 x2 -- x1 x2 x1 x2   dup top 2 cells
+2OVER  x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2
+2SWAP  x1 x2 x3 x4 -- x3 x4 x1 x2  per diagram
+:        --      begin a colon definition
+;
+<      n1 n2 -- flag        test n1<n2, signed
+<#    --             begin numeric conversion
+=      x1 x2 -- flag         test x1=x2
+>     n1 n2 -- flag         test n1>n2, signed
+>BODY    xt -- a-addr      adrs of CREATE data
+>IN     -- a-addr        holds offset into TIB
+>NUMBER  ud adr u -- ud' adr' u'
+                     convert string to number
+>R    x --   R: -- x   push to return stack
+?DUP     x -- 0 | x x    DUP if nonzero
+@       a-addr -- x   fetch cell from memory
+ABORT    i*x --   R: j*x --   clear stk & QUIT
+ABORT"  i*x 0  -- i*x   R: j*x -- j*x  x1=0
+        i*x x1 --       R: j*x --      x1<>0
+ABS     n1 -- +n2     absolute value
+ACCEPT  c-addr +n -- +n'  get line from term'l
+ALIGN    --                         align HERE
+ALIGNED  addr -- a-addr       align given addr
+ALLOT   n --         allocate n bytes in dict
+AND    x1 x2 -- x3            logical AND
+BASE    -- a-addr       holds conversion radix
+BEGIN    -- adrs        target for bwd. branch
+BL      -- char            an ASCII space
+C!      char c-addr --    store char in memory
+C,   char --        append char to dict
+C@     c-addr -- char   fetch char from memory
+CELL+    a-addr1 -- a-addr2      add cell size
+CELLS    n1 -- n2            cells->adrs units
+CHAR   -- char           parse ASCII character
+CHAR+    c-addr1 -- c-addr2   add char size
+CHARS    n1 -- n2            chars->adrs units
+CONSTANT --            define a Forth constant
+COUNT   c-addr1 -- c-addr2 u  counted->adr/len
+CR      --               output newline
+CREATE   --      create an empty definition
+DECIMAL  --      set number base to decimal
+DEPTH    -- +n        number of items on stack
+DO       -- adrs   L: -- 0
+DOES>    --      change action of latest def'n
+DROP     x --          drop top of stack
+DUP      x -- x x      duplicate top of stack
+ELSE     adrs1 -- adrs2    branch for IF..ELSE
+EMIT     c --    output character to console
+EVALUATE  i*x c-addr u -- j*x  interprt string
+EXECUTE   i*x xt -- j*x   execute Forth word
+                          at 'xt'
+EXIT     --            exit a colon definition
+FILL   c-addr u char --  fill memory with char
+FIND   c-addr -- c-addr 0   if not found
+                 xt  1      if immediate
+                 xt -1      if "normal"
+FM/MOD   d1 n1 -- n2 n3   floored signed div'n
+H,    x --           append cell to Head dict
+HALLOT   n --    allocate n bytes in Head dict
+HC,   char --        append char to Head dict
+HERE    -- addr      returns dictionary ptr
+HHERE    -- addr   returns Head dictionary ptr
+HOLD  char --        add char to output string
+I,    x --           append cell to Code dict
+IALLOT   n --    allocate n bytes in Code dict
+IC,   char --        append char to Code dict
+IF       -- adrs    conditional forward branch
+IHERE    -- addr   returns Code dictionary ptr
+IMMEDIATE   --   make last def'n immediate
+INVERT   x1 -- x2            bitwise inversion
+IS"      --            compile in-line string
+I        -- n   R: sys1 sys2 -- sys1 sys2
+                 get the innermost loop index
+J        -- n   R: 4*sys -- 4*sys
+                 get the second loop index
+KEY      -- c      get character from keyboard
+LEAVE    --    L: -- adrs
+LITERAL  x --        append numeric literal
+LOOP    adrs --   L: 0 a1 a2 .. aN --
+LSHIFT  x1 u -- x2    logical L shift u places
+M*     n1 n2 -- d    signed 16*16->32 multiply
+MAX    n1 n2 -- n3       signed maximum
+MIN    n1 n2 -- n3       signed minimum
+MOD    n1 n2 -- n3       signed remainder
+MOVE    addr1 addr2 u --     smart move
+NEGATE   x1 -- x2            two's complement
+OR     x1 x2 -- x3           logical OR
+OVER    x1 x2 -- x1 x2 x1   per stack diagram
+POSTPONE  --   postpone compile action of word
+QUIT     --    R: i*x --    interpret from kbd
+R>    -- x    R: x --   pop from return stack
+R@    -- x     R: x -- x   fetch from rtn stk
+RECURSE  --      recurse current definition
+REPEAT   adrs2 adrs1 --     resolve WHILE loop
+ROT    x1 x2 x3 -- x2 x3 x1  per stack diagram
+RSHIFT  x1 u -- x2    logical R shift u places
+S"       --             compile in-line string
+S>D    n -- d          single -> double prec.
+SIGN  n --           add minus sign if n<0
+SM/REM   d1 n1 -- n2 n3   symmetric signed div
+SOURCE   -- adr n    current input buffer
+SPACE   --               output a space
+SPACES   n --            output n spaces
+STATE   -- a-addr       holds compiler state
+SWAP     x1 x2 -- x2 x1    swap top two items
+THEN     adrs --        resolve forward branch
+TYPE    c-addr +n --     type line to term'l
+U.    u --           display u unsigned
+U<    u1 u2 -- flag       test u1<n2, unsigned
+UM*     u1 u2 -- ud   unsigned 16x16->32 mult.
+UM/MOD   ud u1 -- u2 u3   unsigned 32/16->16
+UNLOOP   --   R: sys1 sys2 --  drop loop parms
+UNTIL    adrs --   conditional backward branch
+VARIABLE --            define a Forth VARIABLE
+WHILE    adrs1 -- adrs2 adrs1
+WORD   char -- c-addr n   word delim'd by char
+XOR    x1 x2 -- x3            logical XOR
+[        --      enter interpretive state
+[']  --         find word & compile as literal
+[CHAR]   --          compile character literal
+]        --      enter compiling state
+ENVIRONMENT?  c-addr u -- false   system query
+
+               ANS Forth Extensions
+These are optional words whose definitions are
+specified by the ANS Forth document.
+
+/STRING  a u n -- a+n u-n   trim string
+<>     x1 x2 -- flag    test not eq (not ANSI)
+AGAIN    adrs --      uncond'l backward branch
+BYE     i*x --    return to MS-DOS
+CMOVE   c-addr1 c-addr2 u --  move from bottom
+CMOVE>  c-addr1 c-addr2 u --  move from top
+COMPILE,  xt --         append execution token
+DABS     d1 -- +d2    absolute value dbl.prec.
+DNEGATE   d1 -- d2     negate double precision
+HEX     --       set number base to hex
+KEY?     -- f    return true if char waiting
+LDUMP  adr n seg --   dump memory
+M+       d n -- d         add single to double
+NIP    x1 x2 -- x2           per stack diagram
+PAD       -- a-addr    user PAD buffer
+tib     -- a-addr     Terminal Input Buffer
+TUCK   x1 x2 -- x2 x1 x2     per stack diagram
+U>    u1 u2 -- flag     u1>u2 unsgd (not ANSI)
+WITHIN   n1|u1 n2|u2 n3|u3 -- f   n2<=n1<n3?
+WORDS    --          list all words in dict.
+.S      --           print stack contents
+
+               Private Extensions
+These are words which are unique to CamelForth.
+Many of these are necessary to implement ANS
+Forth words, but are not specified by the ANS
+document.  Others are functions I find useful.
+
+!CF    adrs cfa --   set code action of a word
+!COLON   --      change code field to docolon
+!DEST   dest adrs --    change a branch dest'n
+#init    -- n    #bytes of user area init data
+'source  -- a-addr      two cells: len, adrs
+(+loop)   n --   R: sys1 sys2 --  | sys1 sys2
+                       run-time code for +LOOP
+(do)    n1|u1 n2|u2 --  R: -- sys1 sys2
+                         run-time code for DO
+(DOES>)  --      run-time action of DOES>
+(IS")     -- c-addr u   run-time code for S"
+(loop)   R: sys1 sys2 --  | sys1 sys2
+                       run-time code for LOOP
+(S")     -- c-addr u   run-time code for S"
+,BRANCH   xt --    append a branch instruction
+,CALL  adrs --       append a subroutine CALL
+,CF    adrs --       append a code field
+,DEST   dest --        append a branch address
+,EXIT    --      append hi-level EXIT action
+><      x1 -- x2         swap bytes (not ANSI)
+>counted  src n dst --     copy to counted str
+>digit   n -- c      convert to 0..9A..Z
+>L   x --   L: -- x        move to leave stack
+?ABORT   f c-addr u --      abort & print msg
+?branch   x --              branch if TOS zero
+?DNEGATE  d1 n -- d2   negate d1 if n negative
+?NEGATE  n1 n2 -- n3  negate n1 if n2 negative
+?NUMBER  c-addr -- n -1      string->number
+                -- c-addr 0  if convert error
+?SIGN   adr n -- adr' n' f  get optional sign
+ advance adr/n if sign; return NZ if negative
+branch   --                  branch always
+CELL     -- n                 size of one cell
+COMPILE   --   append inline execution token
+CS   -- seg          return Code segment
+D->H     c-addr1 c-addr2 u --  move Data->Head
+D->I     c-addr1 c-addr2 u --  move Data->Code
+DIGIT?   c -- n -1   if c is a valid digit
+           -- x  0   otherwise
+dp      -- a-addr       holds dictionary ptr
+DS   -- seg          return Data segment
+ENDLOOP   adrs xt --   L: 0 a1 a2 .. aN --
+ES   -- seg          return Extra segment
+H!       x a-addr --    store cell in Head mem
+H@       a-addr -- x  fetch cell from Head mem
+HC!      c c-addr --    store char in Head mem
+HC@      a-addr -- x  fetch char from Head mem
+HCOUNT  c-addr1 -- c-addr2 u  counted->adr/len
+HDP    -- a-addr     Header dictionary pointer
+HIDE     --      "hide" latest definition
+hp       -- a-addr     HOLD pointer
+HTYPE   c-addr +n --       type line to term'l
+HWORD     c -- c-addr       WORD to Head space
+I!       x a-addr --    store cell in Code mem
+I->D     c-addr1 c-addr2 u --  move Code->Data
+I@       a-addr -- x  fetch cell from Code mem
+IC!      c c-addr --    store char in Code mem
+IC@      a-addr -- x  fetch char from Code mem
+ICOUNT  c-addr1 -- c-addr2 u  counted->adr/len
+IDP    -- a-addr        ROM dictionary pointer
+IMMED?    nfa -- f      fetch immediate flag
+INTERPRET    i*x c-addr u -- j*x
+                     interpret given buffer
+ITYPE   c-addr +n --       type line to term'l
+IWORD     c -- c-addr       WORD to Code space
+L!       x a-addr seg --  store cell in memory
+l0       -- a-addr     bottom of Leave stack
+L>   -- x   L: x --      move from leave stack
+L@    a-addr seg -- x   fetch cell from memory
+latest    -- a-addr     last word in dict.
+LC!      c c-addr seg --  store char in memory
+LC@   c-addr seg -- c   fetch char from memory
+lit      -- x    fetch inline literal to stack
+LP       -- a-addr     Leave-stack pointer
+N=    c-addr1 c-addr2 u -- n   name compare
+            n<0: s1<s2, n=0: s1=s2, n>0: s1>s2
+NFA>CFA   nfa -- cfa    name adr -> code field
+NFA>LFA   nfa -- lfa    name adr -> link field
+PC!     char c-addr --    output char to port
+PC@     c-addr -- char   input char from port
+r0       -- a-addr     end of return stack
+REVEAL   --      "reveal" latest definition
+RP!  a-addr --       set return stack pointer
+RP@  -- a-addr       get return stack pointer
+S!       x a-addr --    store cell in Head mem
+s0       -- a-addr     end of parameter stack
+S=    c-addr1 c-addr2 u -- n   string compare
+            n<0: s1<s2, n=0: s1=s2, n>0: s1>s2
+S@       a-addr -- x  fetch cell from Stack
+SCAN    c-addr u c -- c-addr' u'
+                     find matching char
+SKIP   c-addr u c -- c-addr' u'
+                         skip matching chars
+SP!  a-addr --       set data stack pointer
+SP@  -- a-addr       get data stack pointer
+SS   -- seg          return Stack segment
+tibsize  -- n         size of TIB
+u0      -- a-addr       current user area adrs
+UD*      ud1 d2 -- ud3      32*16->32 multiply
+UD/MOD   ud1 u2 -- u3 ud4   32/16->32 divide
+uinit    -- addr  initial values for user area
+umax    u1 u2 -- u       unsigned maximum
+umin     u1 u2 -- u      unsigned minimum
+USER     n --        define user variable 'n'
+COLD     --      cold start Forth system
+
