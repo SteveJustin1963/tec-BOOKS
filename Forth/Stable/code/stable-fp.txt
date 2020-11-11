@@ -1,0 +1,1 @@
+This is the most advanced version of stable.c. It can also handle floating exact numbers and external system calls! 
