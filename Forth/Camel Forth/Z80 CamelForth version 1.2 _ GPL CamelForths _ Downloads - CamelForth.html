@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!-- saved from url=(0045)http://www.camelforth.com/download.php?view.6 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta http-equiv="content-style-type" content="text/css">
+<meta http-equiv="content-language" content="en">
+<title>Z80 CamelForth version 1.2 / GPL CamelForths / Downloads - CamelForth</title>
+<!-- *JS* -->
+<script type="text/javascript" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/e107.js.download"></script>
+<!-- *CSS* -->
+<!-- Theme css -->
+<link rel="stylesheet" href="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/style.css" type="text/css" media="all">
+<link rel="stylesheet" href="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/e107.css" type="text/css">
+<!-- *META* -->
+<!-- e107helpers meta -->
+<script type="text/javascript" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/e107helper.js.download"></script>
+<link rel="stylesheet" type="text/css" media="all" href="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/calendar.css">
+<script type="text/javascript" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/calendar_stripped.js.download"></script>
+<script type="text/javascript" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/calendar-setup_stripped.js.download"></script>
+<script type="text/javascript" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/English.js.download"></script>
+<!-- log meta -->
+<script type="text/javascript">
+			//<![CDATA[
+function rstr2b64(input)
+{
+	var b64pad  = "="; /* base-64 pad character. "=" for strict RFC compliance   */
+	var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	var output = "";
+	var len = input.length;
+	for(var i = 0; i < len; i += 3)
+	{
+		var triplet = (input.charCodeAt(i) << 16)
+                | (i + 1 < len ? input.charCodeAt(i+1) << 8 : 0)
+                | (i + 2 < len ? input.charCodeAt(i+2)      : 0);
+		for(var j = 0; j < 4; j++)
+		{
+			if(i * 8 + j * 6 > input.length * 8) output += b64pad;
+			else output += tab.charAt((triplet >>> 6*(3-j)) & 0x3F);
+		}
+	}
+	return output;
+}
+var logString = 'referer=' + ref + '&colour=' + colord + '&eself=' + eself + '&res=' + res + '';
+logString = rstr2b64(logString);
+document.write('<link rel="stylesheet" type="text/css" href="/e107_plugins/log/log.php?lv='+logString + '">' );
+//]]>
+</script><link rel="stylesheet" type="text/css" href="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/log.php">
+<!-- rss_menu meta -->
+<link rel="alternate" type="application/rss+xml" title="CamelForth Downloads" href="http://www.camelforth.com/e107_plugins/rss_menu/rss.php?download.2">
+
+
+
+<!-- Core Meta Tags -->
+<meta name="description" content="Requires CP/M (either a CP/M computer or MYZ80 emulator for the PC), and Z80MR assembler.">
+
+<!-- *FAV-ICONS* -->
+<link rel="icon" href="http://www.camelforth.com/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="http://www.camelforth.com/favicon.ico" type="image/xicon">
+
+<!-- *PRELOAD* -->
+</head>
+<body onload="externalLinks();">
+
+<table cellpadding="0" cellspacing="0"><tbody><tr>
+<td id="leftedge">&nbsp;</td>
+<td>
+<h1 id="header"><a href="http://www.camelforth.com/download.php?view.6#" title="e107 v0.7">CamelForth</a></h1>
+<table cellpadding="0" cellspacing="0"><tbody><tr>
+<td class="post">
+
+<div class="spacer"><div class="date">GPL CamelForths [ These are CamelForth implementations licensed under the GNU General Public License, version 3.  Inquire for non-GPL licensing. ]</div>
+        <div style="text-align:center">		<table class="fborder" style="width:100%">		<tbody><tr>		<td colspan="2" class="fcaption" style="text-align:left;">		Z80 CamelForth version 1.2		</td>		</tr>		<tr><td style="width:20%" class="forumheader3">Author</td>		<td style="width:80%" class="forumheader3">B. J. Rodriguez</td></tr>		<tr><td style="width:20%" class="forumheader3">Author email</td>		<td style="width:80%" class="forumheader3"><a rel="external" href="javascript:window.location=&quot;mai&quot;+&quot;lto:&quot;+&quot;bj&quot;+&quot;@&quot;+&quot;camelforth.com&quot;;self.close();" onmouseover="window.status=&quot;mai&quot;+&quot;lto:&quot;+&quot;bj&quot;+&quot;@&quot;+&quot;camelforth.com&quot;; return true;" onmouseout="window.status=&quot;&quot;;return true;" target="_blank"> bj©camelforth.com</a></td></tr>		<tr><td style="width:20%" class="forumheader3">Author website</td>		<td style="width:80%" class="forumheader3"><a href="http://www.camelforth.com/" rel="external" target="_blank">http://www.camelforth.com</a></td></tr>		<tr>		<td style="width:20%" class="forumheader3">Description</td>		<td style="width:80%" class="forumheader3">Requires CP/M (either a CP/M computer or MYZ80 emulator for the PC), and Z80MR assembler.</td>		</tr>		<tr>		<td style="width:20%" class="forumheader3">Image</td>		<td style="width:80%" class="forumheader3">no image available </td>		</tr>		<tr>		<td style="width:20%" class="forumheader3">Filesize</td>		<td style="width:80%" class="forumheader3">42.74 kB</td>		</tr>		<tr>		<td style="width:20%" class="forumheader3">Date</td>		<td style="width:80%" class="forumheader3">Sunday 19 August 2007 - 17:38:03</td>		</tr>		<tr>		<td style="width:20%" class="forumheader3">Downloads</td>		<td style="width:80%" class="forumheader3">2790</td>		</tr>		<tr>		<td style="width:20%" class="forumheader3">Download</td>		<td style="width:80%" class="forumheader3"><a href="http://www.camelforth.com/request.php?6"> <img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/download.png" alt="" style="border:0"></a></td>		</tr>		<tr>		<td style="width:20%" class="forumheader3">Rating</td>		<td style="width:80%" class="forumheader3">
+		<table style="width:100%">
+		<tbody><tr>
+		<td style="width:50%">Not rated</td><td style="width:50%; text-align:right">&nbsp;</td></tr></tbody></table></td>		</tr>		<tr><td style="width:20%" class="forumheader3" colspan="2"><a href="http://www.camelforth.com/download.php?report.6">Report broken download</a></td></tr>		</tbody></table>		<div style="text-align:right; width:100%; margin-left: auto; margin-right: auto"></div>		</div>		<div style="text-align:center">			<table style="width:100%">			<tbody><tr>			<td style="width:40%;"><a href="http://www.camelforth.com/download.php?view.5">&lt;&lt; Previous [8086 Camelforth version 1.0]</a>
+</td>			<td style="width:20%; text-align: center;"><a href="http://www.camelforth.com/download.php?list.1">Back to list</a></td>			<td style="width:40%; text-align: right;"><a href="http://www.camelforth.com/download.php?view.12">[MSP430 CamelForth version 0.3] Next &gt;&gt;</a>
+</td>			</tr>			</tbody></table>		</div>
+</div>
+<br><div style="text-align:center"><b>You must be logged in to make comments on this site - please log in, or if you are not registered click <a href="http://www.camelforth.com/signup.php">here</a> to signup</b></div>
+
+</td>
+<td id="separator">&nbsp;</td>
+<td id="menu">
+<!-- BoF Sitelinks (1) -->
+
+<div class="spacer"><div class="menubox"><b>Main Menu</b><br><span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/index.php">Home</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/e107_plugins/forum/forum.php">Forum</a></span><br>
+<span style="font-weight:bold"><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.png" alt="bullet"> <a href="http://www.camelforth.com/download.php">Downloads</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/page.php?3">Documentation</a></span><br>
+
+
+<div id="sub_6" style="display:block" class="d_sublink">
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> &nbsp;&nbsp;<a class="sublink-level-1" href="http://www.camelforth.com/page.php?9">1802</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> &nbsp;&nbsp;<a class="sublink-level-1" href="http://www.camelforth.com/page.php?6">6809</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> &nbsp;&nbsp;<a class="sublink-level-1" href="http://www.camelforth.com/page.php?4">8051</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> &nbsp;&nbsp;<a class="sublink-level-1" href="http://www.camelforth.com/page.php?10">8052/C8051F</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> &nbsp;&nbsp;<a class="sublink-level-1" href="http://www.camelforth.com/page.php?7">8086</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> &nbsp;&nbsp;<a class="sublink-level-1" href="http://www.camelforth.com/page.php?8">MSP430</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> &nbsp;&nbsp;<a class="sublink-level-1" href="http://www.camelforth.com/page.php?5">Z80</a></span><br>
+
+</div>
+
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/e107_plugins/links_page/links.php">Links</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/user.php">Members</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/contact_us.php">Contact Us</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/e107_plugins/rss_menu/rss.php">RSS Feeds</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/e107_plugins/bugtracker3/bugtracker3.php">Bugtracker3</a></span><br>
+<span><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="bullet"> <a href="http://www.camelforth.com/search.php">Search</a></span><br>
+</div></div>
+<!-- EoF Sitelinks (1) -->
+
+<div class="spacer"><div class="menubox"><b>PayPal Donations</b><br><center><form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_xclick"><input type="hidden" name="business" value="paypal@camelforth.com"><input type="hidden" name="item_name" value="CamelForth donation"><input type="hidden" name="item_number" value="1"><input type="hidden" name="no_shipping" value="1"><input type="hidden" name="no_note" value="1"><input type="hidden" name="currency_code" value="USD"><input type="hidden" name="tax" value="0"><input type="hidden" name="lc" value="CA"><input type="hidden" name="bn" value="PP-DonationsBF"><input type="image" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/x-click-but21.gif" border="0" name="submit" alt="Make payments with PayPal - it&#39;s fast, free and secure!"><img alt="" border="0" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/pixel.gif" width="1" height="1"></form>If you find CamelForth useful, would you please make a small donation? Thank you.<br></center></div></div><div class="spacer"><div class="menubox"><b>Quick Downloads</b><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.1">8051</a><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.5">8086</a><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.6">Z80</a><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.4">6809</a><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.32">MSP430</a><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.16">8052/C8051F</a><br><br>Contributed:<br><a class="bbcode" href="http://www.camelforth.com/download.php?view.19">1802</a> <strong class="bbcode bold">v1.1</strong><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.2">8051</a><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.17">MSP430 (eZ430-RF2500T)</a><br><a class="bbcode" href="http://www.camelforth.com/download.php?view.24">MSP430 FRAM (MSP-EXP430FR5739)</a><br><br>Offsite downloads:<br><a class="bbcode" href="https://github.com/jamesbowman/8051forth">8051/CC1110</a> (as31)<br><a class="bbcode" href="http://4e4th.eu/">MSP430G2553 (4e4th)</a><br><a class="bbcode" href="http://code.google.com/p/rplgm/source/browse/#svn%2Ftrunk%2Ftini%2Fforth">DS80C400</a><br><a class="bbcode" href="http://www.seanet.com/~karllunt/camel80.htm">Z180</a><br><a class="bbcode" href="http://www.worldofspectrum.org/z88forever/camelforth/rom-camel.html">Z88</a><br><a class="bbcode" href="http://www.hytherion.com/beattidp/comput/z80forth.htm">Z80, ZNEO, Z180, Z380/Z382, and eZ80 Acclaim!</a></div></div><div class="spacer"><div class="menubox"><b>Moving Forth: The e-Book</b><br><div style="text-align:center"><a href="https://www.amazon.com/Moving-Forth-Internals-TTL-Processor-ebook/dp/B07BTV7QVR/"><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/movingforth.jpg"></a></div><br>"Moving Forth," the series of articles that led to CamelForth, is now available as an <a href="https://www.amazon.com/Moving-Forth-Internals-TTL-Processor-ebook/dp/B07BTV7QVR/" class="bbcode">Amazon Kindle e-Book</a>.  All thanks to Juergen Pintaske and his <a href="https://www.amazon.com/juergen-pintaske/e/B00N8HVEZM" class="bbcode">Forth Bookshelf</a> project!</div></div><div class="spacer"><div class="menubox"><b>Links</b><br>navigator<br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/links_page/links.php">view links frontpage</a><br><br><br>Recent Additions<br>
+			<table style="width:100%; text-align:left; border:0;" cellpadding="0" cellspacing="0">
+				<tbody><tr>
+					<td style="width:1%; white-space:nowrap; vertical-align:top; padding-right:5px;"><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"></td>
+					<td>
+						<a class="linkspage_url" href="http://amforth.sourceforge.net/" onclick="location.href=&#39;e107_plugins/links_page/links.php?view.20&#39;;return false">AmForth for the AVR8</a>
+						
+						<br>A small, open-source, ANS compatible Forth for AVR8/ATMega microcontrollers.
+					</td>
+				</tr>
+			</tbody></table>
+			<table style="width:100%; text-align:left; border:0;" cellpadding="0" cellspacing="0">
+				<tbody><tr>
+					<td style="width:1%; white-space:nowrap; vertical-align:top; padding-right:5px;"><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"></td>
+					<td>
+						<a class="linkspage_url" href="http://www.mikekohn.net/micro/naken_asm.php" onclick="location.href=&#39;e107_plugins/links_page/links.php?view.19&#39;;return false">naken_asm Assembler</a>
+						
+						<br>A multi-CPU assembler for MSP430, ARM, AVR, dsPIC, 65xx, Z80, and others (more on the way).  This is the preferred tool for MSP430 CamelForth.
+					</td>
+				</tr>
+			</tbody></table></div></div><div class="spacer"><div class="menubox"><b>Latest Forum Posts</b><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?441.post">Posted by Brad R</a><br>Hi Phil, yes, I check in here every few days.I got[more ...]<br>13 Jan : 04:10<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?440.post">Posted by Phillip Eaton</a><br>Hi Brad, hopefully you're still monitoring this fo[more ...]<br>11 Jan : 10:28<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?439.post">Posted by Brad R</a><br>I thought I had written something up about this, b[more ...]<br>15 May : 07:06<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?438.post">Posted by Brad R</a><br>I sometimes compile to RAM when testing.  And that[more ...]<br>22 Dec : 03:59<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?437.post">Posted by Zbiggy</a><br>Brad R wrote ...The way I've handled this in the p[more ...]<br>21 Dec : 07:47<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?436.post">Posted by Brad R</a><br>At first glance, the AT89LP3240 looks like an exce[more ...]<br>21 Dec : 00:06<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?435.post">Posted by Brad R</a><br>Don't type
+[link=hyperlink&nbsp;url]http://ww[more ...]<br>20 Dec : 07:35<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?434.post">Posted by Zbiggy</a><br>Brad R wrote ...[..]There is no explicit function [more ...]<br>20 Dec : 07:00<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?433.post">Posted by Brad R</a><br>Okay, I'm looking at the 89LP51/52 data sheet (doc[more ...]<br>18 Dec : 10:24<br><br><img src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/bullet2.gif" alt="" style="vertical-align: middle;"> <a href="http://www.camelforth.com/e107_plugins/forum/forum_viewtopic.php?432.post">Posted by Brad R</a><br>Welcome back!Just offhand, I wouldn't trust that f[more ...]<br>18 Dec : 08:25<br><br></div></div><div class="spacer"><div class="menubox"><b>Welcome</b><br><form method="post" action="http://www.camelforth.com/download.php?view.6">	<div style="text-align: center">Username: 	<br>	<input class="tbox login user" type="text" name="username" id="username" size="15" value="" maxlength="30">
+	<br>Password: 	<br>    <input class="tbox login pass" type="password" name="userpass" id="userpass" size="15" value="" maxlength="30">
+	<br>  	<input class="button" type="submit" name="userlogin" value="Login">  <br><input type="checkbox" name="autologin" value="1" checked="checked">Remember me	<br>	<br>[ <a class="login_menu_link signup" href="http://www.camelforth.com/signup.php" title="Signup">Signup</a> ]	<br>[ <a class="login_menu_link fpw" href="http://www.camelforth.com/fpw.php" title="Forgot password?">Forgot password?</a> ]	<br>[ <a class="login_menu_link resend" href="http://www.camelforth.com/signup.php?resend" title="Resend Activation Email">Resend Activation Email</a> ]	</div>	</form></div></div><div class="spacer"><br><br><center><a href="http://www.spambotsecurity.com/zbblock.php" title="ZB Block, GPL PHP Website Spam and Hacking Prevention System" style="letter-spacing: -1px; font-size:8pt; background-color:#FFFFFF; text-decoration:none;"><font face="Verdana, Arial, Helvetica, sans-serif" color="#000000"><strong>&nbsp;Protected&nbsp;by&nbsp;:&nbsp;<font color="#FF0000">ZB BLOCK&nbsp;</font></strong></font></a></center></div>
+
+<br><hr><span class="smalltext">"There's a Forth for that" is a service mark of this web site.<br></span>
+</td>
+</tr></tbody></table>
+</td>
+<td id="rightedge">&nbsp;</td>
+</tr></tbody></table>
+
+<script type="text/javascript" src="./Z80 CamelForth version 1.2 _ GPL CamelForths _ Downloads - CamelForth_files/e_ajax.js.download"></script>
+</body></html>

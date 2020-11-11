@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>Moving Forth: Part 6</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.01Gold (Win95; U) [Netscape]">
+   <META NAME="Author" CONTENT="Bradford J. Rodriguez">
+</HEAD>
+<BODY>
+
+<H1 ALIGN=CENTER>MOVING FORTH</H1>
+
+<H2 ALIGN=CENTER>Part 6: the Z80 high-level kernel</H2>
+
+<H3 ALIGN=CENTER>by Brad Rodriguez</H3>
+
+<P><FONT SIZE=-1>This article first appeared in <A HREF="http://www.psyber.com/~tcj">The
+Computer Journal</A> #69 (September/October 1994).</FONT></P>
+
+<H2>ERRATA </H2>
+
+<P>There are two goofs in the CAMEL80.AZM file I presented in TCJ#67. The
+minor goof is that the name length specified in the HEAD macro for the
+Forth word <B>&gt;</B> was incorrectly typed as 2 instead of 1. </P>
+
+<P>The major goof results from a subtlety of CP/M console I/O. KEY must
+not echo the typed character, and so used BDOS function 6. KEY? used BDOS
+function 11 to test non-destructively for the presence of a keypress. Unfortunately,
+BDOS function 6 does not &quot;clear&quot; the keypress detected by function
+11! I have now rewritten KEY? to use BDOS function 6 (see <A HREF="camel80.txt">Listing
+1</A>). Since this is a &quot;destructive&quot; test, I had to add logic
+to save the &quot;consumed&quot; keypress and return it when KEY is next
+used. This new logic can be used whenever your hardware (or operating system)
+provides only a destructive test-for-keypress. </P>
+
+<H2>HIGH LEVEL DEFINITIONS </H2>
+
+<P>In the last installment I did not expound greatly on the source code.
+Each Forth &quot;primitive&quot; performs a miniscule, sharply-defined
+function. It was almost all Z80 assembler code, and if it wasn't obvious
+<I>why</I> a particular word was included, I hope it was clear <I>what</I>
+each word did. </P>
+
+<P>In this installment I have no such luxury: I will present the high level
+definitions which embody the elegant (and tortuous) logic of the Forth
+language. Entire books have been written [1,2,3] describing Forth kernels,
+and if you want complete mastery I highly recommend you buy one of them.
+For TCJ I'll limit myself to some of the key words of the compiler and
+interpreter, given in <A HREF="camel80h.txt">Listing 2</A>. </P>
+
+<H2>TEXT INTERPRETER OPERATION </H2>
+
+<P>The text or &quot;outer&quot; interpreter is the Forth code which accepts
+input from the keyboard and performs the desired Forth operations. (This
+is distinct from the address or &quot;inner&quot; interpreter, NEXT, which
+executes compiled threaded code.) The best way to understand it is to work
+through the startup of the Forth system. </P>
+
+<P>1. The CP/M entry point (see <A HREF="camel80.txt">listing</A> in previous
+installment) determines the top of available memory, set the stack pointers
+(PSP,RSP) and user pointer (UP), establishing the memory map shown in <A HREF="#FIGURE1">Figure
+1</A>. It then sets the &quot;inner&quot; interpreter pointer (IP) to execute
+the Forth word <B>COLD</B>. </P>
+
+<P>2. <B>COLD</B> initializes the user variables from a startup table,
+and then does <B>ABORT</B>. (<B>COLD</B> will also attempt to execute a
+Forth command from the CP/M command line.) </P>
+
+<P>3. <B>ABORT</B> resets the parameter stack pointer and does <B>QUIT</B>.
+</P>
+
+<P>4. <B>QUIT</B> resets the return stack pointer, loop stack pointer,
+and interpret state, and then begins to interpret Forth commands. (The
+name is apt because <B>QUIT</B> can be used to abort an application and
+get back to the &quot;top level&quot; of Forth. Unlike <B>ABORT</B>, <B>QUIT</B>
+will leave the parameter stack contents alone.) <B>QUIT</B> is an infinite
+loop which will <B>ACCEPT</B> a line from the keyboard, and then <B>INTERPRET</B>
+it as Forth commands. When not compiling, <B>QUIT</B> will prompt &quot;ok&quot;
+after each line. </P>
+
+<P>5. <B>INTERPRET</B> is an almost verbatim translation of the algorithm
+given in section 3.4 of the ANS Forth document. It parses one space-delimited
+string from the input, and tries to <B>FIND</B> the Forth word of that
+name. If the word is found, it will be either executed (if it is an IMMEDIATE
+word, or if in the &quot;interpret&quot; state, STATE=0) or compiled into
+the dictionary (if in the &quot;compile&quot; state, STATE&lt;&gt;0). If
+not found, Forth attempts to convert the string as a number. If successful,
+<B>LITERAL</B> will either place it on the parameter stack (if in &quot;interpret&quot;
+state) or compile it as an in-line literal value (if in &quot;compile&quot;
+state). If not a Forth word and not a valid number, the string is typed,
+an error message is displayed, and the interpreter <B>ABORT</B>s. This
+process is repeated, string by string, until the end of the input line
+is reached. </P>
+
+<H2>THE FORTH DICTIONARY </H2>
+
+<P>Whoa! How does the interpreter &quot;find&quot; a Forth word by name?
+Answer: Forth keeps a &quot;dictionary&quot; of the names of all Forth
+words. Each name is connected in some fashion with the executable code
+for the corresponding word. </P>
+
+<P>There are many ways to store a set of strings for searching: a simple
+array, a linked list, a multiple linked list, hash table, etc. Almost all
+are valid here -- all Forth asks is that, if you reuse a name, the <I>latest</I>
+definition is found when you search the dictionary. </P>
+
+<P>It's also possible to have several sets of names (&quot;vocabularies&quot;,
+or &quot;wordlists&quot; in the new ANSI jargon ). This lets you reuse
+a name <I>without</I> losing its previous meaning. For example, you could
+have an integer <B>+</B>, a floating-point <B>+</B>, even a <B>+</B> for
+strings...one way to achieve the &quot;operator overloading&quot; so beloved
+by the object-oriented community. </P>
+
+<P>Each string may be connected with its executable code by being physically
+adjacent in memory -- i.e., the name appears in memory just before the
+executable code, thus being called the &quot;head&quot; or &quot;header&quot;
+of the Forth word. Or the strings may be located in a totally different
+part of memory, and connected with pointers to executable code (&quot;separate
+heads&quot;). </P>
+
+<P>You can even have unnamed (&quot;headless&quot;) fragments of Forth
+code, if you <I>know</I> you'll never need to compile or interpret them.
+ANSI only requires that the ANS Forth words be findable. </P>
+
+<P>The design decisions could fill another article. Suffice it to say that
+CamelForth uses the simplest scheme: a single linked list, with the header
+located just before the executable code. No vocabularies... although I
+may add them in a future issue of TCJ. </P>
+
+<H2>HEADER STRUCTURE (<A HREF="#FIGURE2">FIGURE 2</A>) </H2>
+
+<P>Still more design decisions: what data should be present in the header,
+and how should it be stored? </P>
+
+<P>The minimum data is the name, precedence bit, and pointer (explicit
+or implicit) to executable code. For simplicity, CamelForth stores the
+name as a &quot;counted string&quot; (one byte of length, followed by N
+characters). Early Forth Inc. products stored a length but only the first
+three characters, for faster comparisons (the actual improvement gained
+is another hot debate). Fig-Forth compromised, flagging the last character
+with MSB high in order to allow either full-length or truncated names.
+Other Forths have used packed strings [4], and I suspect even C-style null-terminated
+strings have been used. </P>
+
+<P>The &quot;precedence bit&quot; is a flag which indicates if this word
+has IMMEDIATE status. IMMEDIATE words are executed <I>even during compilation</I>,
+which is how Forth implements compiler directives and control structres.
+There are other ways to distinguish compiler directives -- Pygmy Forth
+[5], for example, puts them in a separate vocabulary. But ANS Forth essentially
+mandates the use of a precedence bit [6]. Many Forths store this bit in
+the &quot;length&quot; byte. I have chosen to put it in a separate byte,
+in order to use the &quot;normal&quot; string operators on word names (e.g.
+<B>S=</B> within <B>FIND</B>, and <B>TYPE</B> within <B>WORDS</B>). </P>
+
+<P>If the names are kept in a linked list, there must be a link. Usually
+the latest word is at the head of the linked list, and the link points
+to a previous word. This enforces the ANSI (and traditional) requirement
+for redefined words. Charles Curley [7] has studied the placement of the
+link field, and found that the compiler can be made significantly faster
+if the link field comes <I>before</I> the name (rather than after, as was
+done in Fig-Forth). </P>
+
+<P><A HREF="#FIGURE2">Figure 2</A> shows the structure of the CamelForth
+word header, and the Fig-Forth, F83, and Pygmy Forth headers for comparison.
+The &quot;view&quot; vield of F83 and Pygmy is an example of other useful
+information which can be stored in the Forth word header. </P>
+
+<P>Remember: it's important to distinguish the header from the &quot;body&quot;
+(executable part) of the word. They need not be stored together. The header
+is only used during compilation and interpretation, and a &quot;purely
+executable&quot; Forth application could dispense with headers entirely.
+However, headers must be present -- at least for the ANSI word set -- for
+it to be a legal ANS Forth System. </P>
+
+<P>When &quot;compiling&quot; a Forth system from assembler source code,
+you can define macros to build this header (see HEAD and IMMED in CAMEL80.AZM).
+In the Forth environment the header, <I>and the Code Field</I>, is constructed
+by the word <B>CREATE</B>. </P>
+
+<H2>COMPILER OPERATION </H2>
+
+<P>We now know enough to understand the Forth compiler. The word <B>:</B>
+starts a new high-level definition, by creating a header for the word (<B>CREATE</B>),
+changing its Code Field to &quot;docolon&quot; (<B>!COLON</B>), and switching
+to compile state (<B>]</B>). Recall that, in compile state, every word
+encountered by the text interpreter is compiled into the dictionary instead
+of being executed. This will continue until the word <B>;</B> is encountered.
+Being an IMMEDIATE word, <B>;</B> will execute, compiling an <B>EXIT</B>
+to end the definition, and then switching back to interpret state (<B>[</B>).
+</P>
+
+<P>Also, <B>:</B> will <B>HIDE</B> the new word, and <B>;</B> will <B>REVEAL</B>
+it (by setting and clearing the &quot;smudge&quot; bit in the name). This
+is to allow a Forth word to be redefined in terms of its &quot;prior self&quot;.
+To force a recursive call to the word being defined, use <B>RECURSE</B>.
+</P>
+
+<P>Thus we see that there is no distinct Forth &quot;compiler&quot;, in
+the same sense that we would speak of a C or Pascal compiler. The Forth
+compiler is embodied in the actions of various Forth words. This makes
+it easy for you to change or extend the compiler, but makes it difficult
+to create a Forth application <I>without</I> a built-in compiler! </P>
+
+<H2>THE DEPENDENCY WORD SET </H2>
+
+<P>Most of the remaining high-level words are either a) necessary to implement
+the compiler and interpreter, or b) provided solely for your programming
+pleasure. But there is one set which deserves special mention: the words
+I have separated into the file CAMEL80D.AZM (<A HREF="camel80d.txt">Listing
+3</A>). </P>
+
+<P>One of the goals of the ANSI Forth Standard was to hide CPU and model
+dependencies (Direct or Indirect Threaded? 16 or 32 bit?) from the application
+programmer. Several words were added to the Standard for this purpose.
+I have taken this one step further, attempting to encapsulate these dependencies
+<I>even within the kernel</I>. Ideally, the high-level Forth code in the
+file CAMEL80H.AZM should be the same for all CamelForth targets (although
+different assemblers will have different syntax). </P>
+
+<P>Differences in cell size and word alignment are managed by the ANS Forth
+words <B>ALIGN ALIGNED CELL+ CELLS CHAR+ CHARS</B> and my own addition,
+<B>CELL</B> (equivalent to <B>1 CELLS</B>, but smaller when compiled).
+</P>
+
+<P>The words <B>COMPILE, !CF ,CF !COLON</B> and <B>,EXIT</B> hide peculiarities
+of the threading model, such as a) how are the threads represented, and
+b) how is the Code Field implemented? The value of these words becomes
+evident when you look at the differences between the direct-threaded Z80
+and the subroutine-threaded 8051: </P>
+
+<PRE> 
+ <U>word     compiles on Z80   compiles on 8051
+
+</U> <B>COMPILE,</B> address           LCALL address
+ <B>!CF</B>      CALL address      LCALL address
+ <B>,CF</B>      !CF &amp; allot       3 bytes !CF &amp; allot 3 bytes
+ <B>!COLON</B>   CALL docolon      nothing!
+ <B>,EXIT</B>    address of EXIT   RET
+</PRE>
+
+<P>(<B>!CF</B> and <B>,CF</B> are different for indirect-threaded Forths.)
+</P>
+
+<P>In similar fashion, the words <B>,BRANCH ,DEST</B> and <B>!DEST</B>
+hide the implementation of high-level branch and loop operators. I have
+tried to invent -- without borrowing from existing Forths! -- the minimal
+set of operators which can factor out all the implementation differences.
+Only time, expert criticism, and many CamelForths will tell how successful
+I've been. </P>
+
+<P>So far I have <I>not</I> been successful factoring the differences in
+header structure into a similar set of words. The words <B>FIND</B> and
+<B>CREATE</B> are so intimately involved with the header contents that
+I haven't yet found suitable subfactors. I have made a start, with the
+words <B>NFA&gt;LFA NFA&gt;CFA IMMED? HIDE REVEAL</B> and the ANS Forth
+words <B>&gt;BODY IMMEDIATE</B>. I'll continue to work on this. Fortunately,
+it is practical for the time being to use the identical header structure
+on all CamelForth implementations (since they're all byte-addressed 16-bit
+Forths). </P>
+
+<H2>NEXT TIME... </H2>
+
+<P>I will probably present the 8051 kernel, and talk about how the Forth
+compiler and interpreter are modified for Harvard architectures (computers
+that have logically distinct memories for Code and Data, like the 8051).
+For the 8051 I will print the files CAMEL51 and CAMEL51D, but probably
+only excerpts from CAMEL51H, since (except for formatting of the assembler
+file) the high-level code shouldn't be different from what I've presented
+this issue...and Bill needs the space for other articles! Don't worry,
+the full code will be uploaded to GEnie. </P>
+
+<P><I>However,</I> I may succumb to demands of Scroungemaster II builders,
+and publish the 6809 CamelForth configured for the Scroungemaster II board.
+Whichever I do next, I'll do the other just one installment later. </P>
+
+<H2>REFERENCES </H2>
+
+<P>1. Derick, Mitch and Baker, Linda, <U>Forth Encyclopedia</U>, Mountain
+View Press, Route 2 Box 429, La Honda, CA 94020 USA (1982). Word-by-word
+description of Fig-Forth. </P>
+
+<P>2. Ting, C. H., <U>Systems Guide to fig-Forth</U>, Offete Enterprises,
+1306 South B Street, San Mateo, CA 94402 USA (1981). </P>
+
+<P>3. Ting, C. H., <U>Inside F83</U>, Offete Enterprises (1986). </P>
+
+<P>4. Ewing, Martin S., <U>The Caltech Forth Manual</U>, a Technical Report
+of the Owens Valley Radio Observatory (1978). This PDP-11 Forth stored
+a length, four characters, and a link in two 16-bit words. </P>
+
+<P>5. Sergeant, Frank, <U>Pygmy Forth for the IBM PC</U>, version 1.4 (1992).
+Distributed by the author, available from the Forth Interest Group (P.O.
+Box 2154, Oakland CA 94621 USA) or on GEnie. </P>
+
+<P>6. J. E. Thomas examined this issue thoroughly when converting Pygmy
+Forth to an ANSI Forth. No matter what tricks you play with relinking words,
+strict ANSI compliance is violated. A regrettable decision on the part
+of the ANS Forth team. </P>
+
+<P>7. In private communication. </P>
+
+<P>The source code for Z80 CamelForth is <I>now</I> available on GEnie
+as CAMEL80.ARC in the CP/M and Forth Roundtables. Really. I just uploaded
+it. (Apologies to those who have been waiting.) </P>
+
+<P><I>Source code for Z80 CamelForth is available on this site at <A HREF="http://www.camelforth.com/public_ftp/cam80-12.zip">http://www.camelforth.com/public_ftp/cam80-12.zip</A>.</I></P>
+
+<H2><A NAME="FIGURE1"></A>FIGURE 1. Z80 CP/M CAMELFORTH MEMORY MAP </H2>
+
+<P>assuming CP/M BDOS starts at ED00 hex. </P>
+
+<PRE>0000 +-----------------------+
+     |      CP/M stuff       |
+0080 +-----------------------+
+     | Terminal Input Buffer |
+     |                       |
+0100 +-----------------------+
+     |                       |
+     | CamelForth Z80 kernel |
+     |                       |
+1700 +-----------------------+
+     | User definitions      |
+     |                       |
+     |                       |   / EB00 reserved     
+     ~~~~~~~~~~~~~~~~~~~~~~~~~  /  EB02 <B>&gt;IN</B>          
+     |                       | /   EB04 <B>BASE</B>         
+EB00 +-----------------------+/    EB06 <B>STATE</B>        
+     | User Area             |     EB08 <B>DP</B>           
+     |                       |\    EB0A,EB0C <B>'SOURCE
+</B>     |                       | \   EB0E <B>LATEST</B>       
+     |       Parameter Stack |  \  EB10 <B>HP</B>           
+EC00 +-----------------------+   \ EB12 <B>LP</B>           
+     |                       |
+     |   HOLD working buffer |
+EC28 +-----------------------+
+     | PAD buffer            |
+     |                       |
+EC80 +-----------------------+
+     | Leave stack*          |
+     |                       |
+     |                       |
+     |          Return stack |
+ED00 +-----------------------+
+     |                       |
+     |         CP/M          |
+     |                       |
+FFFF +-----------------------+
+</PRE>
+
+<P>* used during compilation of DO..LOOPs.</P>
+
+<H2><A NAME="FIGURE2"></A>FIGURE 2. HEADER STRUCTURES </H2>
+
+<PRE>    CamelForth        Fig-Forth          Pygmy Forth            F83
+                                                        
+ D7           D0    D7           D0    D7           D0    D7           D0
++---------------+  +-+-+-+---------+  +---------------+  +---------------+
+|               |  |1|P|S| length  |  |               |  |               |
+|-    link     -|  +-+-+-+---------+  |-    view     -|  |-    view     -|
+|               |  |               |  |               |  |               |
++-------------+-+  |-    name     -|  +---------------+  +---------------+
+|      0      |P|  |               |  |               |  |               |
++-+-----------+-+  ~~~~~~~~~~~~~~~~~  |-    link     -|  |-    link     -|
+|S|   length    |  |               |  |               |  |               |
++-+-------------+  +-+            -|  +-+-+-+---------+  +-+-+-+---------+
+|               |  |1|             |  |0|0|S| length  |  |1|P|S| length  |
+|-    name     -|  +-+-------------+  +-+-+-+---------+  +-+-+-+---------+
+|               |  |               |  |               |  |               |
+~~~~~~~~~~~~~~~~~  |-    link     -|  |-    name     -|  |-    name     -|
+|               |  |               |  |               |  |               |
+|-             -|  +---------------+  ~~~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~
+|               |                     |               |  |               |
++---------------+                     |-             -|  +-+            -|
+                                      |               |  |1|             |
+                                      +---------------+  +-+-------------+
+
+</PRE>
+
+<P><B>Link</B> - in CamelForth and Fig-Forth, points to the previous word's
+Length byte. In Pygmy Forth and F83, points to the previous word's Link.
+</P>
+
+<P><B>P</B> - Precedence bit, equals 1 for an IMMEDIATE word (not used
+in Pygmy). </P>
+
+<P><B>S</B> - Smudge bit, used to prevent FIND from finding this word.
+</P>
+
+<P><B>1</B> - in Fig-Forth and F83, the length byte and the last character
+of the name are flagged with a 1 in the most significant bit (bit 7). </P>
+
+<P><B>View</B> - in Pygmy Forth and F83, contains the block number of the
+source code for this word. </P>
+
+<P><A HREF="moving7.htm">Continue with Part 7</A> |
+<A HREF="index.html">Back to publications page</A></P>
+
+</BODY>
+</HTML>
