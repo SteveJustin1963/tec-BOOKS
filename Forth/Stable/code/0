@@ -1,0 +1,15 @@
+This is block 0, the index block. Enter all your block numbers here with a
+short description. A block can directly be loaded from STABLE.
+
+Command line:
+  Enter ESC to reset current number value to 0.
+  Enter block number. Then enter one of the keys (e, l, d, r, q, c).
+
+BLOCK-INDEX
+ 1 scratch (now with hello world)
+ 8 Terminal ANSI sequences
+ 9 instruction set documentation
+10 mandel
+11 After mandel, Display I was here :-)
+98 endless loop test (CTRL-C)
+99 command line

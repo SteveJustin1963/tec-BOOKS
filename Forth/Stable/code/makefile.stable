@@ -1,0 +1,13 @@
+CFLAGS=-Wimplicit -Wunused -Wformat -Werror -Wreturn-type \
+	-Wmissing-prototypes -funsigned-char -Wno-parentheses \
+	-D_GNU_SOURCE -Wno-pointer-sign -Wno-invalid-source-encoding \
+	-Wno-unused-result -fPIC -fomit-frame-pointer -O3
+ALL=stable stable_fast stable.ori stable_debug
+all: $(ALL)
+stable:
+
+stable.ori: stable.ori.c
+	cc -Wno-implicit-int -Wno-return-type -Wno-implicit-function-declaration stable.ori.c -o stable.ori
+
+clean:
+	rm -f $(ALL)

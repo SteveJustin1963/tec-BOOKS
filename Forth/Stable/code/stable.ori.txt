@@ -1,0 +1,46 @@
+stable.c
+
+STAck Bytecode Language & Engine
+From Sandor Schneider
+
+Inspired by: "Forth" & "False" languages.
+Interpreter < 6K ! the instructions 1 byte long.
+
+prog[2000]    - program memory
+st[30..55]    - 26 possible subroutine address A..Z
+st[0..25]     - 26 data registers a..z  ... writing x: reading x;
+				  they also can be loaded from command line arguments 1..26  --->  a..z
+st[100..2000] - data stack & n to 1999 operative memory n > stack end!! own risk...
+ret[400]      - instruction return stack
+stdin         - input, redirection  < <file>
+stdout        - output,  "          > <file>
+
++ - * / % & | - two variable operations
+_ ~           - one variable operations
++ -           - register increment, decrement if register mark preceedes.
+#             - duplicates stack top
+\             - drops stack top
+$             - stack 0 1 swap
+@             - stack 0 1 2 rotate
+'......'      - text onto stack NewLine(s) as well (reversed order will be!)
+^             - 1 char  from stdin onto stack top
+,             - 1 char  from stack top to stdout
+.             - decimal from stack top to stdout
+"......"      - text to stdout NewLine char as well !
+{X....}       - subroutine definition, where X can be A..Z
+A..Z          - subroutine call eg.  D
+[.....]       - cycle if stack[top] != 0
+(.....)       - if  - if stack[top] != 0
+=             - equals
+~             - NOT
+=~            - NOT =
+>             - greater
+<             - less
+>~            - not greater
+0-999999999   - decimal number, puts onto stack top
+a..z          - register mark
+:             - from stack top to marked register
+;             - from marked register to stack top
+!             - from stack top to memory, address in marked register.
+?             - from memory onto stack top, address in marked register.
+IF THEN ELSE  - ^49=("true")~("false")  true, if you typed 1

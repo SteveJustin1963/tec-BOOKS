@@ -1,0 +1,27 @@
+CSI ...  ESC [
+
+CSI J    clear from cursor to end of screen
+CSI 1 J  clear from cursor to beginning of screen
+CSI 2 J  clear entire screen and moves cursor home
+CSI K    clear from cursor to EOL, cursor not changed
+CSI 1 K  clear from cursor to beginning of line
+CSI 2 K  clear entire line
+CSI s    save cursor pos
+CSI u    restore cursor pos
+CSI y;xH move cursor to row y column x
+CSI A    Cursor UP
+CSI B    Cursor DOWN
+CSI C    Cursor RIGHT
+CSI D    Cursor LEFT
+CSI n m  Select graphic rendition
+         After CSI zero or more parameter
+CSI m    is treaded as  CSI 0 m => reset
+    1    bold
+	 4    underline
+	 7    reverse
+   11-19 Alternative font (n-10)
+   24    underline off
+	27    inverse off
+	30-37	Set foreground color 0=black   1=red  2=green 3=yellow 4=blue
+	40-47	Set background color 5=magenta 6=cyan 7=white
+	      combined: \e[1;31m for bold red
