@@ -1,0 +1,3 @@
+WinAPE Automatic Update Executable Updater Version 2.0
+
+Command Line: "C:\Users\TechFast Australia\Desktop\WinAPE20B2\Update.exe"  /O
