@@ -1,1 +1,0 @@
-FORTH Direct Execution Processors in the Hopkins Ultraviolet Telescope
