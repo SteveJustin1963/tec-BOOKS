@@ -1,0 +1,138 @@
+CF83 Forth User's Guide - Page 1 of 8 
+
+
+                                                                                          CF83 Forth                                                                                                                 Copyright  (c)  1991                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL  60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                        "Thou shalt not steal"                                               Exodus 20:15                                                                                           CF83 is a 1983 Standard Forth for the CoCo II or III, operating under RS-DOS only.  It does not run under OS-9.  Its behavior   with a foreign DOS (e.g. ADOS, etc.) has not been explored.  If you get it to run under a foreign DOS, let us know.                                                                             Before you do anything else, BACKUP THE DISK!                                                                                   This is MOST IMPORTANT - It is much easier to corrupt a disk    with CF83 than it is with BASIC, and at these prices we cannot  replace disks you damage.  If you corrupt your master disk, youronly remedy is to buy a new copy of CF83.  BACKUP THE DISK!! PUTTHE MASTER AWAY!  ONLY USE THE BACKUP!!                                                                                         CF83 is the foundation disk of the CF83 Forth System.  The CF83 System as a whole, in keeping with the forth tradition, is a    collection of individual modules on separate disks so that you  can buy what you need, ONLY what you need, and ONLY when you    need it.  This keeps your cost as low as possible.  You are not forced to pay a big price for a big, full-featured system unlessthat is what you want.                                                                                                          CF83 itself, on this disk, only includes the Required Word Set  of the Forth-83 Standard.  The Double Number Extension Word Set,System Extension Word Set, Block Editor, and other extensions   must either be purchased separately, or you must develop your   own versions using just this foundation disk.  It IS possible todevelop a very complete and diversified system beginning with   just this CF83 foundation disk -- but it won't be easy (unless, of course, you are a true forth guru!).                                                                                         Also in the same forth tradition, this User's Manual does not   attempt to teach you forth or forth programming.  This manual   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83 Forth User's Guide - Page 2 of 8 
+
+
+assumes that you are intimately familiar with both the Forth-83 Standard and with forth programming in general.                                                                                 If you are not familiar with the Forth-83 Standard, you can     purchase BDS Software's product CF83-1: The CF83 Technical      Reference Manual.  Alternatively (or additionally if you choose)you can purchase the FORTH-83 STANDARD, published by the Forth  Interest Group (FIG), P.O. Box 8231, San Jose, CA 95155, phone  (408) 277-0668, fax (408) 286-8988.                                                                                             The price for the FORTH-83 STANDARD is $15.00.  All prices      quoted in this manual are those appearing in the March/April    1991 issue of FORTH DIMENSIONS, FIG's bimonthly journal, and aresubject to change without notice.  The prices are for USA,      Canada, and Mexico delivery - prices are higher for other       delivery locations.  A $3.00 handling fee is added to all       orders and California Sales Tax must be included if you live in California.  FIG members get a 10% discount and membership costs$40.00 per year.  Membership includes 6 bimonthly issues of     FORTH DIMENSIONS.                                                                                                               If you are not familiar with forth programming in general, you  can purchase BDS Software's product CF83-2: The CF83 Forth      Tutorial.  We strongly recommend that you buy the second editionof STARTING FORTH by Leo Brodie, $29.00 from FIG.  If you don't want to buy both, get STARTING FORTH instead of CF83-2.  We feelthat STARTING FORTH is the best introduction to forth program-  ming available anywhere.                                                                                                        Another excellent reference for beginning forth programmers is  FORTH: A TEXT AND REFERENCE, by Mahlon G. Kelly and Nicholas    Spies, available from FIG for $31.00.                                                                                           To start CF83, turn your CoCo off and then back on, insert the  BACKUP of your CF83 disk in drive #0, and enter RUN "CF83".     When the drive light goes out, IMMEDIATELY remove the CF83 disk to avoid any possibility of its being corrupted.                                                                                If you have any CF83 Block Disks containing extensions and/or   applications that you wish to load, put them in the appropriate disk drive(s), and enter the required load command(s).                                                                          If you wish to make CF83 Block Disks with your own applications,just use blank, formatted floppy disks in the appropriate drivesfor the blocks to be written to.  Note that CF83 Block Disks areNOT organized by files and do NOT have disk directories - keep aseparate record of what each CF83 Block Disk contains.                                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83 Forth User's Guide - Page 3 of 8 
+
+
+  ** BLOCKS                                                                                                                     Each floppy disk used as a Block Disk can contain up to 157     Blocks.  Which Block Numbers address the disk depend on which   drive the disk is in.  The block numbers addressed by the disk  drives are as follows:                                                                             The drive number determines       DRIVE #    BLOCK NUMBERS      the Block Numbers.  For                                         example, if you are working          0           0 - 156        with Block 7 in Drive 0, and         1         157 - 313        then move the disk to Drive          2         314 - 470        1; in order to address the           3         471 - 627        same block, you must refer                                      to it as Block 164.                                              ( i.e. 164 = 157 + 7 ).                                                                     If you have not purchased the CF83 Block Editor, you will need  some other method of putting information into Blocks for later  loading into your system.  The simplest approach is to add the  following word to your system:                                       decimal                                                         : make-block ( +n -- ) cr block dup 1024 32 fill 1024                expect update ;                                                                                                       The Block Number +n must be on the top of the stack when you    execute this word.  While this word is simple in design, it is  not so simple to use.  It requires you to enter the entire Blockas a single string of up to 1024 characters.  You must NOT use  the ENTER key until the entire string is input.  If you want to end a line and go to the next line, you must repeatedly use the spacebar until the cursor is at the beginning of the next line.                                                                 If you make an error and notice it before you touch the ENTER   key, you can correct it by backspacing to the location of the   error, but then you must retype not only the error but also     everything that came after it.  If you do not notice the error  until after you have touched the ENTER key, you have no choice  but to begin the Block all over again with another execution of make-block.                                                                                                                     With make-block, there is no way to edit an existing Block.     Once you touch the ENTER key the Block is saved (and is         essentially "cast in concrete" unless you completely redo it).                                                                  However, if you later purchase the CF83 Block Editor (or        develop your own editor) you CAN go back and edit any Blocks youpreviously made with make-block.                                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83 Forth User's Guide - Page 4 of 8 
+
+
+  ** KEYBOARD LAYOUT                                                                                                            The keyboard layout is the same as under BASIC except for the   following characters:                                             CHARACTER  CODE  KEYPRESS COMBINATION                               [        91      CLEAR 8             CODE = Decimal ASCII       \        92      CLEAR /                     Code.              ]        93      CLEAR 9                                        ^        94      CLEAR :             For Keypress Combina-    _          95      SHIFT @              tion, hold down the       `        96      CLEAR 7              left listed key or        {       123      CLEAR ,              keys and then press       |       124      SHIFT CLEAR          the right listed          }       125      CLEAR .              key.                      ~       126      CLEAR SHIFT :                                                                                              ** KEYBOARD CODES                                                                                                             You can actually enter any byte value from zero to 255 with a   single keypress or keypress combination.  Because the Forth-83  Standard word KEY only accepts ASCII values (0 through 127) you will have to add the following word to your system in order to  access the full range of byte values:                                16 base !                                                       create ekey ( -- 8b ) here dup 2- ! 3406 , BD3F , AA4F ,           3704 , 3606 , 3506 , AEA1 , 6E91 ,                           decimal                                                    EKEY works the same as KEY except that it accepts any byte valuefrom 0 through 255.  In the following list, CL = CLEAR, SH =    SHIFT, EN = ENTER, BR = BREAK, UA = Up Arrow, DA = Down Arrow,  LA = Left Arrow, RA = Right Arrow, and SP = Spacebar.                                                                           SH 0 toggles between upper case and lower case.  In lower case, the following keypresses and keypress combinations return the   byte value indicated.  Keypress combinations require that you   hold the left listed key or keys down while pressing the right  listed key.  For example, CL f means hold the CLEAR key down    while pressing the f key, and CL @ h means hold the CLEAR key   and @ key down while pressing the h key.                                                                                        BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS                                                                     0  CL @ 0       5  CL RA       10  DA          15  CL @ 2    ÿÿÿ1  CL SP        6  CL DA       11  UA          16  CL @ 3       2  CL EN        7  CL UA       12  CL BR       17  CL @ 4       3  BR           8  LA          13  EN          18  CL @ 5       4  CL LA        9  RA          14  CL @ 1      19  CL @ 6                                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83 Forth User's Guide - Page 5 of 8 
+
+
+BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS                                                                    20  CL @ 7      33  SH 1        46  .           59  ;           21  SH LA       34  SH 2        47  /           60  SH ,        22  SH RA       35  SH 3        48  0           61  SH -        23  SH DA       36  SH 4        49  1           62  SH .        24  SH UA       37  SH 5        50  2           63  SH /        25  CL @ 8      38  SH 6        51  3           64  @           26  CL @ 9      39  SH 7        52  4           65  SH a        27  CL @ a      40  SH 8        53  5           66  SH b        28  CL @ b      41  SH 9        54  6           67  SH c        29  CL @ c      42  SH :        55  7           68  SH d        30  CL @ d      43  SH ;        56  8           69  SH e        31  CL @ e      44  ,           57  9           70  SH f        32  SP          45  -           58  :           71  SH g                                                                      BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS                                                                    72  SH h        85  SH u        98  b          111  o           73  SH i        86  SH v        99  c          112  p           74  SH j        87  SH w       100  d          113  q           75  SH k        88  SH x       101  e          114  r           76  SH l        89  SH y       102  f          115  s           77  SH m        90  SH z       103  g          116  t           78  SH n        91  CL 8       104  h          117  u           79  SH o        92  CL /       105  i          118  v           80  SH p        93  CL 9       106  j          119  w           81  SH q        94  CL :       107  k          120  x           82  SH r        95  SH @       108  l          121  y           83  SH s        96  CL 7       109  m          122  z           84  SH t        97  a          110  n          123  CL   
+BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS                                                                   124  SH CL      137  CL @ SH ;  150  CL @ j     163  CL SH d    125  CL .       138  CL SH ;    151  CL @ k     164  CL SH e    126  CL SH :    139  CL @ f     152  CL @ l     165  CL SH f    127  CL -       140  CL @ g     153  CL @ m     166  CL SH g    128  CL SH 1    141  CL @ h     154  CL ;       167  CL SH h    129  CL SH 2    142  CL @ i     155  CL SH ,    168  CL SH i    130  CL SH 3    143  CL 0       156  CL SH -    169  CL SH j    131  CL SH 4    144  CL 1       157  CL SH .    170  CL SH k    132  CL SH 5    145  CL 2       158  CL SH /    171  CL SH l    133  CL SH 6    146  CL 3       159  CL @ ,     172  CL SH m    134  CL SH 7    147  CL 4       160  CL SH a    173  CL SH n    135  CL SH 8    148  CL 5       161  CL SH b    174  CL SH o    136  CL SH 9    149  CL 6       162  CL SH c    175  CL SH p                                                                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83 Forth User's Guide - Page 6 of 8 
+
+
+BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS                                                                   176  CL SH q    189  CL @ q     202  CL k       215  CL x       177  CL SH r    190  CL @ r     203  CL l       216  CL y       178  CL SH s    191  CL @ s     204  CL m       217  CL z       179  CL SH t    192  CL a       205  CL n       218  CL @ SH a  180  CL SH u    193  CL b       206  CL o       219  CL @ SH b  181  CL SH v    194  CL c       207  CL p       220  CL @ SH c  182  CL SH w    195  CL d       208  CL q       221  CL @ SH d  183  CL SH x    196  CL e       209  CL r       222  CL @ SH e  184  CL SH y    197  CL f       210  CL s       223  CL @ SH f  185  CL SH z    198  CL g       211  CL t       224  CL @ SH g  186  CL @ n     199  CL h       212  CL u       225  CL @ SH h  187  CL @ o     200  CL i       213  CL v       226  CL @ SH i  188  CL @ p     201  CL j       214  CL w       227  CL @ SH j                                                                 BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS  BYTE  KEYPRESS                                                                   228  CL @ SH k  235  CL @ SH r  242  CL @ SH y  249  CL @ y     229  CL @ SH l  236  CL @ SH s  243  CL @ SH z  250  CL @ z     230  CL @ SH m  237  CL @ SH t  244  CL @ t     251  CL @ SH 1  231  CL @ SH n  238  CL @ SH u  245  CL @ u     252  CL @ SH 2  232  CL @ SH o  239  CL @ SH v  246  CL @ v     253  CL @ SH 3  233  CL @ SH p  240  CL @ SH w  247  CL @ w     254  CL @ SH 4  234  CL @ SH q  241  CL @ SH x  248  CL @ x     255  CL @ SH 5                                                                 After making a keypress combination, you must release all keys  before making another keypress or keypress combination - CF83   does not provide for repeating of keypresses: you will have to  develop your own "repeating" forth words if you want to have a  repeating keypress feature.                                                                                                       ** MEMORY MAP                                                                                                                 ADDRESSES (HEX)     CONTENTS                                                                                                      0000 - 09FF       System Variables, Buffers, and Stacks         0A00 - 21FF       Screen Memory                                 2200 - 31FF       Block Buffers (4)                             3200 - 5D3D       Low Level System Routines                     5D3E - 6DA1       System Dictionary Space (4,196 bytes)         6DA2 - FEFF       Application Dictionary Space (37,214 bytes)   FF00 - FFFF       Memory Mapped Hardware I/O                                                                                  The Application Dictionary Space is the free memory space you   have available for your applications.  The map shows the entire address space of the CoCo II (logical address space - CoCo III).                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83 Forth User's Guide - Page 7 of 8 
+
+
+The Data Stack space and Return Stack space are each 512 bytes. The Terminal Input Buffer space is 256 bytes.  The PAD Buffer   space is 150 bytes.                                                                                                             The system loads without using any mass storage Blocks.         Therefore, all of the mass storage Blocks are available to      applications.  Blocks 0 through 156 are available if you have   one floppy disk drive.  Blocks 0 through 313 are available if   you have two drives.  Blocks 0 through 470 are available if you have three drives.  And, Blocks 0 through 627 are available if  you have the CoCo's maximum of four floppy disk drives.                                                                         CF83 requires a 64K Coco II, 128K CoCo III, or 512K CoCo III;   with at least one RS-DOS floppy disk drive; and a monochrome,   composite color, or RGB color monitor (or TV set).
+  ** ERROR HANDLING                                                                                                             In the Forth tradition, CF83 does very little error trapping on its own.  This allows you to design your own error trapping for the development period and then remove any unnecessary error    trapping after your system or program is complete - thus gainingspeed.                                                                                                                          For most errors, CF83 just blithely continues on with its usual processing. (This generally results in a system CRASH!).  When  the system crashes, it may corrupt any disks in the disk drives.Therefore:                                                                        BACKUP EVERYTHING!   OFTEN!!!                                                                                 Seven types of error result in a system restart and the message:                                                                     X ERROR - CF83 Restart                                                                                                     where X is the Error Number (1-7) as follows:                                                                                        ERROR #    ERROR                                                                                                                   1       Block Number out of range 0-627 decimal.                2       Disk Status Byte error. *                               3       Attempt to CREATE without a following wordname.         4       No word match on using ' (tick).                        5       Attempt to load Block #0. (#0 is not loadable).         6       Attempt to use a 26th vocabulary. (limit = 25).         7       FORGET deleted the compilation vocabulary.                                                                      * A Disk Status Byte error occurs when a disk read/write        operation could not be successfully completed.  This generally  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83 Forth User's Guide - Page 8 of 8 
+
+
+is due to a bad or corrupted disk, but it can also occur if you attempt to address a drive you don't have (e.g. drive #2 when   you only have drive #0 and drive #1).  It will also happen if   you attempt to address an empty drive (i.e. you forgot to put   the disk in the drive).  In this event, the system will either:                                                                      1.  Jam and do nothing until you insert a disk, or                                                                              2.  Do five sets of 4 "grinds" each, output 84 lines of             junk to the screen, and give the 2 ERROR - CF83 Restart         message.                                                                                                               In case no. 2, the proper procedure is to turn the CoCo off and start over.  Attempting to insert a disk between "grinds" is    dangerous - proceed at your own risk!                                                                                             ** A FEW IDIOSYNCRASIES                                                                                                       Most forths use a decimal point to indicate a double number.    CF83 accepts either a decimal point or a percent sign (%),      anywhere in the character stream representing the number, to    indicate a double number.  This was done to allow telling the   difference between double numbers and floating point numbers    when a floating point number package is developed at some point in the future.  You, as an individual programmer, can make use  of this feature also if you wish.  Because of this, if an error occurs, CF83 may report a number input in one form as the other.For example, if in hexadecimal base, you input ffe35.2a (it     should be FFE35.2A), CF83 may respond ffe35%2a ?                                                                                Which points out another idiosyncracy.  CF83 generally treats   upper case and lower case as equal, except in numbers.  Thus,   if you define a word named test, the inputs test, TEST, Test,   teSt, tEST, etc. will all execute that word.  But, while EA61 isa valid hexadecimal number, ea61 is not.                                                                                        Technically, you can use any number base from 2 to 255, but     number bases greater than 72 will be extremely confusing and    difficult to use because the higher digits can not be properly  represented on the screen.  The base 72 digit set is 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~.  The digit set for any lower number base is simply the 72 digit  set truncated to the number of digits equal to the number base, e.g. the base 17 digit set would be 0123456789ABCDEFG.                                                                          In addition to the forth vocabulary, CF83 will support up to 25 additional vocabularies at any given time.                                                                    ** END **         
+
+
+
+
+
+
+
+
+
+
+
+
+

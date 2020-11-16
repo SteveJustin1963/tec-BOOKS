@@ -1,0 +1,340 @@
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 1 of 20 
+
+
+      CF83-8: Uncontrolled Reference Words Plus Set Manual                                 CF83 Forth                                                                                                                 Copyright  (c)  1992                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $15.00 with the User's Guide on disk only, or   for $19.00 with a printed copy of the User's Guide included.    These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was still $15.00 +3.00 handling for US, Canada, or Mexico       delivery as of April 1992.  California Residents add sales tax.                                                                 Some of this manual was copied directly from the Forth-83       Standard, and is subject to copyright by the FORTH Standards    Team; used by permission.  In many cases, the copied material   has been modified to specifically describe features of CF83.    Such changes were not incorporated in the original copyrighted  Forth-83 Standard.                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 2 of 20 
+
+
+                                                                Use:    81 LOAD    to load the set.                                                                                             This Uncontrolled Reference Words Plus Set is divided into six  sections as follows:                                                                                                            1.  A portion of the Uncontrolled Reference Words Set from the  Forth-83 Standard.  Many of the words in that set are not       included because they were either inapplicable or were (or will be) covered elsewhere.                                                                                                          2.  A set of Case Structure words.                                                                                              3.  A set of String Operations words.                                                                                           4.  A set of Printer Control words.                                                                                             5.  A set of Word Structure Relations words.                                                                                    6.  Miscellaneous words.                                                                                                        1.  WORDS FROM THE FORTH-83 STANDARD                                                                                            !BITS               ( 16b1 addr 16b2 -- )       "store-bits"         Store the value of 16b1 masked by 16b2 into the equivalent      masked part of the contents of addr, without affecting          bits outside the mask.                                                                                                     **                  ( n1 +n2 -- n3 )            "power"              n3 is the value of n1 to the power n2.                                                                                     1+!                 ( addr -- )                "one-plus-store"      Add one to the 16-bit contents at addr.                                                                                    1-!                 ( addr -- )               "one-minus-store"      Subtract one from the 16-bit contents at addr.                                                                             <>                  ( w1 w2 -- flag )           "not-equal"          flag is true if w1 is not equal to w2.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 3 of 20 
+
+
+<BUILDS             ( -- )                      "builds"             Used in conjunction with DOES> in defining words, in the        form:                                                                     : <namex> ... <BUILDS ... DOES> ... ;                 and then:                                                                 <namex> <name>                                        When <namex> executes, <BUILDS creates a dictionary entry       for the new <name>.  The sequence of words between <BUILDS      and DOES> established a parameter field for <name>.  When       <name> is later executed, the sequence of words following       DOES> will be executed, with the parameter field address        of <name> on the data stack.                                                                                               <CMOVE              ( addr1 addr2 u -- )       "reverse-c-move"      A synonym for CMOVE> .                                                                                                     ><                  ( 16b1 -- 16b2 )            "byte-swap"          Swap the high and low bytes within 16b1.                                                                                   @BITS               ( addr 16b1 -- 16b2 )       "fetch-bits"         Return the 16-bits at addr masked by 16b1.                                                                                 AGAIN               ( -- )                                           Effect an unconditional jump back to the start of a BEGIN-      AGAIN loop.  See:  BEGIN in the Technical Reference             Manual's CF83 Word List.                                                                                                   ASCII               ( -- char )                 "as-key"             Used in the form:                                                         ASCII ccc                                             where the delimiter of ccc is a space.  char is the ASCII       character value of the first character in ccc.  If              interpreting, char is left on the stack.  If compiling,         compile char as a literal so that when the colon defini-        tion is later executed, char is left on the stack.                                                                         ASHIFT              ( 16b1 n -- 16b2 )          "a-shift"            Shift the value 16b1 arithmetically n bits left if n is         positive, shifting zeros into the least significant bit         positions.  If n is negative, 16b1 is shifted right; the        sign is included in the shift and remains unchanged.                                                                       B/BUF               ( -- 1024 )              "bytes-per-buffer"      A constant leaving 1024, the number of bytes per block          buffer.                                                                                                                                                                                                                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 4 of 20 
+
+
+DPL                 ( -- addr )             "d-p-l"                  A variable containing the number of places after the            fractional point for input conversion.                                                                                     FLD                 ( -- addr )             "f-l-d"                  A variable pointing to the field length reserved for a          number during output conversion.                                                                                           H.                  ( u -- )                "h-dot"                  Output u as a hexadecimal integer with one trailing blank.      The current base is unchanged.                                                                                             INDEX               ( u1 u2 -- )                                     Print the first line of each screen over the range              u1..u2.  This displays the first line of each screen of         source text, which conventionally contains a title.                                                                        LAST                ( -- addr )                                      A variable containing the address of the beginning of the       last dictionary entry made, which may not yet be a              complete or valid entry.                                                                                                   LOADS               ( u -- )                                         A defining word executed in the form:                                     u LOADS <name>                                        When <name> is subsequently executed, block u will be           loaded.                                                                                                                    MASK                ( n -- 16b )                                     16b is a mask of n most-significant bits if n is positive,      or n least-significant bits if n is negative.                                                                              MS                  ( +n -- )               "m-s"                    Delay for approximately +n milliseconds.                                                                                   NAND                ( 16b1 16b2 -- 16b3 )                            16b3 is the one's complement of the logical AND of 16b1         with 16b2.                                                                                                                 NOR                 ( 16b1 16b2 -- 16b3 )                            16b3 is the one's complement of the logical OR of 16b1          with 16b2.                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 5 of 20 
+
+
+NUMBER              ( addr -- d )                                    Convert the count and character string at addr, to a            signed 32-bit integer, using the value of BASE .  If            numeric conversion is not possible, an error condition          exists.  The string may contain a preceding minus sign.         Note that the character string MUST include the % or .          double number identifier.  If . is the identifier,              number may change it to the % identifier within the             string.                                                                                                                    O.                  ( u -- )                  "o-dot"                Print u in octal format with one trailing blank.  The           value in BASE is unaffected.                                                                                               ROTATE              ( 16b1 n -- 16b2 )                               Rotate 16b1 left n bits if n is positive, right n bits if       n is negative.  Bits shifted out of one end of the cell         are shifted back in at the opposite end.                                                                                   S0                  ( -- addr )               "s-zero"               A variable containing the address of the bottom of the          stack.                                                                                                                     SHIFT               ( 16b1 n -- 16b2 )                               Logical shift 16b1 left n bits if n is positive, right n        bits if n is negative.  Zeros are shifted into vacated bit      positions.                                                                                                                 WORDS               ( -- )                                           List the word names in the currently active search order.       In CF83, this includes all the words in all the                 vocabularies in the currently active search order, not just     the words in the first vocabulary as indicated in the           Forth-83 Standard.                                                                                                                                                                         2.  CASE STRUCTURE WORDS                                                                                                        A case structure is analogous to BASIC's ON X GOSUB statement.  It allows you to execute one of several statements depending on the number that is on top of the stack at the time that the casestructure is entered.  An example of case structure usage is as follows:                                                                                                                                                                                                                                                                                                                                                                                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 6 of 20 
+
+
+  : report ( n -- )                                                  CASE                                                              1 OF= ." You entered a one. " ENDOF                             2 OF= ." You entered a two. " ENDOF                             7 OF< ." Your entry was less than seven. " ENDOF                6 15 OFRNG ." Between six and fifteen, noninclusive."                             ENDOF                                         14 OF> ." Greater than fourteen. " ENDOF                        OFOTHER ." Less than one. " ENDOF                             ENDCASE ;                                                                                                                  As can be noted from the above, each case structure must begin  with CASE and must end with ENDCASE.  Each comparison within thecase structure must begin with an "OF" comparison and must end  with ENDOF.  The OF=,  OF<,  and OF> comparison operators must  be preceded by placing the number to be compared to on the top  of the stack.  The OFRNG comparison operator must be preceded byplacing first the low limit and then the high limit of the rangeon the stack.  The OFOTHER operator, if used, must be the last  in the list and automatically covers all conditions not         otherwise covered in the preceding comparisons.  Use of the     above example would result in:                                                                                                    5 report Your entry was less than seven. ok                     1 report You entered a one. ok                                  -23 report Less than one. ok                                    45 report Greater than fourteen. ok                                                                                           The case structure words are:                                                                                                   CASE                ( n -- )                                         Define a case structure.                                                                                                   ENDCASE             ( addr1...addrn -- )                             End a case structure.                                                                                                      ENDOF               ( addr1 -- addr2 )                               End an OF branch of a case structure.                                                                                      OF<                 ( -- addr )                                      Start a branch in a case structure, when a "less than"          condition is met.                                                                                                          OF=                 ( -- addr )                                      Start a branch in a case structure, when an equal               condition is met.                                                                                                                                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 7 of 20 
+
+
+OF>                 ( -- addr )                                      Start a branch in a case structure, when a "greater             than" condition is met.                                                                                                    OFOTHER             ( -- addr )                                      Start an unconditional branch in a case structure.                                                                         OFRNG               ( -- addr )                                      Start a branch in a case structure, when a range                condition is met.                                                                                                                                                                          3.  STRING OPERATIONS WORDS                                                                                                     These words provide a complete string handling package for      CF83.  The package includes words analogous to all the string   handling words of BASIC, as well as several other convenient    words.  The package uses a string stack and also includes words analogous to CF83's standard words such as dup, drop, swap, rot,etc. to make the handling of strings almost as simple as the    stack handling of numbers.  For convenience, all string         operations words begin with a dollar sign ($).                                                                                  The package is based on a string stack ($tack) which is         initialized to 1024 bytes in size when the Word Set is loaded.  You cannot change the stack size after the Word set is loaded,  but you CAN alter the size specification before loading the     set.  To do this, you would change the 1024 in line six of      block 90 of the Word set to whatever value you need.                                                                            For example, if you need 2048 bytes in the $tack, you would     change the line from:                                                                                                             create $tack 1024 allot here dup ...                                                                                          to:                                                                                                                               create $tack 2048 allot here dup ...                                                                                          Note in the following word definitions, that each string        operations word has two stack comments instead of just the usualone.  For example:                                                                                                                : $@ ( addr -- ) $( -- $ ) count 1+ swap 1- $p @ 2 pick ...                                                                   The ( addr -- ) comment is the standard CF83 stack comment and  describes the beginning and ending condition of the parameter   stack.                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 8 of 20 
+
+
+                                                                The $( -- $ ) comment is the string stack ($tack) comment and   describes the beginning and ending condition of the $tack.  The $ inside the comment indicates an arbitrary string on the stack.                                                                Note in the following definitions that "iff" means "if and only if".                                                                                                                            The string operations words are:                                                                                                $!                  ( addr -- ) $( $ -- )                            Remove the counted string from the top of the $tack and         store it at addr.                                                                                                          $(                  ( -- ) $( -- )                                   Begin a $tack comment.                                                                                                     $-ROT               ( -- ) $( $2 $1 $0 -- $0 $2 $1 )                 Rotate the string on the top of the $tack to the third          position on the $tack.  Note that this word uses                additional space above the current top of the $tack             as a scratchpad.  The user must be certain that the             $tack is large enough to accomodate both the                    existing $tack and the scratchpad area =maxlength($1 or $2)                                                                $.                  ( -- ) $( $ -- )                                 Display and discard the top string on the $tack.                                                                           $0                  ( -- addr ) $( -- )                              A constant pointing to the bottom of the $tack.                                                                            $0=                 ( -- flag ) $( -- )                              Return a flag which is true iff the string on the top           of the $tack is the null string.                                                                                           $<                  ( -- flag ) $( -- )                              Return a flag which is true iff the second string on            the $tack has a lower ASCII value than the top string           on the $tack.                                                                                                              $=                  ( -- flag ) $( -- )                              Return a flag which is true iff the top two strings             on the $tack have the same ASCII value.                                                                                    $>                  ( -- flag ) $( -- )                              Return a flag which is true iff the second string on            the $tack has a greater ASCII value than the top                string on the $tack.                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 9 of 20 
+
+
+                                                                $>MID               ( +n -- ) $( $1 $0 -- $1new $0 )                 Replace the substring of the second string on the               $tack beginning at the +nth character with the                  string on top of the $tack.  If $0 overruns the                 original end of $1, an error condition results.                                                                            $@                  ( addr -- ) $( -- $ )                            Copy the counted string at addr to the top of the               $tack.                                                                                                                     $CLR                ( -- ) $( $n...$0 -- )                           Clear the $tack.                                                                                                           $CNT                ( u1 -- u2 ) $( -- )                             Leave the character count of the u1st string on the             $tack on the parameter stack.  u1 = 0, 1, 2, ...                                                                           $CONSTANT           ( -- ) $( $ -- )                                 Create a string constant holding a counted string.              The counted string is taken from the top of the                 $tack.  When executed, the string constant will                 place its string on the $tack.  Example:                                                                                          47 $word dummy/ $constant dum                                                creates the $constant named dum                                                                                    dum                                                                          puts "5dummy" on the $tack                                                                                  $DEPTH              ( -- u ) $( -- )                                 Return the number (u) of strings on the $tack.                  u = 1, 2, 3, ...                                                                                                           $DROP               ( -- ) $( $ -- )                                 Remove the string on the top of the $tack and                   discard it.                                                                                                                $DUP                ( -- ) $( $ -- $ $ )                             Copy the string on the top of the $tack to the                  top of the $tack.                                                                                                          $EXPECT             ( -- ) $( -- $ )                                 Receive a string from the terminal and place it                 on top of the $tack.                                                                                                                                                                                                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 10 of 20 
+
+
+$L<                 ( -- flag ) $( -- )                              Return a flag which is true iff the second string               on the $tack is shorter than the top string on                  the $tack.                                                                                                                 $L=                 ( -- flag ) $( -- )                              Return a flag which is true iff the two strings                 on the top of the $tack are of equal length.                                                                               $L>                 ( -- flag ) $( -- )                              Return a flag which is true iff the second string               on the $tack is longer than the top string on                   the $tack.                                                                                                                 $LEADING+           ( u 8b -- ) $( $ -- $new )                       Append a string of length u bytes, with each byte               equal to 8b, to the beginning of the string on                  the top of the $tack.                                                                                                      $LEADING-           ( 8b -- ) $( $ -- $new )                         Delete all leading 8b bytes from the string on                  the top of the $tack.                                                                                                      $LEFT               ( +n -- ) $( -- $ )                              Create a new string on the top of the $tack                     which is identical to the left +n characters                    of the current top string on the $tack.                                                                                    $LEN                ( -- u ) $( -- )                                 Return the length (i.e. count) of the string on top of the      $tack.                                                                                                                     $LOWER              ( -- ) $( $ -- $lc )                             Convert the top string on the $tack to all lower case.                                                                     $MATCH              ( -- [ false ] or [ addr true ] ) $( -- )        Attempt to find the string on top of the $tack as a             substring of the second string on the $tack.  If the            string is not so found, return a false flag.  If the            string IS so found, return a true flag on top of the            address within the second string where the substring            was found.                                                                                                                 $MAX                ( -- ) $( $1 $0 -- $?)                           $? is whichever of $1 or $0 has the greater ASCII value.                                                                                                                                                                                                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 11 of 20 
+
+
+$MID                ( +n1 +n2 -- ) $( -- $ )                         Create a new string on the top of the $tack which is            identical to the +n2 characters of the current top              string on the $tack beginning with the +n1st character          of that current top string.                                                                                                $MIN                ( -- ) $( $1 $0 -- $? )                          $? is whichever of $1 or $0 has the lesser ASCII value.                                                                    $N@                 ( u -- addr ) $( -- )                            Return the address of the uth string on the $tack.              u = 0, 1, 2, ... ( 0 $N@ is the same as $P@ ).                                                                             $NIP                ( -- ) $( $1 $0 -- $0 )                          Discard the second string on the $tack.                                                                                    $NULL               ( -- ) $( -- $ )                                 Place a null string on the top of the $tack.                                                                               $OVER               ( -- ) $( $1 $0 -- $1 $0 $1 )                    Copy the string which is second on the $tack to the             top of the $tack.                                                                                                          $P                  ( -- addr ) $( -- )                              A variable pointing to the current top of the $tack.                                                                       $P@                 ( -- addr ) $( -- )                              Return the address of the current top of the $tack.                                                                        $PICK               ( +n -- ) $( $n...$0 -- $n...$0 $n )             Copy the +nth string on the $tack to the top of the             $tack.  +n = 0, 1, 2, ... ( 0 $pick is the same as              $dup and 1 $pick is the same as $over )                                                                                    $RIGHT              ( +n -- ) $( -- $ )                              Create a new string on the top of the $tack which is            identical to the right +n characters of the current             top string on the $tack.                                                                                                   $ROLL               ( +n -- )                                                     $( $n-1 $n $n+1...$0 -- $n-1 $n+1...$0 $n )        Remove the +nth string on the $tack and then place it on        the top of the $tack.  +n = 0, 1, 2, ... ( 2 $roll is           the same as $rot and 0 $roll is a null operation ).             Note that this word uses additional space above the             current top of the $tack as a scratchpad.  The user must        be certain that the $tack is large enough to accomodate         both the existing $tack and the scratchpad area = length$n.
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 12 of 20 
+
+
+                                                                $ROOM               ( -- u ) $( -- )                                 Return the number of free $tack bytes.                                                                                     $ROT                ( -- ) $( $2 $1 $0 -- $1 $0 $2 )                 Rotate the third string on the $tack to the top of the          $tack.  Note that this word uses additional space above         the current top of the $tack as a scratchpad.  The user         must be certain that the $tack is large enough to               accomodate both the existing $tack and the scratchpad           area = length$2.                                                                                                           $S.                 ( -- ) $( -- )                                   Non-destructively display the contents of the $tack.                                                                       $STR                ( d -- ) $( -- $ )                               Remove the double number on top of the parameter                stack and convert it to a counted string on top of              the $tack.  Note that the resulting string will                 include the % double number identifier.                                                                                    $STRING             ( u 8b -- ) $( -- $ )                            Place a counted string of length u bytes, with each             byte equal to 8b, on the top of the $tack.                                                                                 $SWAP               ( -- ) $( $1 $0 -- $0 $1 )                       Exchange the top two strings on the $tack.  Note that this      word uses additional space above the current top of the         $tack as a scratchpad.  The user must be certain that the       $tack is large enough to accomodate both the existing           $tack and the scratchpad area = length$1.                                                                                  $T<                 ( -- flag ) $( -- )                              Return a flag which is true iff the second string on the        $tack would have a lower ASCII value than the top string        on the $tack if the longer string were truncated to the         length of the shorter string.                                                                                              $T=                 ( -- flag ) $( -- )                              Return a flag which is true iff the two strings on the          top of the $tack would have the same ASCII value if the         longer string were truncated to the length of the               shorter string.                                                                                                                                                                                                                                                                                                                                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 13 of 20 
+
+
+$T>                 ( -- flag ) $( -- )                              Return a flag which is true iff the second string on the        $tack would have a greater ASCII value than the top             string on the $tack if the longer string were truncated         to the length of the shorter string.                                                                                       $TACK               ( -- ) $( -- )                                   The string stack.                                                                                                          $TOP                ( -- addr ) $( -- )                              A constant pointing to the top of the $tack's available         memory.                                                                                                                    $TRAILING+          ( u 8b -- ) $( $ -- $new )                       Append a string of length u bytes, with each byte equal         to 8b, to the end of the string on top of the $tack.                                                                       $TRAILING-          ( 8b -- ) $( $ -- $new )                         Delete all trailing 8b bytes from the string on the top         of the $tack.                                                                                                              $TUCK               ( -- ) $( $1 $0 -- $0 $1 $0 )                    Copy the string on the top of the $tack to the third            position on the $tack.                                                                                                     $UPPER              ( -- ) $( $ -- $uc )                             Convert the top string on the $tack to all upper case.                                                                     $VAL                ( -- d ) $( $ -- )                               Remove the counted string on the top of the $tack and           convert it to a double number on the parameter stack.           Note that the string MUST include the % or . double             number identifier.                                                                                                         $VARIABLE           ( u -- ) $( -- )                                 Create a string variable to hold a counted string a             maximum of u bytes long.  When executed, the string             variable will leave the address of the counted string           on the parameter stack.                                                                                                    $WORD               ( char -- ) $( -- $ )                            Get a string terminated by char from the input stream           and place it on the top of the $tack.                                                                                                                                                      4.  PRINTER CONTROL WORDS                                                                                                       The  printer control words are designed to output text to any   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 14 of 20 
+
+
+printer connected to your CoCo's serial port, including any     parallel printer connected to that port through a serial to     parallel converter.                                                                                                             The sending of control characters and escape sequences specific to your printer are your responsibility.  This can easily be    accomplished using the PEMIT word.                                                                                              The printer control words are:                                                                                                  P.                  ( n -- )                                         The absolute value of n is printed in a free field format       with a leading minus sign if n is negative.                                                                                PCR                 ( -- )                                           Sends a carraige return ( ASCII 13 ) to the printer.                                                                       PCRLF               ( -- )                                           Sends a carriage return and a line feed ( ASCII 13 10 )         to the printer.                                                                                                            PEMIT               ( 16b -- )                                       The least-significant 7-bit ASCII character is sent to          the printer.                                                                                                               PLF                 ( -- )                                           Sends a line feed ( ASCII 10 ) to the printer.                                                                             PSPACE              ( -- )                                           Prints and ASCII space.                                                                                                    PSPACES             ( +n -- )                                        Prints +n ASCII spaces.  Nothing is printed if +n is            zero.                                                                                                                      PTYPE               ( addr +n -- )                                   +n characters are printed from memory beginning with            the character at addr and continuing through                    consecutive addresses.  Nothing is printed if +n is             zero.                                                                                                                      PU.                ( u -- )                                          u is printed as an unsigned number in a free field              format.                                                                                                                                                                                                                                                                                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 15 of 20 
+
+
+5.  WORD STRUCTURE RELATIONS WORDS                                                                                              CF83 words have five parts as follows:                                                                                               a.  Name Field - consisting of a word name character count          byte followed by the word name itself.  The name field          address  ( nfa ) is the address of the character count          byte.  For example, in hexadecimal, the nfa of the CF83         word "DUP" is 60A8 and the name field contents are as           follows:                                                                                                                           ADDRESS     CONTENTS                                             60A8          03        The character count of DUP              60A9          44        ASCII hexadecimal code "D"              60AA          55        ASCII hexadecimal code "U"              60AB          50        ASCII hexadecimal code "P"                                                                          Note that for IMMEDIATE words, the "character count"            byte is 128 AND the actual character count.  This is            how CF83 recognizes IMMEDIATE words.  Thus, while the           actual character count of LITERAL is 7, its count byte          contains 128 AND 7 = 135.                                                                                                   b.  Link Field - two bytes containing the nfa of the                previous word in the dictionary.  The link field                address ( lfa ) is the address of the lower of the two          bytes.                                                                                                                      c.  Forward Link Field - two bytes containing the nfa of            the next word in the dictionary.  The forward link              field address ( ffa ) is the address of the lower of            the two bytes.                                                                                                              d.  Code Field - two bytes containing the address of the            machine language routine to be executed by the word.            The code field address ( cfa ) is the address of the            lower of the two bytes.                                                                                                     e.  Parameter Field - the Body of the word - the machine            language routine to be executed in the case of a code           word, or the list of words to be executed in the case           of a colon word.  The parameter field address ( pfa )           or body address is the address of the first byte in the         word's body.                                                                                                           ' (tick) returns a word's cfa on the stack.  Thus, for example, ' dup would leave 60B0 on the stack.  The Word Structure        Relations words allow the user to move from one part of a word  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 16 of 20 
+
+
+to another.  The Word Structure Relations words are:                                                                            >BODY               ( addr1 -- addr2 )                               addr1 is the cfa and addr2 is the pfa.                                                                                     >FLINK              ( addr1 -- addr2 )                               addr1 is the cfa and addr2 is the ffa.                                                                                     >LINK               ( addr1 -- addr2 )                               addr1 is the cfa and addr2 is the lfa.                                                                                     >NAME               ( addr1 -- addr2 )                               addr1 is the cfa and addr2 is the nfa.                                                                                     B>FLINK             ( addr1 -- addr2 )                               addr1 is the pfa and addr2 is the ffa.                                                                                     B>LINK              ( addr1 -- addr2 )                               addr1 is the pfa and addr2 is the lfa.                                                                                     B>NAME              ( addr1 -- addr2 )                               addr1 is the pfa and addr2 is the nfa.                                                                                     BODY>               ( addr1 -- addr2 )                               addr1 is the pfa and addr2 is the cfa.                                                                                     F>BODY              ( addr1 -- addr2 )                               addr1 is the ffa and addr2 is the pfa.                                                                                     F>LINK              ( addr1 -- addr2 )                               addr1 is the ffa and addr2 is the lfa.                                                                                     F>NAME              ( addr1 -- addr2 )                               addr1 is the ffa and addr2 is the nfa.                                                                                     FLINK>              ( addr1 -- addr2 )                               addr1 is the ffa and addr2 is the cfa.                                                                                     L>BODY              ( addr1 -- addr2 )                               addr1 is the lfa and addr2 is the pfa.                                                                                     L>FLINK             ( addr1 -- addr2 )                               addr1 is the lfa and addr2 is the ffa.                                                                                     L>NAME              ( addr1 -- addr2 )                               addr1 is the lfa and addr2 is the nfa.                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 17 of 20 
+
+
+LINK>               ( addr1 -- addr2 )                               addr1 is the lfa and addr2 is the cfa.                                                                                     N>BODY              ( addr1 -- addr2 )                               addr1 is the nfa and addr2 is the pfa.                                                                                     N>FLINK             ( addr1 -- addr2 )                               addr1 is the nfa and addr2 is the ffa.                                                                                     N>LINK              ( addr1 -- addr2 )                               addr1 is the nfa and addr2 is the lfa.                                                                                     NAME>               ( addr1 -- addr2 )                               addr1 is the nfa and addr2 is the cfa.                                                                                                                                                     6.  MISCELLANEOUS WORDS                                                                                                         -ROT                ( n1 n2 n3 -- n3 n1 n2 )                         Rotate the top element on the stack to the third position       on the stack.                                                                                                              <=                  ( n1 n2 -- flag )                                Flag is true iff n1 <= n2.                                                                                                 >=                  ( n1 n2 -- flag )                                Flag is true iff n1 >= n2.                                                                                                 ALSO                ( -- )                                           Allows the searching of multiple vocabularies.  Normally,       when you execute a vocabulary word, when a word is entered,     that vocabulary is searched and then the forth vocabulary       is searched.  If you execute a second vocabulary word, when     a word is entered, that second vocabulary is searched and       then the forth vocabulary is searched: the first vocabulary     is no longer searched.  Also allows the searching of more       than just the most recent vocabulary and the forth              vocabulary.  It is used in the form:                                                                                                 forth also xxx also yyy also zzz                                                                                                       or                                                                                                                       only also xxx also yyy also zzz                                                                                            where xxx, yyy, and zzz are vocabulary names.  The effect       of the above statements are that when a word is entered,        first the zzz vocabulary is searched, then the yyy         
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 18 of 20 
+
+
+     vocabulary is searched, then the xxx vocabulary is              searched, and finally the forth vocabulary is searched.                                                                    BCOPY               ( u1 u2 u3 -- )                                  Blocks u1 through u2 inclusive are copied to block u3           and following.  u1 must be less than u2.                                                                                   BINARY              ( -- )                                           Set the input-output numeric conversion base to two.                                                                       BYE                 ( -- )                                           Does an immediate cold start to BASIC.                                                                                     CLS                 ( -- )                                           Clears the screen.                                                                                                         COLD                ( -- )                                           Does an immediate cold start to CF83.                           WARNING - This drops all additions you have made to the         dictionary.                                                                                                                DLITERAL            ( 32b -- )                                       Compiles a system dependent operation so that when later        executed, 32b will be left on the stack.                                                                                   EXEC                ( addr -- )                                      Execute a machine language routine at addr.  The routine        must end in an RTS instruction.                                                                                            FALSE               ( -- 0 )                                         Leave a false flag on the stack.                                                                                           FBLOCK              ( +n u -- addr )                                 Force block u into block buffer +n.  +n = 0, 1, 2, or 3.        CF83 has four block buffers: #0 at hex address 2200, #1         at 2600, #2 at 2A00, and #3 at 2E00.  The standard word         BLOCK allocates these buffers dynamically, loading a            requested block into whichever buffer has been least            recently used (this is intended to minimize disk                accesses and thus maximize system speed).  FBLOCK loads         a requested block into the particular buffer specified          by the user.                                                                                                                                                                                                                                                                                                                                                                                                                                               
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 19 of 20 
+
+
+FENCE               ( -- )                                           Protects the most recently defined word and all words           defined before it from FORGET.  Attempting to FORGET            a word defined before the FENCE address in the                  dictionary will result in all words defined after               the FENCE address being forgotten.                                                                                         HIGHSPEED           ( -- )                                           Does the equivalent of BASIC's high speed poke on a             CoCo2.  Has no effect on a CoCo3.  Because of CF83's            inherent speed advantage, the high speed poke only              has a small effect on some processes and no effect              on others.  It may also overheat your CoCo2 - Use it            with caution.                                                                                                              ISQR                ( d -- +n )                                      +n is the integer portion of the positive square                root of d.  For example, the square root of 4 is 2              and 4 ISQR gives 2.  The square root of 8 is about              2.828427125 but 8 ISQR also gives 2.                                                                                       MEM                 ( -- u )                                         Return the amount of free memory in bytes.                                                                                 NIP                 ( n1 n2 -- n2 )                                  Discard the second element on the stack.                                                                                   ONLY                ( -- )                                           A synonym for FORTH in CF83 - included to maintain              compatibility with systems which have a root directory          which is a subset of the forth vocabulary.                                                                                 PACK                ( 8b1 8b2 -- 16b )                               Pack two bytes into a 16-bit cell.  The high byte is            on the top of the stack.                                                                                                   SETCURSOR           ( +n1 +n2 )                                      Set the cursor position on the screen.                          +n1 = x-coordinate ( 0 - 255 )                                  +n2 = y-coordinate ( 0 - 191 )                                  The origin of coordinates is the upper left-hand                corner of the screen.  x is positive to the right               and y is positive downwards.                                                                                               SPLIT               ( 16b -- 8b1 8b2 )                               Split a 16-bit cell into two bytes.  The high byte              is on the top of the stack.                                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-8: Uncontrolled Reference Words Plus Set Manual - Page 20 of 20 
+
+
+STDSPEED            ( -- )                                           Sets a CoCo2 to its standard 0.89 mhz clock speed.              Has no effect on a CoCo3.                                                                                                  TRUE                ( -- -1 )                                        Leave a true flag on the stack.                                                                                            TUCK                ( n1 n2 -- n2 n1 n2 )                            Copy the element on the top of the stack to the third           position on the stack.                                                                                                     TYPF                ( addr +n )                                      This is the same as TYPE except that it does not clear          character positions before typing over them.  TYPF is           useful where you know the screen area to be typed to            is already clear, or where you purposely want to type           over something ( e.g. a line drawing ) without                  erasing any of it.  TYPF is significantly faster than           TYPE.                                                                                                                      WARM                ( -- )                                           Does an immediate warm start to CF83.  Empties the              block buffers and clears the stacks, but does not               effect the dictionary.                                                                                                     \                   ( -- )                                           Comment to end of line.  Used in blocks only.  All              characters from \ to the end of the current 64                  character line are considered to be a comment when              loading the block ( i.e. they are ignored ).                                                                               \B                  ( -- )                                           Comment to end of block.  Used in blocks only.  All             characters from \B to the end of the current block              are considered to be a comment when loading the                 block ( i.e. they are ignored ).                                                                                                                                                                                                                                                                                                                                                                                                                                                       ** END **                                                                                                                                                                                                                                                                                                                                                           
+
+
+
+
+
+
+
+
+
+
+
+
+

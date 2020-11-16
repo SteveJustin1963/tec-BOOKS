@@ -1,0 +1,136 @@
+   Color Forth User Notes - as modified for operation with DECB by smp, February 2015
+
+
+    Talbot Microsystems Color Forth was originally available as a cartridge for the
+    Radio Shack Color Computer, circa 1981.
+    
+    A copy of the original manual is available on the Internet:
+        ColorForth v1.0 (Talbot Microsystems).pdf
+        http://www.colorcomputerarchive.com/coco/Documents/Manuals/Programming/
+    
+    The original manual is an indispensable aid to understanding the function and
+    capabilities of Color Forth.  It contains all the source code originally
+    compiled into the Color Forth cartridge.
+    
+    Here, I note only the updates I performed to get the code to operate properly in
+    conjunction with the Color Computer Disk Extended Color Basic.
+    
+    Not all of the Color Forth functionality is available.  Cassette I/O was cut out
+    in favor of the new disk I/O.  Some of the Forth code has been left for the user
+    to decide to enter on your own.
+    
+    New commands available in Color Forth:
+    
+    DIR (Directory)
+    This command will show the directory of the current disk.
+    
+    LSCR (Load Screens)
+    This command is used to load Forth code screens 1-8 from disk into memory.
+    Upon receiving LSCR<CR> Color Forth will take up to 8 characters as the file
+    name.  If you enter all 8 characters, Color Forth will immediately operate on
+    that as the file name.  If the file name has fewer than 8 characters, you must
+    enter a <CR> to tell Color Forth you have finished the file name.
+    
+    SSCR (Save Screens)
+    This command is used to save Forth code screens 1-8 onto disk.
+    Upon receiving SSCR<CR> Color Forth will take up to 8 characters as the file
+    name.  If you enter all 8 characters, Color Forth will immediately operate on
+    that as the file name.  If you want a file name with fewer than 8 characters,
+    you must enter a <CR> to tell Color Forth you have finished the file name.
+    
+    BASIC (Return to DECB)
+    This command executes a cold start of Disk Extended Color Basic.
+    This command provides a proper exit from Color Forth without performing a power
+    cycle or hitting the reset button.
+    
+    
+   Color Forth User Notes - as modified for operation with DECB by smp, February 2015
+
+
+    Description of the .DSK images:
+    
+    CCF-EXEC.DSK
+    
+    CC-FORTH.BIN
+    This is the executable code for Color Forth as modified for operation with DECB.
+    
+    CCF-MISC.BIN
+    This is a set of miscellaneous extensions to the Color Forth nucleus from the
+    original source code listings.  This code must be loaded prior to attempting to
+    load and use the editor.
+    
+    CCF-ED.BIN
+    This is the code for the editor.
+    Consult the original Color Forth manual for information on using the editor.
+    The CCF-MISC screens must be loaded first, for the editor to function properly.
+    
+    CCF-DOLR
+    This is a small Forth program to calculate all the ways to make $1.00 (US)
+    from change (pennies, nickels, dimes and quarters).
+
+    CCF-SRC.DSK
+    
+    CC-FORTH.ASM
+    This is the source code file for Color Forth as modified for operation with DECB.
+    
+    CCF-MISC.ASM
+    This is the source code file for a set of miscellaneous extensions to the Color
+    Forth nucleus from the original source code listings.
+    
+    CCF-ED.ASM
+    This is the source code file for the Color Forth Editor from the original source
+    code listings.
+    
+    CCF-DOLR.ASM
+    This is the source code file for a small Forth program to calculate all the ways
+    to make $1.00 (US)from change (pennies, nickels, dimes and quarters).
+
+
+
+
+
+
+   Color Forth User Notes - as modified for operation with DECB by smp, February 2015
+
+
+    Loading and running Color Forth:
+    LOADM"CC-FORTH"
+    EXEC
+    
+    Color Forth will sign on with a beep, and:
+    COLOR FORTH 1.1
+    COPYRIGHT 1981 TJZ & RJT
+    UPDATED FOR DECB, JAN 2015, SMP
+    
+    You will see the familiar Color Computer blinking cursor, and Color Forth is now
+    waiting for commands.
+    
+    Please consult the original manual, as well as other sources for information on
+    the Forth language and how to use it.
+    
+    Once Color Forth is loaded and running, if you want to add the miscellaneous
+    extensions to the Color Forth nucleus:
+    
+    LSCR<CR>CCF-MISC OK
+    4 3 2 1 LOAD LOAD LOAD LOAD<CR> OK
+    
+    In both of the command lines above, the OK is the response from Color Forth that
+    the operation has been completed successfully.
+    
+    If you want to add the editor (after you have added the miscellaneous extensions):
+    
+    LSCR<CR>CCF-ED<CR> OK
+    7 6 5 4 3 2 LOAD LOAD LOAD LOAD LOAD LOAD<CR> OK
+    
+    The editor is now available for use.  Find directions in the original manual.
+    
+    If you want to add the DOLLAR program and try it out:
+    LSCR<CR>CCF-DOLR OK
+    1 LOAD OK
+    DOLLAR<CR>
+    
+    Good luck!  I hope these user notes are helpful to get you operating with
+    Color Forth as modified for operation with DECB.
+    
+    smp, February 2015
+    

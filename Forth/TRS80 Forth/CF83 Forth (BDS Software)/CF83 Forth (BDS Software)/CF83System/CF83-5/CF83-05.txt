@@ -1,0 +1,221 @@
+CF83-5: Assembler Extension Word Set - Page 1 of 13 
+
+
+          CF83-5:  Assembler Extension Word Set Manual                                     CF83 Forth                                                                                                                 Copyright  (c)  1992                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $15.00 with the User's Guide on disk only, or   for $19.00 with a printed copy of the User's Guide included.    These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was still $15.00 +3.00 handling for US, Canada, or Mexico       delivery as of April 1992.  California Residents add sales tax.                                                                 This manual does not attempt to teach you assembly language     programming: if you are not already familiar with assembly      language programming, you will need to consult one or more of   the available references which are devoted to that task.  Some  of the references in the following list are now out of print butyour local library may be able to obtain a copy by interlibrary 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 2 of 13 
+
+
+loan.  These are the references which we have found to be most  useful.                                                                                                                              Leventhal, L.A.; 6809 ASSEMBLY LANGUAGE PROGRAMMING;            Berkeley: Osborne/McGraw-Hill; 1981.                                                                                            Warren, C.D.; THE MC6809 COOKBOOK; Blue Ridge Summit: Tab       Books; 1981.                                                                                                                    Barden, W., Jr.; COLOR COMPUTER ASSEMBLY LANGUAGE               PROGRAMMING; Tandy; No date.                                                                                                    Tepolt, L.A.; ASSEMBLY LANGUAGE PROGRAMMING FOR THE TRS-80      COLOR COMPUTER; Portsmouth: Tepco; 1985.                                                                                        Tepolt, L.A.; ASSEMBLY LANGUAGE PROGRAMMING FOR THE COCO 3;     Portsmouth: Tepco; 1987.                                                                                                        DISK EDTASM; Tandy; 1983                                                                                                   Some of this manual was copied directly from the Forth-83       Standard, and is subject to copyright by the FORTH Standards    Team; used by permission.  In many cases, the copied material   has been modified to specifically describe features of CF83.    Such changes were not incorporated in the original copyrighted  Forth-83 Standard.                                                                                                              Use:    49 LOAD    to load the set.                                                                                                                                                             INTRODUCTION                                                                                                                    Suppose you want CF83 to count to 50,000 and report the time it takes to complete that job.  A set of colon definitions to do   this would be -                                                                                                                 decimal                                                                                                                         : tcnt ( -- ) 0 begin dup 50000 u< while 1+ repeat drop ;                                                                       : test ( -- ) 0 274 ! tcnt cr cr 274 @ ." Timer counts = " u.        cr ;                                                                                                                       When you execute TEST, it reports about 1200 timer counts, or   about 20 seconds.                                                                                                               Now suppose that 20 seconds is much too long for your           application.  What do you do?  If you have an assembler such as 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 3 of 13 
+
+
+Tandy's Disk EDTASM, you could quit CF83, go to the assembler,  and develop a machine language routine like:                                                                                                                                                                      ORG   $5800                                     3406            PSHS  A,B                                       CC   0000       LDD   #0      Initialize Count                  C3   0001  LBA  ADDD  #1      Add one                           1083 C350       CMPD  #50000  Done?                             26F7            BNE   LBA     Go if No                          3506            PULS  A,B                                       AEA1            LDX   ,Y++    Do "NEXT"                         6E91            JMP   [,X++]                                                    END                                                                                                           You can then start CF83 again and, this time, define TCNT by    "comma-ing in" the machine code definition you developed using  your assembler.  The new definitions would then be -                                                                            decimal 16 base !                                                                                                               create tcnt ( -- ) here dup 2- ! 3406 , CC00 , 00C3 , 0001 ,         1083 , C350 , 26F7 , 3506 , AEA1 , 6E91 ,                                                                                  decimal                                                                                                                         : test ( -- ) 0 274 ! tcnt cr cr 274 @ ." Timer counts = " u.        cr ;                                                                                                                       TEST now executes in about one second or less.  A great deal of time, effort, and switching back-and-forth between programs has been expended however.  With the CF83 Assembler, you can avoid  all this by coding the assembly routine directly into CF83 like this -                                                                                                                          decimal assembler clear                                                                                                         code tcnt ( -- ) *e *d pshs 0 ldd# lba label 1 addd# 50000 cmpd#     lba bne *e *d puls end-code                                                                                                resolve                                                                                                                         : test ( -- ) 0 274 ! tcnt cr cr 274 @ ." Timer counts = " u.        cr ;                                                                                                                       and TEST still executes in about one second or less.  (Actual   speed varies with location in the dictionary - the code is      identical for both of the machine language versions but actual  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 4 of 13 
+
+
+timer counts may vary slightly due to location).                                                                                                                                                ASSEMBLER ORGANIZATION                                                                                                          There are three specific differences between this CF83 Assemblerand other assemblers.                                                                                                           First, the CF83 Assembler is an Inline Zero-Pass Assembler.     Most other Assemblers are two-pass assemblers.  A two-pass      assembler runs through a source code text file twice: once to   establish a symbol table, and the second time to assemble the   code while using the symbol table to resolve the addressing.                                                                    The CF83 Assembler uses a pre-defined symbol table at address   $F982 (= 63874 decimal) and only allows the 26 predefined       symbols LBA through LBZ.  This is not really a significant      limitation because CF83 Assembly Language word definitions are  generally short and should readily lend themselves to modular   programming.  You will want to be sure that you don't try to useaddresses above $F981 for anything other than the symbol table  during the assembly.  After the assembly is complete, these     addresses are available for other uses.                                                                                         Before beginning the assembly language definitions, you should  use the command word:                                                                                                                                    CLEAR                                                                                                  which clears the symbol table to initial conditions.  You can   skip this step if you want to use previously defined labels in acurrent assembly (i.e. a previous assembly made without turning off the CoCo in between - turning off the CoCo scrambles the    symbol table).                                                                                                                  After finishing the assembly language definitions, you MUST use the command word:                                                                                                                                        RESOLVE                                                                                                which resolves the symbol table and attaches the proper offsets to branch instructions within the assembly coded words.                                                                         ** WARNING ** - Failure to RESOLVE the symbol table will CRASH  the system!                                                                                                                     The second difference is that, as with the rest of CF83, the    CF83 Assembler uses postfix notation.  Thus, if the following   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 5 of 13 
+
+
+statement appears in another assembler's code:                                                                                                           LDD $435C                                                                                              it would be coded in the CF83 Assembler as:                                                                                                              435C LDD                                                                                               (Note the absence of the $ - the CF83 Assembler automatically   uses the current number base).                                                                                                  The third difference is that the CF83 Assembler uses separate   words for the various 6809 addressing modes, instead of using a separate addressing mode modifier as in other assemblers.  For  example, if an extended addressing mnemonic for adding to the D accumulator appears as follows:                                                                                                                ADDD $43          in another assembler                                                                                          43 ADDD           in the CF83 assembler                                                                          then an immediate mnemonic in the other assembler would be:                                                                                    ADDD #$43                                                                                                        where the # sign is the modifier which indicates that the ADDD  is to be performed in immediate mode.  But in the CF83          Assembler, the coding would be:                                                                                                                43 ADDD#                                                                                                         where ADDD# is actually a different CF83 word than ADDD.                                                                                                                                        THE CF83 ASSEMBLER WORD SET                                                                                                     The following four words are those required by the Forth-83     Standard.  They are all in the FORTH vocabulary.                                                                                ;CODE               ( -- )              "semi-colon-code"            Used in the form:                                                         : <namex> ... <create> ... ;CODE ... END-CODE         Stops compilation, terminates the defining word <namex>         and executes ASSEMBLER.  When <namex> is executed in the        form:                                                                     <namex> <name>                                        to define the new <name>, the execution address of <name>       will contain the address of the code sequence following    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 6 of 13 
+
+
+     the ;CODE in <namex>.  Execution of any <name> will cause       this machine code sequence to be executed.  See:  CODE          below, and DOES> in the Technical Reference Manual's CF83       Word Set.  This is an IMMEDIATE word.  It is also a             compiling word: it may only be used during the compila-         tion of a colon definition.                                                                                                ASSEMBLER           ( -- )                                           Execution replaces the first vocabulary in the search           order with the ASSEMBLER vocabulary.  See:  VOCABULARY          in the Technical Reference Manual's CF83 Word List.                                                                        CODE                ( -- )                                           A defining word executed in the form:                                     CODE <name> ... END-CODE                              Creates a dictionary entry for <name> to be defined by          a following sequence of assembly language words.  Words         thus defined are called code definitions.  This newly           created word definition for <name> cannot be found in the       dictionary until the corresponding END-CODE is success-         fully processed (see:  END-CODE below ).  Executes              ASSEMBLER.                                                                                                                 END-CODE            ( -- )                      "end-code"           Terminates a code definition and allows the <name> of the       corresponding code definition to be found in the                dictionary.  See:  CODE above.  Although not required by        the Forth-83 standard, this is an IMMEDIATE word in CF83.                                                                  The following words are all specific to CF83 and are all        contained in the ASSEMBLER vocabulary.  Refer to an appropriate 6809 Assembly Language reference for the actions performed by   each mnemonic.                                                                                                                    * Inherent Mnemonics                                                                                                          Each inherent mnemonic (except SWI2 and SWI3) simply adds its   opcode byte to the dictionary.  SWI2 and SWI3 each add two      opcode bytes.  The inherent mnemonics are:                                                                                        ABX    ASLA   ASLB   ASRA   ASRB   CLRA   CLRB   COMA           COMB   DAA    DECA   DECB   INCA   INCB   LSLA   LSLB           LSRA   LSRB   MUL    NEGA   NEGB   NOP    ROLA   ROLB           RORA   RORB   RTI    RTS    SEX    SWI    SWI2   SWI3           SYNC   TSTA   TSTB                                                                                                                                                                                                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 7 of 13 
+
+
+A comparative example:                                                                                                               DECA           in another assembler                                                                                             DECA           in this CF83 assembler                                                                                        * Extended Mnemonics                                                                                                          Each extended mnemonic takes its opcode (1 or 2 bytes) from its parameter field and adds it to the dictionary.  Then it takes a 16-bit address from the user stack and adds it to the           dictionary.  The extended mnemonics are:                                                                                          ADCA   ADCB   ADDA   ADDB   ADDD   ANDA   ANDB   ASL            ASR    BITA   BITB   CLR    CMPA   AMPB   CMPD   CMPS           CMPU   CMPX   CMPY   COM    DEC    EORA   EORB   INC            JMP    JSR    LDA    LDB    LDD    LDS    LDU    LDX            LDY    LSL    LSR    NEG    ORA    ORB    ROL    ROR            SBCA   SBCB   STA    STB    STD    STS    STU    STX            STY    SUBA   SUBB   SUBD   TST                                                                                               A comparative example:                                                                                                               LDA $4F3A      in another assembler                                                                                             4F3A LDA       in this CF83 assembler                                                                                        * Direct Mnemonics                                                                                                            Each direct mnemonic takes its opcode (1 or 2 bytes) from its   parameter field and adds it to the dictionary.  Then it takes   the least significant 8-bits of the 16-bits on the stack (i.e.  it takes an 8-bit direct address offset from the stack) and addsit to the dictionary.  The direct mnemonics are:                                                                                  ADCA<  ADCB<  ADDA<  ADDB<  ADDD<  ANDA<  ANDB<  ASL<           ASR<   BITA<  BITB<  CLR<   CMPA<  CMPB<  CMPD<  CMPS<          CMPU<  CMPX<  CMPY<  COM<   DEC<   EORA<  EORB<  INC<           JMP<   JSR<   LDA<   LDB<   LDD<   LDS<   LDU<   LDX<           LDY<   LSL<   LSR<   NEG<   ORA<   ORB<   ROL<   ROR<           SBCA<  SBCB<  STA<   STB<   STD<   STS<   STU<   STX<           STY<   SUBA<  SUBB<  SUBD<  TST<                                                                                              A comparative example:                                                                                                               CMPX $42       in another assembler                                                                                             42 CMPX<       in this CF83 assembler                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 8 of 13 
+
+
+                                                                  * Immediate Mnemonics                                                                                                         Each immediate mnemonic takes its opcode (1 or 2 bytes) from itsparameter field and adds it to the dictionary.  Then it takes a one- or two-byte immediate number from the user stack and adds  it to the dictionary.  The immediate mnemonics are:                                                                               ADCA#  ADCB#  ADDA#  ADDB#  ADDD#  ANDA#  ANDB#  ANDCC#         BITA#  BITB#  CMPA#  CMPB#  CMPD#  CMPS#  CMPU#  CMPX#          CMPY#  CWAI#  EORA#  EORB#  LDA#   LDB#   LDD#   LDS#           LDU#   LDX#   LDY#   ORA#   ORB#   ORCC#  SBCA#  SBCB#          SUBA#  SUBB#  SUBD#                                                                                                           A comparative example:                                                                                                               EORA #$5D      in another assembler                                                                                             5D EORA#       in this CF83 assembler                                                                                        * Register Mnemonics                                                                                                          Push, pull, exchange, and transfer instructions require         identification of the register(s) they are to operate on.  In a two-pass assembler, the register names are simply read from the source code's text file.  But, in this CF83 Zero-Pass Assembler,special register mnemonics push their special identification    codes to the user stack for use by push, pull, exchange, and    transfer mnemonics.  Each register mnemonic is simply an        asterisk followed by its associated register letter.  Since the 6809 push and pull instructions can operate on from one to eightregisters, the mnemonic *E is also provided to indicate when thepush or pull mnemonics have pulled the last register code off   the user stack.  Examples of register mnemonic usage:                                                                                *D *X TFR  ( D register = target, X register = source )           ( *E must NOT be used with EXG or TFR )                                                                                       *E *X *PC *DP *A PSHS                                             ( *E must always be the first in the list )                                                                              The register mnemonics are:                                                                                                       *A     *B     *CC     *D     *DP    *E     *PC    *S            *U     *X     *Y                                                                                                                                                                                                                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 9 of 13 
+
+
+  * Exchange/Transfer Mnemonics                                                                                                 Each of the exchange and transfer mnemonics takes its one-byte  opcode from its parameter field and adds it to the dictionary.  Then it takes its source and target register codes from the userstack and combines them into a single-byte code which it adds tothe dictionary.  The exchange and transfer mnemonics are:                                                                         EXG    TFR                                                                                                                    A comparative example:                                                                                                               EXG D,X           in another assembler                                                                                          *X *D EXG         in this CF83 assembler                                                                                     * Push/Pull Mnemonics                                                                                                         Each of the push and pull mnemonics takes its one-byte opcode   from its parameter field and adds it to the dictionary.  Then ittakes the register codes from the user stack (stopping when it  reaches the *E code) and combines them into a single-byte code  which it adds to the dictionary.  The push and pull mnemonics   are:                                                                                                                              PSHS   PSHU   PULS   PULU                                                                                                     A comparative example:                                                                                                               PSHS A,B,X           in another assembler                                                                                       *E *A *B *X PSHS     in this CF83 assembler                                                                                  * Postbyte Mnemonics                                                                                                          Indexed and Indirect instructions require one to three          postbytes.  In a two-pass assembler, the postbytes are simply   read from the source code's text file.  But, in this CF83       Zero-Pass Assembler, special postbyte mnemonics push their      special identification codes to the user stack for use by       indexed and indirect mnemonics.  An example of postbyte mnemonicusage:                                                                                                                               0FBC ,Y++ LDD]  ( 0FBC, being a number, pushes itself to                          the stack as two bytes of the postbytes                         required, and ,Y++ pushes a postbyte code                       to the stack )                                                                                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 10 of 13 
+
+
+After any required data (0, 1, or 2 bytes) pushes itself to the user stack, the postbyte memonic pushes its postbyte code from  its parameter field to the user stack.  Then it pushes the      number of bytes (1, 2, or 3) to be post-assembled to the user   stack.                                                                                                                          The indirect postbyte mnemonic is:                                                                                                []                                                                                                                            and it is used in the form:                                                                                                          43FA [] LDD]                                                                                                               to load the value contained in the 16-bits whose address is     stored at 43FA.                                                                                                                 The indexed postbyte mnemonics are:                                                                                               ,PC    ,S     ,U     ,X     ,Y                                  ,S+    ,S++   ,-S    ,--S   A,S    B,S    D,S    N,S            ,U+    ,U++   ,-U    ,--U   A,U    B,U    D,U    N,U            ,X+    ,X++   ,-X    ,--X   A,X    B,X    D,X    N,X            ,Y+    ,Y++   ,-Y    ,--Y   A,Y    B,Y    D,Y    N,Y                                                                          IN N,S N,U N,X N,Y the N indicates "Null".  These four mnemonicscan be used without a numerical offset while ,S ,U ,X ,Y        cannot.  For example:                                                                                                                0 ,X LDA]     and     N,X LDA]                                                                                                  both load the 8-bit number which is zero offset from the        address contained in the X register.  But they result in        different postbytes.                                                                                                       The indexed indirect postbyte mnemonics are:                                                                                      [,PC]     [,S]     [,U]     [,X]     [,Y]                       [,S++]    [,--S]   [A,S]    [B,S]    [D,S]    [N,S]             [,U++]    [,--U]   [A,U]    [B,U]    [D,U]    [N,U]             [,X++]    [,--X]   [A,X]    [B,X]    [D,X]    [N,X]             [,Y++]    [,--Y]   [A,Y]    [B,Y]    [D,Y]    [N,Y]                                                                             * Indexed/Indirect Mnemonics                                                                                                  Each indexed/indirect mnemonic takes its opcode (1 or 2 bytes)  from its parameter field and adds it to the dictionary.  Then ituses the top number on the user stack as a do ... loop limit to 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 11 of 13 
+
+
+indicate the number of postbytes (1, 2, or 3) to be taken from  the user stack and added to the dictionary.  The                indexed/indirect mnemonics are:                                                                                                   ADCA]  ADCB]  ADDA]  ADDB]  ADDD]  ANDA]  ANDB]  ASL]           ASR]   BITA]  BITB]  CLR]   CMPA]  CMPB]  CMPD]  CMPS]          CMPU]  CMPX]  CMPY]  COM]   DEC]   EORA]  EORB]  INC]           JMP]   JSR]   LDA]   LDB]   LDD]   LDS]   LDU]   LDX]           LDY]   LEAS]  LEAU]  LEAX]  LEAY]  LSL]   LSR]   NEG]           ORA]   ORB]   ROL]   ROR]   SBCA]  SBCB]  STA]   STB]           STD]   STS]   STU]   STX]   STY]   SUBA]  SUBB]  SUBD]          TST]                                                                                                                          An indirect comparative example:                                                                                                     LDX [$56AF]          in another assembler                                                                                       56AF [] LDX]         in this CF83 assembler                                                                                An indexed comparative example:                                                                                                      LDD ,X++             in another assembler                                                                                       ,X++ LDD]            in this CF83 assembler                                                                                An indexed indirect comparative example:                                                                                             SUBD [3,S]           in another assembler                                                                                       3 [,S] SUBD]         in this CF83 assembler                                                                                  * Label Mnemonics                                                                                                             Relative (i.e. branch) instructions need a labeled address to   branch to.  This CF83 Assembler provides 26 labels which can be used in conjunction with branching instructions.  The general   limitations are:                                                                                                                     1.  Each label can only appear once between each CLEAR and          RESOLVE command.                                                                                                            2. Each label can be branched to a maximum of 25 times             between each CLEAR and RESOLVE command.  (Actually, this        can be extended by eliminating a following label, i.e.          LBD can be branched to a maximum of 52 times if LBE is          not used, a maximum of 79 times if both LBE and LBF are         not used, etc.).                                                                                                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 12 of 13 
+
+
+The word LABEL is used to identify the labeled location for the branch instructions to branch to.  An example of a labeled      location is:                                                                                                                         LBQ LABEL           ( Also See Note 1 on Page 13 )                                                                         The label mnemonic will leave its high memory symbol table      location on the stack.  The LABEL word then stores the current  value of the dictionary pointer into that symbol table location.                                                                The label mnemonics are:                                                                                                          LBA    LBB    LBC    LBD    LBE    LBF    LBG    LBH            LBI    LBJ    LBK    LBL    LBM    LBN    LBO    LBP            LBQ    LBR    LBS    LBT    LBU    LBV    LBW    LBX            LBY    LBZ                                                                                                                      * Relative Mnemonics                                                                                                          Each relative mnemonic adds its opcode (1 or 2 bytes) to the    dictionary.  Then it ALLOTS space (1 or 2 bytes) for its        displacement in the dictionary.  Then it sets up its address in its referenced label's high memory symbol table location.  When the word RESOLVE is later executed, the high memory symbol tablewill be resolved into displacements (1 or 2 bytes) which will   then be inserted into the spaces alloted for them in the        dictionary.  An example of relative mnemonic usage is:                                                                               LBT BCS                                                                                                                    The relative mnemonics are:                                                                                                       BCC    BCS    BEQ    BGE    BGT    BHI    BHS    BLE            BLO    BLS    BLT    BMI    BNE    BPL    BRA    BRN            BSR    BVC    BVS    LBCC   LBCS   LBEQ   LBGE   LBGT           LBHI   LBHS   LBLE   LBLO   LBLS   LBLT   LBMI   LBNE           LBPL   LBRA   LBRN   LBSR   LBVC   LBVS                                                                                       A comparative example:                                                                                                               LBA LDX $33A7                                                        .                                                               .                                                               .                                                              BNE LBA                        in another assembler                                                                         LBA LABEL 33A7 LDX ... LBA BNE     in this CF83 assembler                                                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-5: Assembler Extension Word Set - Page 13 of 13 
+
+
+NOTES:                                                                                                                           1.  In other assemblers, labels are used both to identify           addresses to branch to, and also to identify storage            locations.  A storage location reference in another             assembler might appear as:                                                                                                                     vname rmb 2                                                            .                                                               .                                                               .                                                              ldd #$46F3                                                      std vname                                                                                                  But in this CF83 assembler, labels are ONLY used to             identify branch addresses.  Do NOT try to use a label to        identify a storage location - If you do, you will CRASH         the system.  Instead, just use a standard CF83 variable.        For example:                                                                                                                               variable vname                                                  code test ... 46F3 ldd vname std ... end-code                                                                        Thus, while the number of branch addresses is limited, the      number of storage locations is not.                                                                                         2.  You can also use constants in code definitions.  For            example:                                                                                                                                   44F7 constant cname                                             code tst2 ... cname ldd# ... end-code                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ** END **                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+

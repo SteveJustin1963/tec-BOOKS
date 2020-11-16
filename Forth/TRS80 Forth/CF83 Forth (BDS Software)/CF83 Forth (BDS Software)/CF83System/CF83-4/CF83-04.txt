@@ -1,0 +1,51 @@
+CF83-4: Double Number Extension Word Set Manual - Page 1 of 3 
+
+
+        CF83-4:  Double Number Extension Word Set Manual                                   CF83 Forth                                                                                                                 Copyright  (c)  1991                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $15.00 with the User's Guide on disk only, or   for $19.00 with a printed copy of the User's Guide included.    These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was $15.00 +3.00 handling for US, Canada, or Mexico delivery as of April 1991.  California Residents add sales tax.                                                                             Much of this manual was copied directly from the Forth-83       Standard, and is subject to copyright by the FORTH Standards    Team; used by permission.  In many cases, the copied material   has been modified to specifically describe features of CF83.    Such changes were not incorporated in the original copyrighted  Forth-83 Standard.  Use:    9 LOAD    to load the set.                                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-4: Double Number Extension Word Set Manual - Page 2 of 3 
+
+
+2!               ( 32b addr -- )                 "two-store"         32b is stored at addr.  See:  "number" in the Technical         Reference Manual's Glossary.                                                                                               2@               ( addr -- 32b )                 "two-fetch"         32b is the value at addr.  See:  "number" in the Technical      Reference Manual's Glossary.                                                                                               2CONSTANT        ( 32b -- )                      "two-constant"      A defining word executed in the form:                                     32b 2CONSTANT <name>                                  Creates a dictionary entry for <name> so that when <name>       is later executed, 32b will be left on the stack.                                                                          2DROP            ( 32b -- )                      "two-drop"          32b is removed from the stack.                                                                                             2DUP             ( 32b -- 32b 32b )              "two-dupe"          Duplicate 32b.                                                                                                             2OVER            ( 32b1 32b2 -- 32b1 32b2 32b3 ) "two-over"          32b3 is a copy of 32b1.                                                                                                    2ROT        ( 32b1 32b2 32b3 -- 32b2 32b3 32b1 ) "two-rote"          The top three double numbers on the stack are rotated,          bringing the third double number number to the top of the       stack.                                                                                                                     2SWAP            ( 32b1 32b2 -- 32b2 32b1 )      "two-swap"          The top two double numbers are exchanged.                                                                                  2VARIABLE        ( -- )                          "two-variable"      A defining word executed in the form:                                     2VARIABLE <name>                                      A dictionary entry for <name> is created and four bytes         are ALLOTted in its parameter field.  This parameter            field is to be used for contents of the variable.  The          application is responsible for initializing the content         of the variable which it creates.  When <name> is later         executed, the address of its parameter field is placed on       the stack.                                                                                                                 D+               ( wd1 wd2 -- wd3 )                                  Part of the Required Word Set.                                                                                             D-               ( wd1 wd2 -- wd3 )              "d-minus"           wd3 is the result of subtracting wd2 from wd1.                                                                             
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-4: Double Number Extension Word Set Manual - Page 3 of 3 
+
+
+D.               ( d -- )                        "d-dot"             The absolute value of d is displayed in a free field            format.  A leading negative sign is displayed if d is           negative.                                                                                                                  D.R              ( d +n -- )                     "d-dot-r"           d is converted using the value of BASE and then displayed       right aligned in a field +n characters wide.  A leading         minus sign is displayed if d is negative.  If the number        of characters required to display d is greater than +n,         an error condition exists.  See:  "number conversion" in        the Technical Reference Manual's Glossary.                                                                                 D0=              ( wd -- flag )                 "d-zero-equals"      flag is true if wd is zero.                                                                                                D2/              ( d1 -- d2 )                   "d-two-divide"       d2 is the result of d1 arithmetically shifted right one         bit.  The sign is included in the shift and remains             unchanged.                                                                                                                 D<               ( d1 d2 -- flag )                                   Part of the Required Word Set.                                                                                             D=               ( wd1 wd2 -- flag )            "d-equal"            flag is true if wd1 equals wd2.                                                                                            DABS             ( d -- ud )                    "d-absolute"         ud is the absolute value of d.  If d is -2,147,483,648          then ud is the same value.  See:  "arithmetic, two's            complement" in the Technical Reference Manual's Glossary.                                                                  DMAX             ( d1 d2 -- d3 )                "d-max"              d3 is the greater of d1 and d2.                                                                                            DMIN             ( d1 d2 -- d3 )                "d-min"              d3 is the lesser of d1 and d2.                                                                                             DNEGATE          ( d1 -- d2 )                                        Part of the Required Word Set.                                                                                             DU<              ( ud1 ud2 -- flag )            "d-u-less"           flag is true if ud1 is less than ud2.  Both numbers             are unsigned.                                                                                                                                                                                                            END                                                                                               
+
+
+
+
+
+
+
+
+
+
+
+
+

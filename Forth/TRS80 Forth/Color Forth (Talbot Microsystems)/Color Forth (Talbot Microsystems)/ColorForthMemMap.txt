@@ -1,0 +1,46 @@
+   Color Forth Memory Map - as modified for operation with DECB by smp, January 2015
+
+    ----------------------------------------  $0000
+    |        SYSTEM RAM FOR BASIC          |
+    ----------------------------------------  $0400  SCREEN
+    |        VIDEO DISPLAY RAM             |
+    ----------------------------------------  $0600  DISK SYSTEM
+    |        DISK SYSTEM USE               |
+    ----------------------------------------  $18CE
+    |        NOT USED BY COLOR FORTH       |
+    ----------------------------------------  $2000
+    |        DOWN LOADED WORDS             |
+    |            MOVED FROM NUCLEUS        |
+    ----------------------------------------  $20AA  UP
+    |                                      |
+    |        USER VARIABLES - TABLE        |
+    |                                      |
+    ////////////////////////////////////////
+    |                                      |
+    |        DATA STACK          ^         |
+    |                            |         |
+    ----------------------------------------  $2280  SO/TIB
+    |    |                                 |
+    |    V   TERMINAL INPUT BUFFER (TIB)   |
+    |                                      |
+    ////////////////////////////////////////
+    |                                      |
+    |        RETURN STACK        ^         |
+    |                            |         |
+    ----------------------------------------  $2380  RO/FIRST
+    |                                      |
+    |        SCREEN BUFFER NUMBER 1        |
+    |                                      |
+    ////////////////////////////////////////
+    |                                      |
+    |        SCREEN BUFFER NUMBER 8        |
+    |                                      |
+    ----------------------------------------  $43A0
+    |                                      |
+    |        USER DICTIONARY SPACE         |
+    |                                      |
+    ----------------------------------------  $5800  COLOR FORTH
+    |                                      |
+    |        COLOR FORTH NUCLEUS (10K)     |
+    |                                      |
+    ----------------------------------------  $7FFF  32K END

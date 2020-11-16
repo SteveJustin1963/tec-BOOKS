@@ -1,0 +1,493 @@
+CF83-1: Technical Reference Manual - Page 1 of 29 
+
+
+               CF83-1: Technical Reference Manual                                          CF83 Forth                                                                                                                 Copyright  (c)  1991                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                          This manual is the detailed technical reference for CF83 Forth.                                                                 While it can serve as a reasonable introduction to the Forth-83 Standard, it is not a complete copy of that standard.  Further- more, it will be of little practical use unless you have also   purchased BDS Software's product CF83: Forth-83 Standard        Required Words Set.                                                                                                             If you wish a complete copy of the Forth-83 Standard, it is     available from the Forth Interest Group (FIG), P.O. Box 8231,   San Jose, CA 95155, phone (408) 277-0668, fax (408) 286-8988.   Their price was $15.00 + $3.00 handling for US, Canada, or      Mexico delivery as of April 1991.  California residents add     sales tax.                                                                                                                      Much of this manual was copied directly from the Forth-83       Standard, and is subject to copyright by the FORTH Standards    Team; used by permission.  In many cases, the copied material   has been modified to specifically describe features of CF83.    Such changes were not incorporated in the original copyrighted  Forth-83 Standard.                                                                                                              This manual will not attempt to teach you forth programming - Itassumes that you are intimately with forth programming in       general.  If you are not, you can purchase BDS Software's       product CF83-2: The CF83 Forth Tutorial.  We strongly recommend that you buy the second edition of STARTING FORTH by Leo Brodie,$29.00 from FIG (4/91).  If you don't want to buy both, get     STARTING FORTH instead of CF83-2.  We feel that STARTING FORTH  is the best introduction to forth programming available         anywhere.                                                                                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 2 of 29 
+
+
+  ** Word Set Usage                                                                                                             Return Stack                                                        A Standard Program may cautiously use the return stack with the following restrictions: The return stack may not be accessedinside a do-loop for values placed on the return stack before   the loop was entered.  Further, neither I nor J may be used to  obtain the index of a loop if values are placed and remain on   the return stack within the loop.  When the do-loop is executed all values placed on the return stack within that loop must be  removed before LOOP , +LOOP , or LEAVE is executed.  Similarly, all values placed on the return stack within a colon definition must be removed before the colon definition is terminated at ;  or before EXIT is executed.                                                                                                     Compilation                                                         The system uses the return stack and the dictionary during  the compilation of colon definitions.  Some words use the data  stack during compilation.                                                                                                       Numbers                                                             Interpreted or compiled numbers are in the range            -32,768..65,535.  See:  "number conversion" in the Glossary.                                                                    Control Structures                                                  Control structures are compiled inside colon definitions.   Control structures can be nested but cannot overlap.  For       additional limitations see DO .                                                                                                                                                                   **  Word Set Notation                                                                                                         Stack Comments                                                      The stack parameters shown in parentheses in the following  CF83 Word Set form the Forth Stack Comment for the word they arepart of.  The stack parameters input to and output from a       definition are described using the notation:                                                                                                   before -- after                                                                                                                      before    stack parameters before execution                     after     stack parameters after execution                                                                  In this notation, the top of the stack is to the right.  Words  may also be shown in context when appropriate.  Unless otherwisenoted, all stack notation describes exectution time.  If it     applies at compile time, the line is followed by: (compiling) .                                                                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 3 of 29 
+
+
+Stack Parameters                                                    Unless otherwise stated, all references to numbers apply to 16- bit  signed integers.  The implied range of values is shown as from..to.  The contents of an address is shown by double     braces, particularly for the contents of variables, i.e., BASE  2..255.  The following are the stack parameter abbreviations    and types of numbers used throughout the glossary.  These       abbreviations may be suffixed with a digit to differentiate     multiple parameters of the same type.                                                                                                     Stack     Number           Range in            Minimum          Abbrv.    Type             Decimal             Field                                                                            flag      boolean          0=false, else=true  16               true      boolean          -1 (as a result)    16               false     boolean          0                   16               b         bit              0..1                 7               char      character        0..127               7               8b        8 arbitrary      not applicable       8                           bits (byte)                                         16b       16 arbitrary     not applicable      16                            bits                                               n         number           -32,768..32,767     16                         (weighted bits)                                       +n        positive number  0..32,767           16               u         unsigned number  0..65,535           16               w         unspecified      -32,768..65,535     16                         weighted number                                                 (n or u)                                              addr      address          0..65,535           16                         (same as u)                                           32b       32 arbitrary     not applicable      32                            bits                                               d         double number    -2,147,483,648..    32                                             2,147,483,647                     +d        positive double  0..2,147,483,647    32                            number                                             ud        unsigned double  0..4,294,967,265    32                            number                                             wd        unspecified      -2,147,483,648..    32                         weighted double     4,294,967,295                               number (d or ud)                                                                                            Any other symbol refers to an arbitrary signed 16-bit integer inthe range -32,768..32,767, unless otherwise noted.  Because of  the use of two's complement arithmetic, the signed 16- bit      number (n) -1 has the same bit representation as the unsigned   number (u) 65,535.  Both of these numbers are within the set of 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 4 of 29 
+
+
+unspecified weighted numbers (w). See: "arithmetic, two's       complement"  "number"  "number types"  "stack, data" in the     Glossary.                                                                                                                       Input Text                                                                                                                          <name> An arbitrary FORTH word accepted from the input                 stream.  This notation refers to text from the input            stream, not to values on the data stack.                 ccc    A sequence of arbitrary characters accepted from the            input stream until the first occurrence of the                  specified delimiting character.  The delimiter is               accepted from the input stream, but is not one of the           characters ccc and is therefore not otherwise                   processed.  This notation refers to text from the               input stream, not to values on the data stack.                  Unless noted otherwise, the number of characters                accepted may be from 0 to 255.                                                                                        Pronunciation                                                      The natural language pronunciation of word names is given indouble quotes (") where it differs from English pronunciation.                                                                                                                                    **  CF83 Word Set                                                                                                             !          ( 16b addr -- )             "store"                      16b is stored at addr.                                                                                                      #          ( +d1 -- +d2 )              "sharp"                      The remainder of +d1 divided by the value of BASE is            converted to an ASCII character and appended to the output      string toward lower memory addresses.  +d2 is the quotient      and is maintained for further processing.  Typically used       between <# and #> .                                                                                                         #>         ( 32b -- addr +n )          "sharp-greater"              Pictured numeric output conversion is ended dropping 32b.       addr is the address of the resulting output string.  +n is      the number of characters in the output string.  addr and +n     together are suitable for TYPE .                                                                                            #S         ( +d -- 0 0 )               "sharp-s"                    +d is converted appending each resultant character into the     pictured numeric output string until the quotient (see: # )     is zero.  A single zero is added to the output string if the    number was initially zero.  Typically used between <# and #>                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 5 of 29 
+
+
+#TIB       ( -- addr )                 "number-t-i-b"               The address of a variable containing the number of bytes in     the text input buffer.  #TIB is accessed by WORD when BLK is    zero.  0..256 (capacity of TIB) See: "input stream" in          Glossary.                                                                                                                   '          ( -- addr )                 "tick"                       Used in the form:                                                    ' <name>                                                   addr is the compilation address of <name>.  An error            condition exists if <name> is not found in the currently        active search order.                                                                                                        (          ( -- )                      "paren"                             ( -- )  (compiling)                                      Used in the form:                                                    ( ccc)                                                     The characters ccc, delimited by ) (closing parenthesis),       are considered comments.  Comments are not otherwise            processed.  The blank following ( is not part of ccc.  ( may    be freely used while interpreting or compiling.  The number     of characters in ccc may be zero to the number of characters    remaining in the input stream up to the closing parenthesis.                                                                *          ( w1 w2 -- w3 )             "times"                      w3 is the least-significant 16 bits of the arithmetic           product of w1 times w2.                                                                                                     */         ( n1 n2 n3 -- n4 )          "times-divide"               n1 is first multiplied by n2 producing an intermediate 32-      bit result.  n4 is the floor of the quotient of the             intermediate 32-bit result divided by the divisor n3.  The      product of n1 times n2 is maintained as an intermediate 32-     bit result for greater precision than the otherwise             equivalent sequence: n1 n2 * n3 / .  An error occurs if the     divisor is zero or if the quotient falls outside of the         range -32,768..32,767.  See: "division, floored" in             Glossary.                                                                                                                   */MOD      ( n1 n2 n3 -- n4 n5 )       "times-divide-mod"           n1 is first multiplied by n2 producing an intermediate 32-      bit result.  n4 is the remainder and n5 is the floor of the     quotient of the intermediate 32-bit result divided by the       divisor n3.  A 32-bit intermediate product is used as for       */ .  n4 has the same sign as n3 or is zero.  An error          occurs if the divisor is zero or if the quotient falls          outside of the range -32,768..32,767.  See: "division,          floored" in Glossary.                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 6 of 29 
+
+
+                                                                +          ( w1 w2 -- w3 )             "plus"                       w3 is the arithmetic sum of w1 plus w2.                                                                                     +!         ( w1 addr -- )              "plus-store"                 w1 is added to the w value at addr using the convention for     + .  This sum replaces the original value at addr.                                                                          +LOOP      ( n -- )                    "plus-loop"                  n is added to the loop index.  If the new index was             incremented across the boundary between limit-1 and limit       then the loop is terminated and loop control parameters are     discarded.  When the loop is not terminated, execution          continues to just after the corresponding DO .  See: DO .                                                                   ,          ( 16b -- )                  "comma"                      ALLOT space for 16b then store 16b at HERE 2- .                                                                             -          ( w1 w2 -- w3 )             "minus"                      w3 is the result of subtracting w2 from w1.                                                                                 -TRAILING  ( addr +n1 -- addr +n2 )    "dash-trailing"              The character count +n1 of a text string beginning at addr      is adjusted to exclude trailing spaces.  If +n1 is zero,        then +n2 is also zero.  If the entire string consists of        spaces, then +n2 is zero.                                                                                                   .          ( n -- )                    "dot"                        The absolute value of n is displayed in a free field format     with a leading minus sign if n is negative.                                                                                 ."         ( -- )                      "dot-quote"                         ( -- )  (compiling)                                      Used in the form:                                                    ." ccc"                                                    Later execution will display the characters ccc up to but       not including the delimiting " (close-quote).  The blank        following ." is not part of ccc.                                                                                            .(         ( -- )                      "dot-paren"                         ( -- )  (compiling)                                      Used in the form:                                                    .( ccc)                                                    The characters ccc up to but not including the delimiting )     (closing parenthesis) are displayed.  The blank following .(    is not part of ccc.                                                                                                                                                                         
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 7 of 29 
+
+
+                                                                /          ( n1 n2 -- n3               "divide"                     n3 is the floor of the quotient of n1 divided by the divisor    n2.  An error occurs if the divisor is zero or if the           quotient falls outside of the range -32,768..32,767.            See:  "division, floored" in the Glossary.                                                                                  /MOD       ( n1 n2 -- n3 n4 )          "divide-mod"                 n3 is the remainder and n4 the floor of the quotient of n1      divided by the divisor n2.  n3 has the same sign as n2 or is    zero.  An error occurs if the divisor is zero or if             the quotient falls outside of the range - 32,768..32,767.       See:  "division, floored" in the Glossary.                                                                                  0<         ( n -- flag )               "zero-less"                  flag is true if n is less than zero (negative).                                                                             0=         ( w -- flag )               "zero-equals"                flag is true if w is zero.                                                                                                  0>         ( n -- flag )               "zero-greater"               flag is true if n is greater than zero.                                                                                     1+         ( w1 -- w2 )                "one-plus"                   w2 is the result of adding one to w1 according to the           operations of + .                                                                                                           1-         ( w1 -- w2 )                "one-minus"                  w2 is the result of subtracting one from w1 according to the    operation of - .                                                                                                            2+         ( w1 -- w2 )                "two-plus"                   w2 is the result of adding two to w1 according to the           operation of + .                                                                                                            2-         ( w1 -- w2 )                "two-minus"                  w2 is the result of subtracting two from w1 according to the    operation of - .                                                                                                            2/         ( n1 -- n2 )                "two-divide"                 n2 is the result of arithmetically shifting n1 right one        bit.  The sign is included in the shift and remains             unchanged.                                                                                                                                                                                                                                                                                                                                                                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 8 of 29 
+
+
+                                                                :          ( -- )                      "colon"                      A defining word executed in the form:                                : <name> ... ;                                             Create a word definition for <name> in the compilation          vocabulary and set compilation state.  The search order is      changed so that the first vocabulary in the search order is     replaced by the compilation vocabulary.  The compilation        vocabulary is unchanged.  The text from the input stream is     subsequently compiled.  <name> is called a "colon               definition".  The newly created word definition for <name>      cannot be found in the dictionary until the corresponding ;     is successfully processed.  An error occurs if a word is not    found and cannot be converted to a number or if, during         compilation from mass storage, the input stream is exhausted    before encountering ; .  See: "compilation" in the Glossary.                                                                ;          ( -- )                      "semi-colon"                        ( -- )  (compiling)                                      Stops compilation of a colon definition, allows the <name>      of this colon definition to be found in the dictionary, sets    interpret state and compiles EXIT.  See: EXIT  See "stack,      return" in Glossary.                                                                                                        <          ( n1 n2 -- flag )           "less-than"                  flag is true if n1 is less than n2.                                  -32678 32767 < returns true.                                    -32768 0 < returns true.                                                                                               <#         ( -- )                      "less-sharp"                 Initialize pictured numeric output conversion.  The words:           #  #>  #S  <#  HOLD  SIGN                                  can be used to specify the conversion of a double number        into an ASCII text string stored in right- to-left order.                                                                   =          ( w1 w2 -- flag )           "equals"                     flag is true if w1 is equal to w2.                                                                                          >          ( n1 n2 -- flag )           "greater-than"               flag is true if n1 is greater than n2.                               -32768 32767 > returns false.                                   -32768 0 > returns false.                                                                                              >BODY      ( addr1 -- addr2 )          "to-body"                    addr2 is the parameter field address corresponding to the       compilation address addr1.                                                                                                                                                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 9 of 29 
+
+
+                                                                >IN        ( -- addr )                 "to-in"                      The address of a variable which contains the present            character offset within the input stream 0..the number of       characters in the input stream.  See:  WORD                                                                                 >R         ( 16b -- )                  "to-r"                       Transfers 16b to the return stack.                                                                                          ?DUP       ( 16b -- 16b 16b )          "question-dupe"                 or  ( 0 -- 0 )                                               Duplicate 16b if it is non-zero.                                                                                            @          ( addr -- 16b )             "fetch"                      16b is the value at addr.                                                                                                   ABORT      ( -- )                                                   Clears the data stack and performs the function of QUIT .       No message is displayed.                                                                                                    ABORT"     ( flag -- )                 "abort-quote"                       ( -- )  (compiling)                                      Used in the form:                                                    flag ABORT" ccc"                                           When later executed, if flag is true the characters ccc,        delimited by " (close-quote), are displayed and then the        error abort sequence, including the function of ABORT , is      performed.  If flag is false, the flag is dropped and           execution continues.  The blank following ABORT" is not part    of ccc.                                                                                                                     ABS        ( n -- u )                  "absolute"                   u is the absolute value of n.  If n is -32,768 then u is the    same value.  See: "arithmetic, two's complement" in the         Glossary.                                                                                                                   ALLOT      ( w -- )                                                 Allocates w bytes in the dictionary.  The address of the        next available dictionary entry is updated accordingly.                                                                     AND        ( 16b1 16b2 -- 16b3 )                                    16b3 is the bit-by-bit logical 'and' of 16b1 with 16b2.                                                                     BASE       ( -- addr )                                              The address of a variable containing the current numeric        conversion radix.                                                                                                                                                                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 10 of 29 
+
+
+BEGIN      ( -- )                                                   Used in the form:                                                    BEGIN ... flag UNTIL                                       or                                                                   BEGIN ... flag WHILE ... REPEAT                            BEGIN marks the start of a word sequence for repetitive         execution.  A BEGIN-UNTIL loop will be repeated until flag      is true.  A BEGIN-WHILE-REPEAT will be repeated until flag      is false.  The words after UNTIL or REPEAT will be executed     when either loop is finished.                                                                                               BLK        ( -- addr )                 "b-l-k"                      The address of a variable containing the number of the mass     storage block being interpreted as the input stream.  If the    value of BLK is zero the input stream is taken from the         text input buffer.  0..627  See:  TIB .  See "input             stream" in the Glossary.                                                                                                    BLOCK      ( u -- addr )                                            addr is the address of the assigned buffer of the first byte    of block u.  If the block occupying that buffer is not block    u and has been UPDATEed it is transferred to mass storage       before assigning the buffer.  If block u is not already         in memory, it is transferred from mass storage into an          assigned block buffer.  A block may not be assigned to more     than one buffer.  If u is not an available block number, an     error occurs.  Only data within the last buffer referenced      by BLOCK or BUFFER is valid.  The contents of a block buffer    must not be changed unless the change may be transferred to     mass storage.                                                                                                               BUFFER     ( u -- addr )                                            BUFFER is a synonym for BLOCK in CF83.                                                                                      C!         ( 16b addr -- )             "c-store"                    The least-significant 8 bits of 16b are stored into the byte    at addr.                                                                                                                    C@         ( addr -- 8b )              "c-fetch"                    8b is the contents of the byte at addr.                                                                                     CMOVE      ( addr1 addr2 u -- )        "c-move"                     Move u bytes beginning at address addr1 to addr2.  The byte     at addr1 is moved first, proceeding toward high memory.  If     u is zero nothing is moved.                                                                                                                                                                                                                                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 11 of 29 
+
+
+CMOVE>     ( addr1 addr2 u -- )        "c-move-up"                  Move the u bytes at address addr1 to addr2.  The move begins    by moving the byte at (addr1 plus u minus 1) to (addr2 plus     u minus 1) and proceeds to successively lower addresses for     u bytes.  If u is zero nothing is moved.  (Useful for           sliding a string towards higher addresses).                                                                                 COMPILE    ( -- )                                                   Typically used in the form:                                          : <name> ... COMPILE <namex> ... ;                         When <name> is executed, the compilation address compiled       for <namex> is compiled and not executed.  <name> is            typically immediate and <namex> is typically not immediate.     See: "compilation" in the Glossary.                                                                                         CONSTANT   ( 16b -- )                                               A defining word executed in the form:                                16b CONSTANT <name>                                        Creates a dictionary entry for <name> so that when <name> is    later executed, 16b will be left on the stack.                                                                              CONVERT    ( +d1 addr1 -- +d2 addr2 )                               +d2 is the result of converting the characters within the       text beginning at addr1+2 into digits, using the value of       BASE , and accumulating each into +d1 after multiplying +d1     by the value of BASE .  Conversion continues until an           unconvertible character is encounter.  addr2 is the location    of the first unconvertible character.                                                                                       COUNT      ( addr1 -- addr2 +n )                                    addr2 is addr1+1 and +n is the length of the counted string     at addr1.  The byte at addr1 contains the byte count +n.        Range of +n is 0.255  See:  "string, counted" in the            Glossary.                                                                                                                   CR         ( -- )                      "c-r"                        Displays a carriage-return and line-feed or equivalent          operation.                                                                                                                  CREATE     ( -- )                                                   A defining word executed in the form:                                CREATE <name>                                              Creates a dictionary entry for <name>.  After <name> is         created, the next available dictionary location is the first    byte of <name>'s parameter field.  When <name> is               subsequently executed, the address of the first byte of         <name>'s parameter field is left on the stack.  CREATE does     not allocate space in <name>'s parameter field.             
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 12 of 29 
+
+
+                                                                D+         ( wd1 wd2 -- wd3 )          "d-plus"                     wd3 is the arithmetic sum of wd1 plus wd2.                                                                                  D<         ( d1 d2 -- flag )           "d-less-than"                flag is true if d1 is less than d2 according to the             operation of < except extended to 32 bits.                                                                                  DECIMAL    ( -- )                                                   Set the input-output numeric conversion base to ten.                                                                        DEFINITIONS ( -- )                                                  The compilation vocabulary is changed to be the same as the     first vocabulary in the search order.  See:  "vocabulary,       compilation" in the Glossary.                                                                                               DEPTH      ( -- +n )                                                +n is the number of 16-bit values contained in the data         stack before +n was placed on the stack.                                                                                    DNEGATE    ( d1 -- d2 )                                             "d-negate" d2 is the two's complement of d1.                                                                                DO         ( w1 w2 -- )                                             Used in the form:                                                    DO ... LOOP                                                or                                                                   DO ... +LOOP                                               Begins a loop which terminates based on control parameters.     The loop index begins at w2, and terminates based on the        limit w1.  See LOOP and +LOOP for details on how the loop is    terminated.  The loop is always executed at least once.  For    example: w DUP DO ... LOOP executes 65,536 times.                                                                           DOES>      ( -- addr )                 "does"                              ( -- )  (compiling)                                      Defines the execution-time action of a word created by a        high-level defining word.  Used in the form:                         : <namex> ... <create> ... DOES> ... ;                     and then:                                                            <namex> <name>                                             where <create> is CREATE or any user defined word which         executes CREATE .  Marks the termination of the defining        part of the defining word <namex> and then begins the           definition of the execution-time action for words that will     later be defined by <namex>.  When <name> is later executed,    the address of <name>'s parameter fld is placed on stack and    then the sequence of words between DOES> and ; are executed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 13 of 29 
+
+
+                                                                DROP       ( 16b -- )                                               16b is removed from the stack.                                                                                              DUP        ( 16b -- 16b 16b )          "dupe"                       Duplicate 16b.                                                                                                              ELSE       ( -- )                                                          ( -- )   (compiling)                                     Used in the form:                                                    flag IF ... ELSE ... THEN                                  ELSE executes after the true part following IF .  ELSE          forces execution to continue at just after THEN .  See:  IF     THEN                                                                                                                        EMIT       ( 16b -- )                                               The least-significant 7-bit ASCII character is displayed.       Each EMIT deals with only one ASCII character.                                                                              EXECUTE    ( addr -- )                                              The word definition indicated by addr is executed.  An error    occurs if addr is not a compilation address.                                                                                EXIT       ( -- )                                                   Compiled within a colon definition such that when executed,     that colon definition returns control to the definition that    passed control to it by returning control to the return         point on the top of the return stack.  An error occurs if       the top of the return stack does not contain a valid return     point.  May not be used within a do-loop.  See: ;  "stack,      return" in the Glossary.                                                                                                    EXPECT     ( addr +n -- )                                           Receive characters and store each into memory.  The transfer    begins at addr proceeding towards higher addresses one byte     per character until either a "return" is received or until      +n characters have been transferred.  No more than +n           characters will be stored.  The "return" is not stored into     memory.  No characters are received or transferred if +n is     zero.  All characters actually received and stored into         memory will be displayed, with the "return" displaying as a     space.  Some control characters are processed to allow          editing of the characters.                                                                                                  FILL       ( addr u 8b -- )                                         u bytes of memory beginning at addr are set to 8b.  No          action is taken if u is zero.                                                                                               
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 14 of 29 
+
+
+FIND       ( addr1 -- addr2 n )                                     addr1 is the address of a counted string.  The string           contains a word name to be located in the currently active      search order.  If the word is not found, addr2 is the string    address addr1, and n is zero.  If the word is found, addr2      is the compilation address and n is set to one of two non-      zero values.  If the word found has the immediate attribute,    n is set to one.  If the word is non-immediate, n is set to     minus one (true).                                                                                                           FLUSH      ( -- )                                                   Performs the function of SAVE-BUFFERS then unassigns all        block buffers.  (This may be useful for mounting or changing    mass storage media).                                                                                                        FORGET     ( -- )                                                   Used in the form:                                                    FORGET <name>                                              If <name> is found in the compilation vocabulary, delete        <name> from the dictionary and all words added to the           dictionary after <name> regardless of their vocabulary.         Failure to find <name> is an error.  An error also occurs       if the compilation vocabulary is deleted.                                                                                   FORTH      ( -- )                                                   The name of the primary vocabulary.  Execution replaces the     first vocabulary in the search order with FORTH .  FORTH is     initially the compilation vocabulary and the first              vocabulary in the search order.  New definitions become part    of the FORTH vocabulary until a different compilation           vocabulary is established.  See:  VOCABULARY                                                                                FORTH-83   ( -- )                                                   No Action                                                                                                                   HERE       ( -- addr )                                              The address of the next available dictionary location.                                                                      HOLD       ( char -- )                                              char is inserted into a pictured numeric output string.         Typically used between <# and #>.                                                                                           I          ( -- w )                                                 w is a copy of the loop index.  May only be used in the         form:                                                                DO ... I ... LOOP                                          or                                                                   DO ... I ... +LOOP                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 15 of 29 
+
+
+                                                                IF         ( flag -- )                                                     ( -- )   (compiling)                                     Used in the form:                                                    flag IF ... ELSE ... THEN                                  or                                                                   flag IF ... THEN                                           If flag is true, the words following IF are executed and the    words following ELSE until just after THEN are skipped.  The    ELSE part is optional.  If flag is false, the words from IF     through ELSE , or from IF through THEN (when no ELSE is         used), are skipped.                                                                                                         IMMEDIATE  ( -- )                                                   Marks the most recently created dictionary entry as a word      which will be executed when encountered during compilation      rather than compiled.                                                                                                       J          ( -- w )                                                 w is a copy of the index of the next outer loop.  May only      be used within a nested DO-LOOP or DO- +LOOP in the form,       for example:                                                         DO ... DO ... J ... LOOP ... +LOOP                                                                                     KEY        ( -- 16b )                                               The least-significant 7 bits of 16b is the next ASCII           character received.  All valid ASCII characters 0..127 can      be received.  Control characters are not processed by the       system for any editing purpose.  Characters received by KEY     will not be displayed.  Each KEY receives one ASCII             character, with more-significant bits zero.                                                                                 LEAVE      ( -- )                                                          ( -- )  (compiling)                                      Transfers execution to just beyond the next LOOP or +LOOP .     The loop is terminated and loop control parameters are          discarded.  May only be used in the form:                            DO ... LEAVE ... LOOP                                      or                                                                   DO ... LEAVE ... +LOOP                                     LEAVE may appear within other control structures which are      nested within the do-loop structure.  More than one LEAVE       may appear within a do-loop.                                                                                                                                                                                                                                                                                                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 16 of 29 
+
+
+LITERAL    ( -- 16b )                                                      ( 16b -- )  (compiling)                                  Typically used in the form:                                          [ 16b ] LITERAL                                            Compiles an operation so that when later executed, 16b will     be left on the stack.                                                                                                       LOAD       ( u -- )                                                 The contents of >IN and BLK , which locate the current input    stream, are saved.  The input stream is then redirected to      the beginning of screen u by setting >IN to zero and BLK to     u.  The screen is then interpreted.  If interpretation from     screen u is not terminated explicitly it will be terminated     when the input stream is exhausted and then the contents of     >IN and BLK will be restored.  An error occurs if u is zero.    See:  >IN  BLK  BLOCK                                                                                                       LOOP       ( -- )                                                          ( -- )  (compiling)                                      Increments the DO-LOOP index by one.  If the new index was      incremented across the boundary between limit-1 and limit       the loop is terminated and loop control parameters are          discarded.  When the loop is not terminated, execution          continues to just after the corresponding DO .  See:  DO                                                                    MAX        ( n1 n2 -- n3 )             "max"                        n3 is the greater of n1 and n2 according to the operation of    > .                                                                                                                         MIN        ( n1 n2 -- n3 )             "min"                        n3 is the lesser of n1 and n2 according to the operation of     < .                                                                                                                         MOD        ( n1 n2 -- n3 )                                          n3 is the remainder after dividing n1 by the divisor n2.  n3    has the same sign as n2 or is zero.  An error occurs if the     divisor is zero or if the quotient falls outside of the         range -32,768..32,767.  See:  "division, floored" in the        Glossary.                                                                                                                   NEGATE     ( n1 -- n2 )                                             n2 is the two's complement of n1, i.e, the difference of        zero less n1.                                                                                                               NOT        ( 16b1 -- 16b2 )                                         16b2 is the one's complement of 16b1.                                                                                                                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 17 of 29 
+
+
+OR         ( 16b1 16b2 -- 16b3 )                                    16b3 is the bit-by-bit inclusive-or of 16b1 with 16b2.                                                                      OVER       ( 16b1 16b2 -- 16b1 16b2 16b3 )                          16b3 is a copy of 16b1.                                                                                                     PAD        ( -- addr )                                              The lower address of a scratch area used to hold data for       intermediate processing.  The PAD capacity is 150 bytes.                                                                    PICK       ( +n -- 16b )                                            16b is a copy of the +nth stack value, not counting +n          itself.  0..the number of elements on stack-1                        0 PICK is equivalent to DUP                                     1 PICK is equivalent to OVER                                                                                           QUIT       ( -- )                                                   Clears the return stack, sets interpret state, accepts new      input from the current input device, and begins text            interpretation.  No message is displayed.                                                                                   R>         ( -- 16b )                  "r-from"                     16b is removed from the return stack and transferred to the     data stack.                                                                                                                 R@         ( -- 16b )                  "r-fetch"                    16b is a copy of the top of the return stack.                                                                               REPEAT     ( -- )                                                          ( -- )  (compiling)                                      Used in the form:                                                    BEGIN ... flag WHILE ... REPEAT                            At execution time, REPEAT continues execution to just after     the corresponding BEGIN .  See: BEGIN                                                                                       ROLL       ( +n -- )                                                The +nth stack value, not counting +n itself is first           removed and then transferred to the top of the stack, moving    the remaining values into the vacated position.  0..the         number of elements on the stack-1                                    2 ROLL is equivalent to ROT                                     0 ROLL is a null operation                                                                                             ROT        ( 16b1 16b2 16b3 -- 16b2 16b3 16b1 ) "rote"              The top three stack entries are rotated, bringing the           deepest to the top.                                                                                                                                                                         
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 18 of 29 
+
+
+SAVE-BUFFERS ( -- )                    "save-buffers"               The contents of all block buffers marked as UPDATEed are        written to their corresponding mass storage blocks.  All        buffers are marked as no longer being modified, but remain      assigned.                                                                                                                   SIGN       ( n -- )                                                 If n is negative, an ASCII "-" (minus sign) is appended to      the pictured numeric output string.  Typically used between     <# and #> .                                                                                                                 SPACE      ( -- )                                                   Displays an ASCII space.                                                                                                    SPACES     ( +n -- )                                                Displays +n ASCII spaces.  Nothing is displayed if +n is        zero.                                                                                                                       SPAN       ( -- addr )                                              The address of a variable containing the count of characters    actually received and stored by the last execution of EXPECT    See:  EXPECT                                                                                                                STATE      ( -- addr )                                              The address of a variable containing the compilation state.     A non-zero content indicates compilation is occurring.                                                                      SWAP       ( 16b1 16b2 -- 16b2 16b1 )                               The top two stack entries are exchanged.                                                                                    THEN       ( -- )                                                          ( -- )  (compiling)                                      Used in the form:                                                    flag IF ... ELSE ... THEN                                  or                                                                   flag IF ... THEN                                           THEN is the point where execution continues after ELSE , or     IF when no ELSE is present.  sys is balanced with its           corresponding IF or ELSE .  See:  IF  ELSE                                                                                  TIB        ( -- addr )                 "t-i-b"                      The address of the text input buffer.  This buffer is used      to hold characters when the input stream is coming from the     current input device.  The capacity of TIB is 256               characters.                                                                                                                                                                                                                                                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 19 of 29 
+
+
+TYPE       ( addr +n -- )                                           +n characters are displayed from memory beginning with the      character at addr and continuing through consecutive            addresses.  Nothing is displayed if +n is zero.  Byte values    less than 32 and greater than 126 (up to 255) display as a      space.                                                                                                                      U.         ( u -- )                    "u-dot"                      u is displayed as an unsigned number in a free-field format.                                                                U<         ( u1 u2 -- flag )           "u-less-than"                flag is true if u1 is less than u2.                                                                                         UM*        ( u1 u2 -- ud )             "u-m-times"                  ud is the unsigned product of u1 times u2.  All values and      arithmetic are unsigned.                                                                                                    UM/MOD     ( ud u1 -- u2 u3 )          "u-m-divide-mod"             u2 is the remainder and u3 is the floor of the quotient         after dividing ud by the divisor u1.  All values and            arithmetic are unsigned.  An error occurs if the divisor is     zero or if the quotient lies outside the range 0..65,535.       See:  "floor, arithmetic" in the Glossary.                                                                                  UNTIL      ( flag -- )                                              Used in the form:                                                    BEGIN ... flag UNTIL                                       Marks the end of a BEGIN-UNTIL loop which will terminate        based on flag.  If flag is true, the loop is terminated.  If    flag is false, execution continues to just after the            corresponding BEGIN .  See:  BEGIN                                                                                          UPDATE     ( -- )                                                   The currently valid block buffer is marked as modified.         Blocks marked as modified will subsequently be automatically    transferred to mass storage should its memory buffer be         needed for storage of a different block or upon execution of    FLUSH or SAVE-BUFFERS .                                                                                                     VARIABLE   ( -- )                                                   A defining word executed in the form: VARIABLE <name> A         dictionary entry for <name> is created and two bytes are        ALLOTted in its parameter field.  This parameter field is to    be used for contents of the variable.  The application is       responsible for initializing the contents of the variable       which it creates.  When <name> is later executed, the           address of its parameter field is placed on the stack.                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 20 of 29 
+
+
+VOCABULARY ( -- )                                                   A defining word executed in the form:                                VOCABULARY <name>                                          A dictionary entry for <name> is created which specifies a      new ordered list of word definitions.  Subsequent execution     of <name> replaces the first vocabulary in the search order     with <name>.  When <name> becomes the compilation vocabulary    new definitions will be appended to <name>'s list.  See:        DEFINITIONS .  See: "search order" in the Glossary.                                                                         WHILE      ( flag -- )                                              Used in the form:                                                    BEGIN ... flag WHILE ... REPEAT                            Selects conditional execution based on flag.  When flag is      true, execution continues to just after the WHILE through to    the REPEAT which then continues execution back to just after    the BEGIN .  When flag is false, execution continues to just    after the REPEAT , exiting the control structure.  See:         BEGIN                                                                                                                       WORD       ( char -- addr )                                         Generates a counted string by non-destructively accepting       characters from the input stream until the delimiting           character char is encountered or the input stream is            exhausted.  Leading delimiters are ignored.  The entire         character string is stored in memory beginning at addr as a     sequence of bytes.  The string is followed by a blank which     is not included in the count.  The first byte of the string     is the number of characters 0..255.  If the string is           longer than 255 characters, the count is unspecified.  If       the input stream is already exhausted as WORD is called,        then a zero length character string will result.  If the        delimiter is not found the value of >IN is the size of the      input stream.  If the delimiter is found >IN is adjusted to     indicate the offset to the character following the              delimiter.  #TIB is unmodified.  The counted string returned    by WORD resides in the "free" dictionary area at HERE or        above.  Note that the text interpreter also uses this area.     See:  "input stream" in the Glossary.                                                                                       XOR        ( 16b1 16b2 -- 16b3 )       "x-or"                       16b3 is the bit-by-bit exclusive-or of 16b1 with 16b2.                                                                      [          ( -- )                      "left-bracket"                      ( -- )  (compiling)                                      Sets interpret state.  The text from the input stream is        subsequently interpreted.  For typical usage see LITERAL .      See:  ]                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 21 of 29 
+
+
+                                                                [']        ( -- addr )                 "bracket-tick"                      ( -- )  (compiling)                                      Used in the form:                                                    ['] <name>                                                 Compiles the compilation address addr of <name> as a            literal.  When the colon definition is later executed addr      is left on the stack.  An error occurs if <name> is not         found in the currently active search order.  See: LITERAL                                                                   [COMPILE]  ( -- )                      "bracket-compile"                   ( -- )  (compiling)                                      Used in the form:                                                    [COMPILE] <name>                                           Forces compilation of the following word <name>.  This          allows compilation of an immediate word when it would           otherwise have been executed.                                                                                               ]          ( -- )                      "right-bracket"              Sets compilation state.  The text from the input stream is      subsequently compiled.  For typical usage see LITERAL .         See:  [                                                                                                                                                                                       ** Glossary                                                                                                                   address, byte                                                       An unsigned 16-bit number that locates an 8-bit byte in the memory over the range 0..65,535.  Addresses are treated as      unsigned numbers.  See:  "arithmetic, two's complement"                                                                         address, compilation                                                The numerical value compiled for a FORTH word definition    which identifies that definition.  The address interpreter uses this value to locate the machine code corresponding to each     definition.                                                                                                                     address, parameter field                                            The address of the first byte of memory associated with a   word definition for the storage of compilation addresses (in a  colon definition), numeric data, text characters, etc.                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 22 of 29 
+
+
+arithmetic, two's complement                                        Arithmetic is performed using two's complement integers     within a field of either 16 or 32 bits as indicated by the      operation.  Addition and subtraction of two's complement        integers ignore any overflow condition. This allows numbers     treated as unsigned to produce the same results as if the       numbers had been treated as signed.                                                                                             block                                                               The 1024 bytes of data from mass storage which are          referenced by block numbers in the range 0..627.  The actual    amount of data transferred and the translation from block numberto device and physical record is a function of the              implementation.  See:  "block buffer" "mass storage"                                                                            block buffer                                                        A 1024-byte memory area where a block is made temporarily   available for use.  Block buffers are uniquely assigned to      blocks.                                                                                                                         byte                                                                An assembly of 8 bits.  In reference to memory, it is the   storage capacity for 8 bits.                                                                                                    character                                                           A 7-bit number the significance of which is given by the    ASCII standard.  When contained in a larger field, the higher   order bits are zero.                                                                                                            compilation                                                         The action of converting text words from the input stream   into an internal form suitable for later execution.  When in thecompile state, the compilation addresses of FORTH words are     compiled into the dictionary for later execution by the address interpreter.  Numbers are compiled to be placed on the data     stack when later executed.  Numbers are accepted from the input stream unsigned or negatively signed and converted using the    value of BASE .  See:  "number"  "number conversion"            "interpreter, text"                                                                                                             defining word                                                       A word that, when executed, creates a new dictionary entry  in the compilation vocabulary.  The new word name is taken from the input stream.  If the input stream is exhausted before the  new name is available, an error condition exists.  Example of   defining words are:                                                 :  CONSTANT  CREATE                                                                                                         
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 23 of 29 
+
+
+definition                                                          See:  "word definition"                                                                                                     dictionary                                                          A structure of word definitions in computer memory which is extensible and grows toward higher memory addresses.  Entries   are organized in vocabularies to aid location by name.  See:    "search order"                                                                                                                  display                                                             The process of sending one or more characters to the screen.                                                                division, floored                                                   Integer division in which the remainder carries the sign of the divisor or is zero, and the quotient is rounded to its      arithmetic floor.  Note that, except when errors occur, n1 n2   SWAP OVER /MOD ROT * + is identical to n1.  See: "floor,        arithmetic"  Examples:                                                            dividend  divisor  remainder  quotient                              10        7        3          1                                -10        7        4         -2                                 10       -7       -4         -2                                -10       -7       -3          1                                                                           enter                                                               The means of indicating the end of text by striking the     "ENTER" key on the keyboard.                                                                                                    equivalent execution                                                A standard program will produce the same results, exclusive of timing dependencies, when given the same inputs on any       Standard System which has sufficient resources to execute the   program.  Only standard source programs are transportable.                                                                      errors                                                              See the CF83 Forth User's Guide                                                                                             false                                                               A zero number represents the false state of a flag.                                                                         flag                                                                A number that may have one of two logical states, false or  true.  See: "false"  "true"                                                                                                                                                                                                                                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 24 of 29 
+
+
+floor, arithmetic                                                   If z is any real number, then the floor of z is the greatestinteger less than or equal to z.                                         The floor of +.6 is 0                                           The floor of -.4 is -1                                                                                                 free field format                                                   Numbers are converted using the value of BASE and then      displayed with no leading zeros.  A trailing space is           displayed.  The number of characters displayed is the minimum   number of characters, at least one, to uniquely represent the   number.  See:  "number conversion"                                                                                              immediate word                                                      A word which executes when encountered during compilation orinterpretation.  Immediate words handle special cases during    compilation.  See, for example, IF LITERAL ." etc.                                                                              input stream                                                        A sequence of characters available to the system, for       processing by the text interpreter.  The input stream           conventionally may be taken from the keyboard (via the text     input buffer) and mass storage (via a block buffer).  BLK , >IN , TIB and #TIB specify the input stream.  Words using or        altering BLK , >IN , TIB and #TIB are responsible for           maintaining and restoring control of the input stream.  The     input stream extends from the offset value of >IN to the size ofthe input stream.  If BLK is zero the input stream is contained within the area addressed by TIB and is #TIB bytes long.  If BLKis non-zero the input stream is contained within the block      buffer specified by BLK and is 1024 bytes long.                                                                                 interpreter, address                                                The machine code instructions, routine or other facilities  that execute compiled word definitions containing compilation   addresses.                                                                                                                      interpreter, text                                                   The word definitions(s) that repeatedly accepts a word name from the input stream, locates the corresponding compilation    address and starts the address interpreter to execute it.  Text from the input stream interpreted as a number leaves the        corresponding value on the data stack.  Numbers are accepted    from the input stream unsigned or negatively signed and         converted using the value of BASE .  See: "number" "number      conversion"                                                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 25 of 29 
+
+
+load                                                                Redirection of the text interpreter's input stream to be    from mass storage.  This is the general method for compilation  of new definitions into the dictionary.                                                                                         mass storage                                                        Storage which resides on the disk drive(s), outside the     memory address space 0..65,535.  Mass storage data is made      available in the form of 1024-byte blocks.  A block is          accessible within the memory address space in a block buffer.   When a block has been indicated as UPDATEed (modified) the blockwill ultimately be transferred to mass storage.                                                                                 number                                                              When values exist within a larger field, the most-          significant bits are zero.  16-bit numbers are represented in   memory by addressing the first of two bytes at consecutive      addresses.  The address of the least significant byte is one    greater than the address of the most significant byte.  Double  numbers are represented on the stack with the most-significant  16 bits (with sign) most accessible.  Double numbers are        represented in memory by two consecutive 16-bit numbers.  The   address of the least significant 16 bits is two greater than theaddress of the most significant 16 bits.  The byte order within each 16-bit field is the same as for 16-bit numbers.  See:      "arithmetic, two's complement" "number types"                                                                                   number conversion                                                   Numbers are maintained internally in binary and represented externally by using graphic characters within the ASCII         character set.  Conversion between the internal and external    forms is performed using the current value of BASE to determine the digits of a number.  A digit has a value ranging from zero  to the value of BASE-1.  The digit with the value zero is       represented by the ASCII character "0" (position 3/0 with the   decimal equivalent of 48).  This representation of digits       proceeds through the ASCII character set to the character "9"   corresponding to the decimal value 9.  For digits with a value  exceeding 9, the ASCII graphic characters beginning with the    character "A" (position 4/1 with the decimal equivalent 65)     corresponding to the decimal value 10 are used.  This sequence  then continues up to and including the digit with the decimal   value 71 which is represented by the ASCII character "~"        (position 7/14 with a decimal equivalent 126).  A negative      number may be represented by preceding the digits with a single leading minus sign, the character "-".                                                                                                                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 26 of 29 
+
+
+number types                                                        All number types consist of some number of bits.  These bitsare either arbitrary or are weighted.  Signed and unsigned      numbers use weighted bits.  Weighted bits within a number have avalue of a power of two beginning with the rightmost            (least-significant) bit having the value of two to the zero     power.  This weighting continues to the leftmost bit increasing the power by one for each bit.  For an unsigned number this     weighting pattern includes the leftmost bit; thus, for an       unsigned 16-bit number the weight of the leftmost bit is        32,768.  For a signed number this weighting pattern includes theleftmost bit but the weight of the leftmost bit is negated;     thus, for a signed 16-bit number the weight of the leftmost bit is -32,768.  This weighting pattern for signed numbers is calledtwo's complement notation.  Unspecified weighted numbers are    either unsigned numbers or signed numbers; program context      determines whether the number is signed or unsigned.                                                                            pictured numeric output                                             The use of numeric output definitions which convert         numerical values into text strings.  These definitions are used in a sequence which resembles a symbolic 'picture' of the       desired text format.  Conversion proceeds from least-significantdigit to most-significant digit, and converted characters are   stored from higher memory addresses to lower.                                                                                   program                                                             A complete specification of execution to achieve a specific function (application task) expressed in FORTH source code form.                                                                receive                                                             The process of obtaining one character from the keyboard.                                                                   recursion                                                           The process of self-reference, either directly or           indirectly.                                                                                                                     return                                                              See "enter"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 27 of 29 
+
+
+search order                                                        A specification of the order in which selected vocabularies in the dictionary are searched.  Execution of a vocabulary makesit the first vocabulary in the search order.  The dictionary is searched whenever a word is to be located by its name.  This    order applies to all dictionary searches unless otherwise       noted.  The search order begins with the last vocabulary        executed and ends with FORTH.                                                                                                   source definition                                                   Text consisting of word names suitable for compilation or   execution by the text interpreter.  Such text is usually        arranged in blocks and maintained on a mass storage device.                                                                     stack, data                                                         A last in, first out list consisting of 16-bit binary       values.  This stack is primarily used to hold intermediate      values during execution of word definitions.  Stack values may  represent numbers, characters, addresses, boolean values, etc.  When the name 'stack' is used alone, it implies the data stack.                                                                 stack, return                                                       A last in, first out list which contains the addresses of   word definitions whose execution has not been completed by the  address interpreter.  As a word definition passes control to    another definition, the return point is placed on the return    stack.  The return stack may cautiously be used for other       values.                                                                                                                         string, counted                                                     A sequence of consecutive 8-bit bytes located in memory by  their low memory address.  The byte at this address contains a  count 0..255 of the number of bytes following which are part    of the string.  The count does not include the count byte       itself.  Counted strings usually contain ASCII characters.                                                                      string, text                                                        A sequence of consecutive 8-bit bytes located in memory by  their low memory address and length in bytes.  Strings usually, but not exclusively, contain ASCII characters.  When the term   'string' is used alone or in conjunction with other words it    refers to text strings.                                                                                                                                                                                                                                                                                                                                                                                                                                         
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 28 of 29 
+
+
+structure, control                                                  A group of FORTH words which when executed alter the        execution sequence.  The group starts and terminates with       compiler words.  Examples of control structures:  DO ...  LOOP  DO ... +LOOP  BEGIN ... WHILE ... REPEAT  BEGIN ...  UNTIL  IF  ... THEN  IF ... ELSE ... THEN .                                                                                                transportability                                                    This term indicates that equivalent execution results when aprogram is executed on other than the system on which it was    created.  See: "equivalent execution"                                                                                           true                                                                A non-zero value represents the true state of a flag.  Any  non-zero value will be accepted as 'true'.                                                                                      vocabulary                                                          An ordered list of word definitions.  Vocabularies are an   advantage in separating different word definitions that may havethe same name.  More than one definition with the same name can exist in one vocabulary.  The latter is called a redefinition.  The most recently created redefinition will be found when the   vocabulary is searched.                                                                                                         vocabulary, compilation                                             The vocabulary into which new word definitions are appended.                                                                word                                                                A sequence of characters terminated by one blank or the end of the input stream.  Leading blanks are ignored.  Words are    usually obtained via the input stream.                                                                                          word definition                                                     A named FORTH execution procedure compiled into the         dictionary.  Its execution may be defined in terms of machine   code, as a sequence of compilation address, or other compiled   words.                                                                                                                          word name                                                           The name of a word definition.  Word names are limited to 31characters and may not contain an ASCII space.  If two          definitions have different word names in the same vocabulary    they will be uniquely findable when this vocabulary is          searched.  See:  "vocabulary"                                                                                                   word set, assembler extension                                       Additional words which facilitate programming in the 6809   machine language.                                               
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-1: Technical Reference Manual - Page 29 of 29 
+
+
+                                                                word set, double number extension                                   Additional words which facilitate manipulation of 32-bit    numbers.                                                                                                                        word set, required                                                  The minimum words needed to compile and execute Standard    Programs.                                                                                                                       word set, system extension                                          Additional words which facilitate the access to internal    system characteristics.                                                                                                         word, standard                                                      A named FORTH procedure definition, in the Required word setor any extension word sets, formally reviewed and accepted by   the FORTH Standards Team.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   **  END  **                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+
+
+
+
+
+
+
+
+
+
+
+
+

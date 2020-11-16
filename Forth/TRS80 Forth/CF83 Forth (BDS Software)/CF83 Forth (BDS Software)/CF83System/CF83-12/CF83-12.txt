@@ -1,0 +1,102 @@
+CF83-12: RS-DOS File Handling Word Set" - Page 1 of 6 
+
+
+         CF83-12: RS-DOS File Handling Words Set Manual                                    CF83 Forth                                                                                                                 Copyright  (c)  1992                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $15.00 with the User's Guide on disk only, or   for $19.00 with a printed copy of the User's Guide included.    These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was still $15.00 +3.00 handling for US, Canada, or Mexico       delivery as of April 1992.  California Residents add sales tax.                                                                 The primary purpose of this word set is the SAVEM word.  This   word allows you to create executable binary machine language    program files which will run directly on the CoCo without any   need for the user to have CF83 Forth.  If, for example, you use the SAVEM word to create PROGRAM.BIN, and then give PROGRAM.BIN to a friend, all the friend has to do is put the disk in the    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-12: RS-DOS File Handling Word Set" - Page 2 of 6 
+
+
+drive and enter:                                                                                                                     LOADM"PROGRAM.BIN"                                                                                                         and then:                                                                                                                            EXEC                                                                                                                       whereupon PROGRAM.BIN will execute just like any other          executable binary machine language program.                                                                                     You may freely distribute ML programs you create with SAVEM in  any manner you choose.  You can sell them, give them away, or   whatever.  There is no license fee for use of CF83 in this      manner.  The CF83 operating system which will be included in    such SAVEM'ed ML programs will not be accessable to the end userand BDS Software and M. David Johnson hereby grant you an       unlimited software license to use CF83 Forth in this manner     only.  The only restriction on this license is that you must notuse SAVEM in a fashion that will create a program that is       further extendable by the end user ( i.e. your program must not allow the end user to create any new CF83 words ).                                                                              SAVEM itself will create a system of three or four files which  will together comprise an ML program of up to 64K in size, whichwill LOADM and EXEC directly from BASIC.  This is twice the     usual 32K limit of BASIC ( Normally, even in a CoCo III, an     attempt to directly LOADM an ML file greater than 32K would     overwrite the RAM image of the BASIC ROM and thus crash the     system ).  The need to get around this 32K limit is why SAVEM   creates three or four files instead of just one.                                                                                Actually, the "64K" limit is 65,261 bytes, 64K less the         dedicated upper I/O and CoCo III Interrupt Jump Vector memory.  The CF83 operating system occupies the first 28,065 bytes in allSAVEM'ed ML programs ( and includes screen memory, block        buffers, system variables, etc. ) so that a total of 37,196     bytes are available for specific program code.                                                                                  For comparison, note that only 22,839 bytes are available for   BASIC programs under RS-DOS ( see p. 171 of Tandy's Color       Computer Disk System Owners Manual & Programming Guide ).  Also note that CF83's threaded interpreter design allows more compactprogramming so that you can get significantly more CF83 code perK than you can in BASIC.                                                                                                        Judicious use of the FSAVE word to create partial memory ML     files, along with appropriate programming within the 64K SAVEM  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-12: RS-DOS File Handling Word Set" - Page 3 of 6 
+
+
+space itself, will allow ML programs to use the full CoCo III   512K memory.  ( No discussion of how to do that is included     here - an extensive knowledge of the CoCo III and ML programmingis required - discussion of such is beyond the scope of this    manual ).                                                                                                                       The save-system word is provided especially for your            convenience: it allows you to load blocks and add words to CF83 and then save the system to disk so that you can later LOADM andEXEC the system in its extended form and then extend it further as desired.  For example, if you are going to be developing a   lot of systems using PMODEG graphics, you can RUN"CF83", load   this RS-DOS File Handling Set, load the Block Editor, load the  PMODEG Graphics Set, and save-system the combination as a new   program file.  When you LOADM and EXEC that file you will be in CF83 with RS-DOS File Handling, the Block Editor, and PMODEG    Graphics already loaded.  This saves a great deal of loading    time and will significantly speed-up your program development.                                                                  Note: When working with RS-DOS filenames, remember that they ARE      case sensitive: FILE.BAS is NOT the same file as file.bas.                                                                Note: Whenever the term   - more -   appears at the end of a          list of items, you can list additional items by pressing        any key except the BREAK key.  Pressing the BREAK key           aborts the process.                                                                                                       Note: In the following list of words, the terms filename.ext,   etc. denote any valid RS-DOS filename and extension.                                                                            ***  NOTE  **************************************************** *                                                             * *  If you are going to use this set, it MUST ( MUST MUST )    * *  be the first set loaded to CF83, and it must be loaded     * *  BEFORE any other words are defined ( i.e. it must be       * *  loaded IMMEDIATELY after you RUN"CF83" from BASIC, hit     * *  any key at the opening screen, and get the first "ok"      * *  prompt).  If you intend to load any other blocks and/or    * *  define any other words, you must do so only AFTER this     * *  set is loaded !                                            * *                                                             * ***************************************************************                                                                 Use:    55 LOAD    to load the set.                                                                                                                                                                                                                                                                                             
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-12: RS-DOS File Handling Word Set" - Page 4 of 6 
+
+
+The RS-DOS File Handling Word Set includes the following words:                                                                 CKDIR               ( +n -- )                                        List a full detailed information directory of the RS-DOS        diskette in drive number +n ( 0 to 3 ) to the screen.                                                                      CKFILE              ( +n -- )                                        List detailed information about a file on the RS-DOS            diskette in drive number +n ( 0 to 3 ).  Used in the form:                                                                                +n ckfile filename.ext                                                                                           DIR                 ( +n -- )                                        List a standard information directory of the RS-DOS             diskette in drive number +n (0 to 3 ) to the screen.                                                                       DSKI$               ( +n1 +n2 +n3 addr -- )                          Read a disk sector into memory.  Does NOT check buffer          contents in advance like BLOCK does.                                                                                                      +n1 = drive number  ( 0 to 3 )                                  +n2 = track number  ( 0 to 34 )                                 +n3 = sector number ( 1 to 18 )                                addr = 256 byte buffer address                                                                                    DSKO$               ( +n1 +n2 +n3 addr -- )                          Write a memory buffer into a disk sector.  See DSKI$ for        identification of stack comments.                                                                                          FLOAD               ( +n u -- )                                      Load an RS-DOS binary machine language file into memory.                                                                                   +n = drive number ( 0 to 3 )                                     u = offset                                                                                                          You MUST include an offset value on the stack - there is no     default value.  If you do not wish to offset the file, use      a zero ( 0 ) offset value on the stack.  Used in the form:                                                                                +n u fload filename.ext                                                                                          FREE                ( +n -- )                                        Report the number of free grans on the RS-DOS diskette in       drive number +n ( 0 to 3 ).                                                                                                                                                                                                                                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-12: RS-DOS File Handling Word Set" - Page 5 of 6 
+
+
+FSAVE               ( +n u addr1 addr2 addr3 -- )                    Save a portion of memory to disk as an RS-DOS executable        binary machine language file.                                                                                                              +n = drive number ( 0 to 3 )                                     u = offset                                                  addr1 = start address                                           addr2 = end address                                             addr3 = execution address                                                                                               See offset value note under FLOAD.  Used in the form:                                                                                     +n u addr1 addr2 addr3 fsave filename.ext                                                                        KILL                ( +n -- )                                        Kill ( i.e. delete ) a file on the RS-DOS diskette in drive     number +n ( 0 to 3 ).  Used in the form:                                                                                                  +n kill filename.ext                                                                                             SAVE-SYSTEM         ( +n -- )                                        Save the entire CF83 systwm ( from 0 to here @ ) as a           collection of binary machine language files on the RS-DOS       diskette in drive number +n ( 0 to 3 ).  Used in the form:                                                                                +n save-system filename.ext                                                                                           Save-system creates the three files filename.ext,               filename.ex2, and filename.ex3.  If ( here @ ) is greater       than $7FFF, it also creates filename.ex4.  When you later       LOADM"filename.ext" and then EXEC, filename.ext                 automatically loads the other two or three files in the         collection.                                                                                                                     The result of the LOADM and EXEC is an extended version of      CF83 ( including whatever words you defined before              executing save-system ) up and running AS CF83 Forth, and       further extendable in the normal CF83 manner.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-12: RS-DOS File Handling Word Set" - Page 6 of 6 
+
+
+SAVEM              ( +n addr -- )                                    Save the entire system ( from 0 to here @ ) as a collection     of non-extendable binary machine language files on the          RS-DOS diskette in drive number +n ( 0 to 3 ).                                                                                           addr = the execution address of the system's top                       execution word.                                                                                                 Generally used in the form:                                                                                                               +n ' execword savem filename.ext                                                                                      For example, if you wanted to save an application whose top     word was RUNME to the diskette in drive number zero as          GAME3.BIN, the command line would be:                                                                                                     0 ' runme savem GAME3.BIN                                                                                             Savem creates the three files filename.ext, filename.ex2,       and filename.ex3.  If ( here @ ) is greater than $7FFF, it      also creates filename.ex4.  When you later                      LOADM"filename.ext" and then EXEC, filename.ext                 automatically loads the other two or three files in the         collection, and then executes the system's top execution        word.                                                                                                                           The result of the LOADM and EXEC is the same as with any        executable binary machine language program.                                                                                SDIR                ( +n -- )                                        List a short information directory of the RS-DOS diskette       in drive number +n ( 0 to 3 ) to the screen.                                                                               SORTDIR             ( +n -- )                                        Sort the directory of the RS-DOS diskette in drive number       +n ( 0 to 3 ) into ASCII alphanumeric filename.ext order.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             **  END  **                                                                                                                                                                                                                                                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
