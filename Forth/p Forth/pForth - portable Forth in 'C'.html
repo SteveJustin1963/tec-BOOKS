@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0032)http://www.softsynth.com/pforth/ -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>pForth - portable Forth in 'C'</title>
+<link rel="SHORTCUT ICON" href="http://www.softsynth.com/favicon.ico">
+<link href="./pForth - portable Forth in &#39;C&#39;_files/custom.css" rel="stylesheet" type="text/css">
+<link href="./pForth - portable Forth in &#39;C&#39;_files/aardvark.css" rel="stylesheet" type="text/css">
+<!-- extra head -->
+
+<script type="text/javascript" async="" src="./pForth - portable Forth in &#39;C&#39;_files/ga.js.download"></script><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-750748-3']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</head>
+<body>
+<div id="container">
+<div id="header">
+  <div id="leftheader"><a href="http://www.softsynth.com/"> <img src="./pForth - portable Forth in &#39;C&#39;_files/softsynth_logo.png" width="200" height="100" border="0"></a></div>
+  <div id="rightheader">
+    <!-- Google CSE Search Box Begins -->
+    <form id="searchbox_015572705897646109065:fp6grb7yfpk" action="http://www.google.com/cse">
+      <input type="hidden" name="cx" value="015572705897646109065:fp6grb7yfpk">
+      <input name="q" type="text" size="40" placeholder="Custom Search" style="border: 1px solid rgb(126, 157, 185); padding: 2px; background: url(&quot;https://www.google.com/cse/static/images/1x/googlelogo_lightgrey_46x16dp.png&quot;) left center no-repeat rgb(255, 255, 255); text-indent: 48px;">
+      <input type="submit" name="sa" value="Search">
+      <input type="hidden" name="cof" value="FORID:0">
+    <input name="siteurl" type="hidden" value="www.softsynth.com/pforth/"><input name="ref" type="hidden" value="www.google.com/"><input name="ss" type="hidden" value=""></form>
+    <script type="text/javascript" src="./pForth - portable Forth in &#39;C&#39;_files/f.txt"></script>
+    <!-- Google CSE Search Box Ends -->
+  </div>
+  <div id="midheader">
+    <h1>SoftSynth</h1>
+    <h2>... music and computers ...</h2>
+  </div>
+  <br class="clearfloat">
+</div>
+<!-- Left Side Navigation ******************************** -->
+<div id="leftside">
+  <div id="leftside_inner"> <ul>
+<li><a href="http://www.softsynth.com/index.php">Home</a>
+</li><li><a href="http://www.softsynth.com/products.php">Products</a>
+</li><li><a href="http://www.softsynth.com/jsyn/index.php">JSyn</a>
+</li><li><a href="http://www.softsynth.com/syntona/index.php">Syntona</a>
+</li><li><span class="current_link">pForth</span>
+</li><li><a href="http://www.softsynth.com/music/index.php">Music</a>
+</li><li><a href="http://www.softsynth.com/news/index.php">News</a>
+</li><li><a href="http://www.softsynth.com/links/index.php">Links</a>
+</li><li><a href="http://www.softsynth.com/contacts.php">Contact&nbsp;Us</a>
+</li><li><a href="http://www.softsynth.com/aboutus.php">About&nbsp;Us</a>
+</li></ul>
+ </div>
+</div>
+<!-- Right Side Display ******************************** -->
+<div id="rightside">
+  <div id="rightside_inner">
+  
+  <h3>Projects</h3>
+<table border="1">
+  <tbody><tr>
+    <td><a href="http://www.softsynth.com/jsyn/">JSyn</a> - modular synthesis API for Java.</td>
+  </tr>
+  <tr>
+    <td><a href="http://www.algomusic.com/jmsl/" target="_blank">JMSL</a> - Java Music Specification Language</td>
+  </tr>
+  <tr>
+    <td><a href="http://www.portaudio.com/" target="_blank">PortAudio</a> - cross platform audio I/O API for 'C'</td>
+  </tr>
+</tbody></table>
+<!-- data for adsense -->
+    <script type="text/javascript"><!--
+	  google_ad_client = "pub-1426437777355396";
+	  google_ad_width = 160;
+	  google_ad_height = 600;
+	  google_ad_format = "160x600_as";
+	  google_ad_type = "text";
+	  google_ad_channel ="7963716298";
+	  google_color_border = "B0E0E6";
+	  google_color_bg = "FFFFFF";
+	  google_color_link = "000000";
+	  google_color_url = "336699";
+	  google_color_text = "333333";
+//--></script>
+<!--
+    <script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+-->
+  </div>
+</div>
+<div id="content">
+<!-- Begin Content DIV ******************************** -->
+<p class="navbar">
+<span class="current_link">pForth</span>
+&nbsp;:&nbsp;<a href="https://github.com/philburk/pforth/">GitHub</a>
+&nbsp;|&nbsp;<a href="http://www.softsynth.com/pforth/pf_tut.php">Tutorial</a>
+&nbsp;|&nbsp;<a href="http://www.softsynth.com/pforth/pf_ref.php">Reference</a>
+&nbsp;|&nbsp;<a href="http://www.softsynth.com/forthlinks.php">Links</a>
+</p>
+
+<h1>pForth - Portable Forth in 'C'</h1>
+<p> Translations to <a href="http://www.softsynth.com/pforth/indexfr.php">Français</a> by <a href="http://www.softsynth.com/pforth/infotrad.php"> Antoine Billiau</a>, or <a href="http://vision.twbbs.org/~letoh/forth/pf_tuttw.html" target="_blank">Chinese</a> by <a href="http://vision.twbbs.org/~letoh/blog/?page_id=169" target="_blank">Letoh</a></p>
+<p> PForth is a <a href="http://www.softsynth.com/pforth/#Legal">public
+  domain</a>, <b>portable</b> ANS Forth
+  based on a kernel written in ANSI 'C'. This makes it easy to port pForth
+  to multiple platforms. So far, pForth has run on Macintosh, Windows, Linux, Beagle Board, Raspberry Pi, SUNs, Amigas,
+  BeOS, Nokia Communicator, SGI Indys, 3DO ARM systems, 3DO PowerPC
+  systems, WebTV systems, Hitachi SH4, OpenTV prototypes, Compaq Ipaq 3970,
+  Sharp LH79520 ARM processor, Ciena Systems networking hardware, and some internal
+  projects at Lucent. If you build pForth for an embedded system,
+  please let me know and I will add your machine to the list of machines
+  that pForth has run on.</p>
+<p>PForth was developed by <a href="http://www.softsynth.com/philburk.html">Phil
+  Burk</a> while working at 3DO. PForth is open source, and may be used for free.</p>
+<h2>PForth source is now on <b><a href="https://github.com/philburk/pforth" target="_blank">GitHub</a></b>!</h2>
+<h2>PForth Features</h2>
+<ul>
+  <li> ANS standard support for Core, Core Extensions, File-Access, Floating-Point,
+    Locals, Programming-Tools, Strings word sets.</li>
+  <li> Compiles from simple ANSI 'C' code with no special pre-processing needed.
+    Also compiles under C++.</li>
+  <li> INCLUDE reads source from normal files, not BLOCKs.</li>
+  <li> Precompiled dictionaries can be saved and reloaded.</li>
+  <li> Custom 'C' code can be easily linked with pForth.</li>
+  <li> Handy words like ANEW&nbsp; INCLUDE? SEE&nbsp; WORDS.LIKE&nbsp; FILE?</li>
+  <li> Single Step Debugger</li>
+  <li> Smart conditionals.&nbsp; 10 0 DO I . LOOP works in outer interpreter.</li>
+  <li> Conditional compilation.&nbsp; [IF]&nbsp;&nbsp; [ELSE]&nbsp;&nbsp; [THEN]</li>
+  <li> Local variables using { }</li>
+  <li> 'C' like structure defining words.</li>
+  <li> Vectored execution using DEFER</li>
+  <li> Can be compiled without any stdlib calls for embedded systems. Only needs
+    custom KEY and EMIT equivalents in 'C'.</li>
+</ul>
+<h2> Download pForth</h2>
+<p>Download a zip archive, or checkout a Git repository from <b><a href="https://github.com/philburk/pforth" target="_blank">GitHub</a></b>.</p>
+<p><span class="topic">Older release are available from the <a href="http://code.google.com/p/pforth/downloads/list" target="_blank">old repository on Google Code!</a></span></p>
+<h2>pForth Documentation</h2>
+<ul>
+  <li>See the README.txt file in the pForthV* directory
+    for version information.</li>
+  <li>For information on pForth see the <a href="http://www.softsynth.com/pforth/pf_ref.php">pForth
+    Reference Manual</a>.</li>
+  <li>To learn the Forth language see the <a href="http://www.softsynth.com/pforth/pf_tut.php">Forth
+    Tutorial</a>. Translations to <a href="http://www.softsynth.com/pforth/pf_tutfr.php">Français,</a> or <a href="http://vision.twbbs.org/~letoh/forth/pf_tuttw.html" target="_blank">Chinese</a> by <a href="http://vision.twbbs.org/~letoh/blog/?page_id=169" target="_blank">Letoh</a> </li>
+  <li>Peruse the <a href="http://www.softsynth.com/pforth/pf_faq.php">pForth FAQ</a> (Frequently Asked Questions)</li>
+  <li>For a <b>glossary</b> of Forth words refer to the draft <a href="http://www.taygeta.com/forthlit.html">ANS
+    Forth spec</a>.</li>
+</ul>
+<p>To report bugs, please use the Issue tracker on GitHub.</p>
+<p>To ask pForth specific questions, please use the<a href="https://groups.google.com/forum/#!forum/pforthdev" target="_blank"> pforth developer group list</a>.<br>
+</p>
+<hr width="100%">
+<h3><a name="Legal" id="Legal"></a>Legal Stuff</h3>
+<p>Copyright 1994 - 3DO, Phil Burk, Larry
+  Polansky, David Rosenboom </p>
+<p>The pForth software code is dedicated
+  to the public domain, and any third party may reproduce, distribute and
+  modify the pForth software code or any derivative works thereof without
+  any compensation or license. The pForth software code is provided on an
+  "as is" basis without any warranty of any kind, including, without limitation,
+  the implied warranties of merchantability and fitness for a particular
+  purpose and their equivalents under the laws of any jurisdiction.</p>
+<br class="clearfloat">
+<!-- end content div ******************************** -->
+</div>
+
+<div id="footer">
+  <p class="copyright">(C) 1997-2015 Mobileer Inc - All Rights Reserved - <a href="http://www.softsynth.com/contacts.php">Contact Us</a></p>
+</div>
+<!-- end container div ******************************** -->
+</div>
+
+
+</body></html>
