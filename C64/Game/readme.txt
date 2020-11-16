@@ -1,0 +1,1 @@
+In number 7 of RetroMagazine you will find the review of a great classic by Bonaventura Di Bello: Amos Newton - Mente Aliena ! Play it back on your favorite Commodore 64 emulator by downloading the tape image from our site, courtesy of the author to RetroMagazine readers.
