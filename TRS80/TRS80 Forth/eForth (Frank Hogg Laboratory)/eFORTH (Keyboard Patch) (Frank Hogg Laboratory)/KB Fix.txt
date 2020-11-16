@@ -1,0 +1,63 @@
+
+A patched version of Frank Hogg Lab's EFORTH to allow it to run on the VCC, and Jeff Vavasour's emulators.
+Patch is to resolve the non-standard way in which EFORTH reads the Keyboard matrix.
+Will also work on real hardware without any problem.
+
+Leslie Ayling
+
+$2D12 - $2D23 made space for KB patch behind Copyright message
+
+RAM:2CDF 6E 9F 10 08                    jmp     [off_1008]
+RAM:2CDF                ; ---------------------------------------------------------------------------
+RAM:2CE3 12 65 46 4F 52+aEforthVersion1:fcb $12                 ; DATA XREF: RAM:2CB9o
+RAM:2CE3 54 48 20 56 31+                fcc "eFORTH V1.0-KB fix"
+RAM:2CF6 1B             byte_2CF6:      fcb 27                  ; DATA XREF: RAM:2CC3o
+RAM:2CF7 28 43 29 31 39+aCopyright1984B:fcc "(C)1984 Frank Hogg Lab inc.                  "
+RAM:2D24                ; ---------------------------------------------------------------------------
+RAM:2D24
+RAM:2D24                loc_2D24:                               ; DATA XREF: RAM:off_1004?o
+RAM:2D24 1F 01                          tfr     d, x
+RAM:2D26 4A                             deca
+RAM:2D27 1F 8B                          tfr     a, dp
+
+
+
+Old Keyboard code
+
+AM:303E 8E 30 24                        ldx     #word_3024
+RAM:3041 86 01                          lda     #1              ; start at column 0 : @,H,P,X,0,8,<ENTER>
+RAM:3043
+RAM:3043                loc_3043:                               ; CODE XREF: READ_KBD_PIO+32
+RAM:3043 C6 30                          ldb     #$30 ; '0'
+RAM:3045 D7 03                          stb     <byte_3         ; $FF03 select DDR in $FF02
+RAM:3047 97 02                          sta     <byte_2         ; *$FF02 select only *1* column as output, rest are HI-Z (value in A)
+RAM:3049 C6 34                          ldb     #$34 ; '4'
+RAM:304B D7 03                          stb     <byte_3         ; select output register
+RAM:304D 0F 02                          clr     <byte_2         ; $FF02 <= $00, but only one bit will be selected as an output.
+RAM:304D                                                        ; ** Next instruction relies on the internal pull-ups on port A **
+RAM:304D                                                        ; Only one bit can be low!
+RAM:304F D6 00                          ldb     <byte_0         ; read B <= $FF00,
+RAM:3051 53                             comb
+RAM:3052 E4 10                          andb    -$10,x          ; $3014 -> $301B
+RAM:3054 E7 10                          stb     -$10,x
+RAM:3056 D6 00                          ldb     <byte_0
+RAM:3058 53                             comb
+RAM:3059 EA 84                          orab    ,x              ; $3024 -> $302B
+RAM:305B E7 80                          stb     ,x+
+RAM:305D 48                             asla                    ; shift column select bit left for next run through
+RAM:305E 24 E3                          bcc     loc_3043        ; have we done all 8 columns yet?
+
+
+New KBD code
+
+304D:   7E 2D 12   JMP $2D12		; jump to patch behind copyright message
+3050:   12         NOP   (not used)
+3051:   53         comb
+
+
+2D12:  1F 89               tfr     a, b
+2D14:  53                  comb
+2D15:  D7 02               stb     <byte_2
+2D17:  D6 00               ldb     <byte_0         ; read B <= $FF00,
+2D19:  7E 30 51            JMP $3051		; return to keyboard code proper
+

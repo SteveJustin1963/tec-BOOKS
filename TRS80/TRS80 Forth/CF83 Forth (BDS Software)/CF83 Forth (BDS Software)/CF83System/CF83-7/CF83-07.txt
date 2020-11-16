@@ -1,0 +1,68 @@
+CF83-7: Controlled Reference Words Set - Page 1 of 4 
+
+
+         CF83-7:  Controlled Reference Words Set Manual                                    CF83 Forth                                                                                                                 Copyright  (c)  1992                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $15.00 with the User's Guide on disk only, or   for $19.00 with a printed copy of the User's Guide included.    These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was $15.00 +3.00 handling for US, Canada, or Mexico delivery as of April 1991.  California Residents add sales tax.                                                                             Much of this manual was copied directly from the Forth-83       Standard, and is subject to copyright by the FORTH Standards    Team; used by permission.  In many cases, the copied material   has been modified to specifically describe features of CF83.    Such changes were not incorporated in the original copyrighted  Forth-83 Standard.                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-7: Controlled Reference Words Set - Page 2 of 4 
+
+
+                                                                Use:   15 LOAD    to load the set.                                                                                                                                                              -->                 ( -- )                    "next-block"           Continue interpretation on the next sequential block.  May      be used within a colon definition that crosses a block          boundary.                                                                                                                  .R                  ( n +n -- )               "dot-r"                n is converted using BASE and then displayed right aligned      in a field +n characters wide.  A leading minus sign is         displayed if n is negative.  If the number of characters        required to display n is greater than +n, an error              condition exists.  See:  "number conversion" in Technical       Reference Manual's Glossary.                                                                                               2*                  ( w1 -- w2 )              "two-times"            w2 is the result of shifting w1 left one bit.  A zero is        shifted into the vacated bit position.                                                                                     BL                  ( -- 32 )                 "b-l"                  Leave the ASCII character value for space (decimal 32).                                                                    BLANK               ( addr u -- )                                    u bytes of memory beginning at addr are set to the ASCII        character value for space.  No action is taken if u is          zero.                                                                                                                      C,                  ( 16b -- )                "c-comma"              ALLOT one byte then store the least-significant 8 bits of       16b at HERE 1- .                                                                                                           DUMP                ( addr u -- )                                    List the contents of u addresses starting at addr.  Each        line of values is preceded by the address of the first          value.                                                                                                                     EDITOR              ( -- )                                           Included in CF83-3: Block Editor.                                                                                          EMPTY-BUFFERS       ( -- )                                           Unassign all block buffers.  UPDATEed blocks are not            written to mass storage.  See:  BLOCK in the Technical          Reference Manual's CF83 Word List.                                                                                         END                 ( flag -- )                                      A synonym for UNTIL .                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-7: Controlled Reference Words Set - Page 3 of 4 
+
+
+                                                                ERASE               ( addr u -- )                                    u bytes of memory beginning at addr are set to zero.  No        action is taken if u is zero.                                                                                              HEX                 ( -- )                                           Set the numeric input-output conversion base to sixteen.                                                                   INTERPRET           ( -- )                                           Begin text interpretation at the character indexed by the       contents of >IN relative to the block number contained in       BLK , continuing until the input stream is exhausted.  If       BLK contains zero, interpret characters from the text           input buffer.  See:  "input stream" in the Technical            Reference Manual's Glossary.  See:  >IN and BLK in the          Technical Reference Manual's CF83 Word List.  NOTE: Trying      to use Interpret outside of a colon definition is highly        complex and not recommended.  In CF83, Interpret must be        called differently, dependent upon whether it is to             interpret from the terminal or from a disk block.  If from      the terminal, it should be preceded by Query, e.g.                                                                                   : test 0 begin dup . 1+ tib 256 blank query interpret               0 until ;                                                                                                              while, if from a disk block, it should be preceded by "blk      @ >in @ #1 blk ! #2 >in !", where #1 = a valid block number     and #2 = a valid offset, e.g.                                                                                                        : test blk @ >in @ 17 blk ! 64 >in ! interpret ;                                                                      K                   ( -- w )                                         w is a copy of the index of the second outer loop.  May         only be used within a nested DO-LOOP or DO-+LOOP in the         form, for example:                                                     DO ... DO ... DO ... K ... LOOP ... +LOOP ... LOOP                                                                  LIST                ( u -- )                                         The contents of block u are displayed.  SCR is set to u.        See:  BLOCK in the Technical Reference Manual's CF83 Word       List.  See:  SCR below.                                                                                                    OCTAL               ( -- )                                           Set the numeric input-output conversion base to eight.                                                                                                                                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-7: Controlled Reference Words Set - Page 4 of 4 
+
+
+OFFSET                                                               Not used in CF83.  This word is only useful in a multi-         user environment.  Since CF83 is a single-user system,          this word is not needed.                                                                                                   QUERY               ( -- )                                           Characters are received and transferred into the memory         area addressed by TIB .  The transfer terminates when           either a "return" is received or the number of characters       transferred reaches the size of the area addressed by TIB.      The values of >IN and BLK are set to zero and the value of      #TIB is set to the value of SPAN .  WORD may be used to         accept text from this buffer.  See:  "input stream" in the      Technical Reference Manual's Glossary.  See:  #TIB, >IN,        BLK, EXPECT, SPAN, TIB, and WORD in the Technical               Reference Manual's CF83 Word List.  NOTE: Query does not        blank the terminal input buffer.  If you don't blank the        TIB before using Query, it may contain extraneous               characters you don't want.  If you don't blank the TIB          after using Query, CF83 will attempt to execute or compile      the information in the TIB - unless this is your intention,     an error will result.                                                                                                      RECURSE             ( -- )                                           Compile the compilation address of the definition being         compiled to cause the definition to later be executed           recursively.                                                                                                               SCR                 ( -- addr )               "s-c-r"                The address of a variable containing the number of the          screen most recently LISTed.                                                                                               SP@                 ( -- addr )               "s-p-fetch"            addr is the address of the top of the stack just before         SP@ was executed.                                                                                                          THRU                ( u1 u2 -- )                                     Load consecutively the blocks from u1 through u2.                                                                          U.R                 ( u +n -- )               "u-dot-r"              u is converted using the value of BASE and then displayed       as an unsigned number right aligned in a field +n               characters wide.  If the number of characters required to       display u is greater than +n, an error condition exists.        See:  "number conversion" in the Technical Reference            Manual's Glossary.                                                                                                                                        ** END **                        
+
+
+
+
+
+
+
+
+
+
+
+
+

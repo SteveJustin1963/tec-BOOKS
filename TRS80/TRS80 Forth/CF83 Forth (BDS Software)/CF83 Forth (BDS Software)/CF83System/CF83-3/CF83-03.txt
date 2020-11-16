@@ -1,0 +1,255 @@
+CF83-3: Block Editor - Page 1 of 15 
+
+
+                      CF83-3: Block Editor                                                 CF83 Forth                                                                                                                 Copyright  (c)  1991                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                          This is the detailed instruction manual for CF83 Forth's screen oriented Block Editor.  For those of you who like to experiment (i.e. "mess things up") before you read the instructions:                                                                            1.  BACKUP THIS DISK BEFORE YOU DO ANYTHING ELSE!  Put              this original away.  Only use the backup.                                                                                   2.  To load the editor, be sure you are at CF83's "ok"              prompt, put the editor disk in drive #0, and enter:                                                                                             81 load                                                                                                         After the editor has loaded, remove the disk and insert         the disk(s) containing the block(s) you wish to edit.                                                                       3.  To invoke the editor, enter:                                                                                                                    x edit                                                                                                          where x is the number of the block you wish to edit.                                                                   Have fun!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 2 of 15 
+
+
+Now, for those of us who are not quite so adventuresome         (reckless?):                                                                                                                    CF83-3 is a screen oriented block editor.  That means you work  with an entire block at a time (sort of like a micro- word      processor) instead of with individual lines (like basic's EDIT  command does).                                                                                                                  Except for typing in the actual block contents, almost          everything you do will be done with a single keypress or        keypress combination.  This includes moving around within the   block, changing the edit mode, moving to a different block,     sending the block to your printer, etc.                                                                                         When you invoke the editor (with "x edit" as noted above), the  screen is divided into two parts.  The larger, upper part       displays the contents of the block itself in the standard forth block format: 16 lines of 64 characters each.  The smaller,     lower part indicates the block number and which edit mode you   are in, and provides a PAD where you can enter block numbers forthe two keypress commands that require them.                                                                                      **  KEYPRESS COMMANDS                                                                                                         A keypress command consists of either pressing a single key     (e.g. "Up Arrow" means press the up arrow key), or of holding   down one or more keys while pressing another (e.g. "Clear - Up  Arrow" means pressing the up arrow key while holding the clear  key down).  The keypress commands work the same whether the     keyboard is set for uppercase or lowercase.  The keypress       commands are:                                                                                                                   Right Arrow                                                       Moves the cursor right one character position on the screen.                                                                  Left Arrow                                                        Moves the cursor left one character position on the screen.                                                                   Up Arrow                                                          Moves the cursor up one line on the screen.                                                                                   Down Arrow                                                        Moves the cursor down one line on the screen.                                                                                 Shift - Right Arrow                                               Moves the cursor to the end of the current line.                                                                                                                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 3 of 15 
+
+
+Shift - Left Arrow                                                Moves the cursor to the start of the current line.                                                                            Shift - Up Arrow                                                  Moves the cursor to the start of the block.                                                                                   Shift - Down Arrow                                                Moves the cursor to the end of the block.                                                                                     Enter                                                             Fills the rest of the current line with spaces (ASCII 32) and   performs a carriage return and linefeed.                                                                                      Clear - Up Arrow                                                  Moves the cursor to the start of the preceding block.  For      example, if you are editing block 43 and you press Clear - Up   Arrow, you will now be editing block 42 with the cursor at the  start of block 42.  CAUTION - this command does NOT save the    block you were working on.  If you want it to be saved, you     must explicitly save it before executing this command.                                                                        Clear - Down Arrow                                                Moves the cursor to the start of the following block.  For      example, if you are editing block 43 and you press Clear -      Down Arrow, you will now be editing block 44 with the cursor    at the start of block 44.  CAUTION - this command does NOT      save the block you were working on.  If you want it to be       saved, you must explicitly save it before executing this        command.                                                                                                                      Clear - @ - 0                                                     As noted in the CF83 Forth User's Guide, CF83 allows you to     enter any byte value from 0 through 255 decimal via a single    keypress or keypress combination.  However, as you can see      from this list of commands, some of those keypresses are        dedicated to the commands themselves in this editor.  This      command allows you to insert any byte value at the cursor       while editing.  When you hold down the Clear and @ (at) keys    while pressing the 0 (zero) key, there seems to be no           response.  But, after you have released them, the very next     keypress combination that you make will insert a byte value     into the block and display it on the screen (of course, byte    values less than 32 and greater than 126 only display as a      space).  For example, if your next keypress is the Up Arrow,    the decimal byte value 11 is inserted in the block instead of   the cursor being moved up one line.  Refer to the User's Guide  for a list of the keypress and keypress combination byte        values.                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 4 of 15 
+
+
+                                                                Clear - A                                                         ABORT: Exits the Editor and returns to the CF83 "ok" prompt.    CAUTION - this command does NOT save the block you were         working on.  If you want it to be saved, you must explicitly    save it before executing this command.                                                                                        Clear - C                                                         CLEAR: Clears the block contents, i.e. fills the block with     1024 spaces (ASCII 32).  NOTE - Whenever you begin editing a    brand new block (i.e. one that appears empty) you must ALWAYS   begin with "Clear - C" before you do anything else.  This is    because, even though the block appears empty, it is really      filled with byte value 255 rather than byte value 32.                                                                         Clear - D                                                         DELETE: Deletes the character at the cursor.                                                                                  Clear - G                                                         GET:  Gets a new block.  When you press "Clear - G", the        cursor moves to the PAD to allow you to enter the number of     the block you wish to get.  You must press the enter key after  you have typed the number to the PAD.  For example, if you are  editing block 43 and you press "Clear - G" and then enter 197   at the PAD, you will now be editing block 197 with the cursor   at the start of block 197.  CAUTION - this command does NOT     save the block you were working on.  If you want it to be       saved, you must explicitly save it before executing this        command.  WARNING: Executing this command and then entering a   number that is out of the range of your installed disk drives,  or entering a number that addresses a drive that doesn't have   a floppy diskette in it, will cause an error resulting in       either a CF83 Restart or a system CRASH!                                                                                      Clear - I                                                         INSERT/OVERWRITE TOGGLE:  Toggles between the Insert and        Overwrite Edit Modes.  If you are in the Insert Mode and press  "Clear - I", the editor will change to Overwrite Mode.  If you  are in the Overwrite Mode and press "Clear - I", the editor     will change to Insert Mode.  NOTE:  The editor initially comes  up in the Overwrite Mode and you will want to do as much of     your editing as possible in this mode.  The Insert Mode is      VERY slow and inconvenient.  Leaving it slow and inconvenient   saved a lot of memory and doesn't cause as much trouble as it   would in a full-sized word processor.  If you want it faster,   you can always write your own block editor.  If you do and it   really works, please let us know.                                                                                             
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 5 of 15 
+
+
+Clear - N                                                         NUMBER: Changes the block number of the block you are           editing.  When you press "Clear - N", the cursor moves to the   PAD to allow you to enter the number you wish to change the     block number to.  You must press the enter key after you have   typed the number to the PAD.  For example, if you are editing   block 43 and you press "Clear - N" and then enter 88 at the     PAD, you will now be editing block 88.  Neither the block       contents nor the cursor position will have changed.  If you     now save the block, block 88 will be saved, not block 43.       Block 43 will remain unchanged.  This command is especially     useful for making a new block which duplicates all or part of   an existing block.  CAUTION - this command does NOT save the    block you were originally working on.  If you make some         changes before you change the block number, the changes will    not automatically be saved as a change to the original block.   If you want the changes to be saved to the original block, you  must explicitly save that block before executing the "Clear -   N" command.  WARNING: Executing this command and then entering  a number that is out of the range of your installed disk        drives, or entering a number that addresses a drive that        doesn't have a floppy diskette in it, will cause an error       resulting in either a CF83 Restart or a system CRASH!                                                                         Clear - P                                                         PRINT: Prints the block number and the block contents of the    block you are currently editing, to your printer.  Three        blocks can be printed on each 8-1/2 inch by 11 inch (or wider)  sheet.  WARNING: If you do not have a printer connected when    you execute this command, the system will CRASH!  If your       printer is not turned on when you execute this command, the     system will jam until you turn it on.  At that point, the       printout will be corrupted and incorrect, but you must let it   run to completion before doing anything else.                                                                                 Clear - Q                                                         QUIT: Exits the Editor and returns to the CF83 "ok" prompt.     The block you were editing is automatically saved to disk       before the exit.                                                                                                              Clear - S                                                         SAVE: The block you are currently editing is saved to disk.     The cursor position is not changed.                                                                                                                                                                                                                                                                                                                                                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 6 of 15 
+
+
+Clear - Z                                                         ZILCH: Deletes any and all changes you have made in the block   you are currently editing (reloads the block from disk).  This  command will only work if you have not already saved your       changes: it reloads whatever the block on disk currently        contains.                                                                                                                     NOTE: Because Forth requires that all words and numbers be      separated by at least one space (ASCII 32), the last character  in every block should generally be left blank.                                                                                    **  WORDS REFERENCE                                                                                                           The above command list is all you need to use this Block        Editor.  The following reference information is provided for    those who want to do further editor development and thus need a better understanding of its internal workings.                                                                                  The numbers in brackets after each word indicate the number of  the editor block in which the word is to be found.                                                                              Loading the editor establishes the editor vocabulary, and most  of the editor words are in that vocabulary.  The following threewords, however, are in the Forth vocabulary:                                                                                    edit ( +n -- )     [ 94 ]                                         marks all four block buffers as empty, makes the editor       vocabulary current, and begins editing block number +n.                                                                         editor ( -- )     [ 82 ]                                          makes the editor vocabulary current.                                                                                          thrx (+n1 +n2 -- )    [ 81 ]                                      loads and reports the loading of editor blocks +n1 through    +n2.                                                                                                                            EDITOR VARIABLES                                                                                                                blkptr     [ 82 ]                                                 block pointer - points to the character address within the    block.                                                                                                                          eblk     [ 82 ]                                                   the number of the block being edited.                                                                                         emode     [ 82 ]                                                  the edit mode ( 0 = overwrite, <>0 = insert ).                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 7 of 15 
+
+
+hblkn     [ 82 ]                                                  block number location pointer - points to the address in low  memory containing the number of the block being edited.                                                                         hblku     [ 82 ]                                                  block update location pointer - points to the address in low  mwmory containing the block update code of the block being      edited.                                                                                                                         hblock     [ 82 ]                                                 block buffer pointer - points to the starting address of the  block buffer containing the block being edited.                                                                                 padptr     [ 82 ]                                                 PAD pointer - points to the charcter address within the PAD.                                                                  qcode     [ 82 ]                                                  quit code ( 0 = continue editing, <>0 = quit ).                                                                               txcurs     [ 82 ]                                                 temporary holding variable for x-cursor.                                                                                      tycurs     [ 82 ]                                                 temporary holding variable for y-cursor.                                                                                      EDITOR WORDS                                                                                                                    (pntos) ( u +n -- n )     [ 83 ]                                  assembly language number conversion routine - only used in    pntos - see below.                                                                                                              aborted ( -- )     [ 89 ]                                         see "Clear - A" in Keypress Commands list.                                                                                    addchr ( char -- )     [ 89 ]                                     put char into the block being edited and display it on the    screen.                                                                                                                         ban1 ( addr1 -- [addr1] or [addr1 addr2 addr3])     [ 85 ]        push block number and update addresses for block buffer #1 to the stack if block buffer #1 contains the block being edited.                                                                   ban2 ( addr1 -- [addr1] or [addr1 addr2 addr3])     [ 86 ]        push block number and update addresses for block buffer #2 to the stack if block buffer #2 contains the block being edited.                                                                                                                                                                                                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 8 of 15 
+
+
+ban3 ( addr1 -- [addr1] or [addr1 addr2 addr3])     [ 86 ]        push block number and update addresses for block buffer #3 to the stack if block buffer #3 contains the block being edited.                                                                    ban4 ( addr1 -- [addr1] or [addr1 addr2 addr3])     [ 86 ]       push block number and update addresses for block buffer #4 to the stack if block buffer #4 contains the block being edited.                                                                   banc ( addr1 -- addr1 addr2 addr3)     [ 86 ]                     push block number and update addresses to the stack for the   block buffer which contains the block being edited.                                                                             bget ( +n -- )     [ 86 ]                                         store the proper values for block number +n to the editor     variables eblk, hblkn, hblku, and hblock.                                                                                       bn ( -- )     [ 85 ]                                              put the block number on the screen.                                                                                           bnt ( -- )     [ 85 ]                                             put the block number title on the screen.                                                                                     bprt ( -- )     [ 90 ]                                            send the block being edited to the printer.                                                                                   bscr ( -- )     [ 85 ]                                            set-up the blank edit screen.                                                                                                 btype ( -- )     [ 86 ]                                           display the block contents on the screen.                                                                                     cbn ( +n -- )     [ 90 ]                                          change the block number to +n.                                                                                                chgblk ( -- )     [ 90 ]                                          see "Clear - N" in Keypress Commands list.                                                                                    clb ( -- )     [ 84 ]                                             clear the block contents (upper) area of the screen.                                                                          cldn ( -- )     [ 89 ]                                            see "Clear - Down Arrow" in Keypress Commands list.                                                                           clrblk ( -- )     [ 89 ]                                          see "Clear - C" in Keypress Commands list.                                                                                                                                                                                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 9 of 15 
+
+
+cls ( -- )     [ 84 ]                                             clear the screen.                                                                                                             clup ( -- )     [ 89 ]                                            see "Clear - Up Arrow" in Keypress Commands list.                                                                             cps ( -- +n )     [ 87 ]                                          push the cursor character position to the stack.                                                                              curpad ( -- )     [ 85 ]                                          send the cursor to the pad (rclcrs returns it to previous     position).                                                                                                                      dchange ( -- )     [ 89 ]                                         see "Clear - Z" in Keypress Commands list.                                                                                    delchr ( -- )     [ 89 ]                                          see "Clear - D" in Keypress Commands list.                                                                                    dnarw ( -- )     [ 87 ]                                           see "Up Arrow" in Keypress Commands list.                                                                                     eemit ( char -- )     [ 83 ]                                      display char on the screen.                                                                                                   eenter ( -- )     [ 90 ]                                          see "Enter" in Keypress Commands list.                                                                                        ek0 ( char -- char )     [ 94 ]                                   check if Clear - @ - 0 keypress combination has been pressed.                                                                 ek10 ( char -- char )     [ 91 ]                                  check if Down Arrow has been pressed.                                                                                         ek11 ( char -- char )     [ 91 ]                                  check if Up Arrow has been pressed.                                                                                           ek13 ( char -- char )     [ 91 ]                                  check if Enter has been pressed.                                                                                              ek160 ( char -- char )     [ 93 ]                                 check if Clear - A (uppercase) keypress combination has been  pressed.                                                                                                                        ek162 ( char -- char )     [ 92 ]                                 check if Clear - C (uppercase) keypress combination has been  pressed.                                                                                                                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 10 of 15 
+
+
+ek163 ( char -- char )     [ 92 ]                                 check if Clear - D (uppercase) keypress combination has been  pressed.                                                                                                                        ek166 ( char -- char )     [ 92 ]                                 check if Clear - G (uppercase) keypress combination has been  pressed.                                                                                                                        ek168 ( char -- char )     [ 93 ]                                 check if Clear - I (uppercase) keypress combination has been  pressed.                                                                                                                        ek173 ( char -- char )     [ 93 ]                                 check if Clear - N (uppercase) keypress combination has been  pressed.                                                                                                                        ek175 ( char -- char )     [ 93 ]                                 check if Clear - P (uppercase) keypress combination has been  pressed.                                                                                                                        ek176 ( char -- char )     [ 93 ]                                 check if Clear - Q (uppercase) keypress combination has been  pressed.                                                                                                                        ek178 ( char -- char )     [ 92 ]                                 check if Clear - S (uppercase) keypress combination has been  pressed.                                                                                                                        ek185 ( char -- char )     [ 92 ]                                 check if Clear - Z (uppercase) keypress combination has been  pressed.                                                                                                                        ek192 ( char -- char )     [ 93 ]                                 check if Clear - a (lowercase) keypress combination has been  pressed.                                                                                                                        ek194 ( char -- char )     [ 92 ]                                 check if Clear - c (lowercase) keypress combination has been  pressed.                                                                                                                        ek195 ( char -- char )     [ 92 ]                                 check if Clear - d (lowercase) keypress combination has been  pressed.                                                                                                                        ek198 ( char -- char )     [ 92 ]                                 check if Clear - g (lowercase) keypress combination has been  pressed.                                                                                                                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 11 of 15 
+
+
+ek200 ( char -- char )     [ 93 ]                                 check if Clear - i (lowercase) keypress combination has been  pressed.                                                                                                                        ek205 ( char -- char )     [ 92 ]                                 check if Clear - n (lowercase) keypress combination has been  pressed.                                                                                                                        ek207 ( char -- char )     [ 93 ]                                 check if Clear - p (lowercase) keypress combination has been  pressed.                                                                                                                        ek208 ( char -- char )     [ 93 ]                                 check if Clear - q (lowercase) keypress combination has been  pressed.                                                                                                                        ek21 ( char -- char )     [ 91 ]                                  check if Shift - Left Arrow keypress combination has been     pressed.                                                                                                                        ek210 ( char -- char )     [ 92 ]                                 check if Clear - s (lowercase) keypress combination has been  pressed.                                                                                                                        ek217 ( char -- char )     [ 92 ]                                 check if Clear - z (lowercase) keypress combination has been  pressed.                                                                                                                        ek22 ( char -- char )     [ 91 ]                                  check if Shift - Right Arrow keypress combination has been    pressed.                                                                                                                        ek23 ( char -- char )     [ 91 ]                                  check if Shift - Down Arrow keypress combination has been     pressed.                                                                                                                        ek24 ( char -- char )     [ 91 ]                                  check if Shift - Up Arrow keypress combination has been       pressed.                                                                                                                        ek6 ( char -- char )     [ 92 ]                                   check if Clear - Down Arrow keypress combination has been     pressed.                                                                                                                        ek7 ( char -- char )     [ 92 ]                                   check if Clear - Up Arrow keypress combination has been       pressed.                                                                                                                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 12 of 15 
+
+
+ek8 ( char -- char )     [ 91 ]                                   check if Left Arrow key has been pressed.                                                                                     ek9 ( char -- char )     [ 91 ]                                   check if Right Arrow key has been pressed.                                                                                    ekey ( -- 8b )     [ 83 ]                                         gets a keypress or keypress combination ( 0-255 decimal) from the keyboard.                                                                                                                   eloop ( -- )     [ 94 ]                                           gets a keypress or keypress combination from the keyboard and acts upon it.                                                                                                                   em ( -- )     [ 85 ]                                              put the edit mode on the screen.                                                                                              epad ( -- )     [ 85 ]                                            erases the PAD area on the screen.                                                                                            ftype ( addr +n -- )     [ 84 ]                                   types the +n characters beginning at address addr to the      screen without first clearing character positions.                                                                              gblk ( +n -- )     [ 89 ]                                         get the block whose number is on the stack.                                                                                   gblock ( +n -- )     [ 87 ]                                       set up a blank screen, get the block whose number is on the   stack, and display the block contents on the screen.                                                                            getblk ( -- )     [ 90 ]                                          see "Clear - G" in Keypress Commands list.                                                                                    gpnk ( -- char )     [ 89 ]                                       get a number key keypress code to the PAD.                                                                                    gpnum ( -- )     [ 90 ]                                           get a number to the pad.                                                                                                      home ( -- )     [ 84 ]                                            home the cursor ( move it to top left corner of screen ).                                                                     ic! ( addr char -- addr+1 )     [ 90 ]                            c! and increment address.                                                                                                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 13 of 15 
+
+
+lpr ( +n -- )     [ 90 ]                                          send one 64 character line from the block being edited to the printer.                                                                                                                        lprint ( addr -- )    [ 90 ]                                      send one 64 character line to the printer.                                                                                    ltarw  ( -- )     [ 87 ]                                          see "Left Arrow" in Keypress Commands list.                                                                                   mbcl ( -- )     [ 88 ]                                            move following block contents left one character position.                                                                    mbcr ( -- )     [ 88 ]                                            move following block contents right one character position.                                                                   msbl ( -- )     [ 88 ]                                            move block and screen contents left one character position.                                                                   msbr ( -- )     [ 88 ]                                            move block and screen contents right one character position.                                                                  msc ( -- )     [ 84 ]                                             clear a portion of the block's screen area consisting of the  line that the cursor is on and all lines below it.                                                                              pbd ( -- )     [ 84 ]                                             place the block area divider line on the screen.                                                                              pcr ( -- )     [ 83 ]                                             sends a carriage return to the printer.  NOTE: this word's    definition, as follows:                                                                                                                   pcr ( -- ) here dup 2- ! BD4F , 91AE , A16E , 9112 ,                                                                  is correct for all printers that perform both a carriage return and a linefeed when a carriage return (ASCII 13) is sent to     them.  If your printer performs a carriage return alone, you    should edit block #83 to change this definition to:                                                                                       pcr ( -- ) here dup 2- ! BD4F , 8AAE , A16E , 9112 ,                                                                  Once you have made this change, you must turn off your CoCo,    restart CF83, and reload the revised block editor.                                                                              pdt ( -- )     [ 85 ]                                             put the PAD title on the screen.                                                                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 14 of 15 
+
+
+pechar ( char -- )     [ 88 ]                                     put the character on the stack to the block and to the screen.                                                                pntos ( -- n )     [ 89 ]                                         push the number in the PAD to the stack.                                                                                      ppchar ( char -- char )     [ 88 ]                                put the character on the stack to the PAD and to the screen.                                                                  print ( addr +n -- )     [ 83 ]                                   send a message to the printer.                                                                                                prtblk ( -- )     [ 91 ]                                          see "Clear - P" in Keypress Commands list.                                                                                    prtbn ( -- )     [ 91 ]                                           send the block number title and the block number to the       printer.                                                                                                                        prtnum ( n -- )     [ 90 ]                                        send the number on the stack to the printer.                                                                                  quited ( -- )     [ 89 ]                                          see "Clear - Q" in Keypress Commands list.                                                                                    rclcrs ( -- )     [ 85 ]                                          recall the cursor location.                                                                                                   rpad ( -- )     [ 85 ]                                            reset the pad pointer.                                                                                                        rtarw ( -- )     [ 87 ]                                           see "Right Arrow" in Keypress Commands list.                                                                                  rtype ( -- )     [ 87 ]                                           retype the screen, i.e. temporarily move the x-cursor to the  beginning of the current line and ftype to the end of the block.                                                                savblk ( -- )     [ 89 ]                                          see "Clear - S" in Keypress Commands list.                                                                                    savcrs ( -- )     [ 84 ]                                          save the cursor location.                                                                                                     shdn ( -- )     [ 88 ]                                            see "Shift - Down" in Keypress Commands list.                                                                                                                                                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-3: Block Editor - Page 15 of 15 
+
+
+shlt ( -- )     [ 87 ]                                            see "Shift - Left" in Keypress Commands list.                                                                                 shrt ( -- )     [ 87 ]                                            see "Shift - Right" in Keypress Commands list.                                                                                shup ( -- )     [ 88 ]                                            see "Shift - Up" in Keypress Commands list.                                                                                   sptr ( -- )     [ 87 ]                                           set the block pointer.                                                                                                         tmode ( -- )     [ 89 ]                                           see "Clear - I" in Keypress Commands list.                                                                                    uparw ( -- )     [ 87 ]                                           see "Up Arrow" in Keypress Commands list.                                                                                     upd ( -- )     [ 86 ]                                             mark the block being edited as having been updated.                                                                           xcurs ( -- addr )     [ 84 ]                                      push the x-cursor low memory address to the stack.                                                                            xps ( -- +n )     [ 86 ]                                          push the cursor x-location to the stack.                                                                                      ycurs ( -- addr )     [ 84 ]                                      push the y-cursor low memory address to the stack.                                                                            yps ( -- +n )     [ 86 ]                                          push the cursor y-location to the stack.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               **  END  **                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+

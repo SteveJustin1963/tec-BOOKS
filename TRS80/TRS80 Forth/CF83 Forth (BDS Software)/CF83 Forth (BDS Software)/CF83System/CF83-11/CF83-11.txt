@@ -1,0 +1,34 @@
+CF83-11: Sound, etc. Word Set Manual - Page 1 of 2 
+
+
+              CF83-11: Sound, etc. Word Set Manual                                         CF83 Forth                                                                                                                 Copyright  (c)  1993                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $3.00 with the User's Guide on disk only, or    for $8.00 with a printed copy of the User's Guide included.     These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was $15.00 +3.00 handling for US, Canada, or Mexico delivery as of April 1991.  California Residents add sales tax.                                                                             Use:     11 load     to load this word set.                                                                                                                                                                                                                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-11: Sound, etc. Word Set Manual - Page 2 of 2 
+
+
+  **  Sound, etc. Word Set                                                                                                      FIREL1             ( -- flag )                                       Flag = true if left joystick button #1 depressed.          FIREL2             ( -- flag )                                       Flag = true if left joystick button #2 depressed - CoCo3.  FIRER1             ( -- flag )                                       Flag = true if right joystick button #1 depressed.         FIRER2             ( -- flag )                                       Flag = true if right joystick button #2 depressed - CoCo3.                                                                 GTIMER             ( -- u )                                          Returns current timer value, 0-65535.                      STIMER             ( u -- )                                          Sets timer value = u, 0-65535.                                                                                             JOYLH              ( -- 6b )                                         Returns left joystick horizontal position, 0-63.           JOYLV              ( -- 6b )                                         Returns left joystick vertical position, 0-63.             JOYRH              ( -- 6b )                                         Returns right joystick horizontal position, 0-63.          JOYRV              ( -- 6b )                                         Returns right joystick vertical position, 0-63.                                                                            RND                ( -- +n )                                         Returns a random number between 0 and 32767.               RANDOM             ( n1 -- n2 )                                      Returns a random number between 0 and n1.                  RANDOMIZE                                                            Sets the random number seed to a random value.  ( n seed !      sets the random number seed to user selected value n ).                                                                    SOUND              ( 8b u -- )                                       Generates a tone of frequency 8b ( 0-255 ) for a duration       of u ( 0-65535 ).                                                                                                          Note that SOUND is a very simple tone generator.  No words have been provided which correspond to BASIC's PLAY command because  it is expected that each application will have individual needs,i.e. a music program might use four or more parts, while a game program would be more likely to use "noise" than musical tones. Words analogous to PLAY would be inadequate in either case.     Therefore, any development of more sophisticated sound words is left to the user.                                                                                                                                                      ** END **                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+

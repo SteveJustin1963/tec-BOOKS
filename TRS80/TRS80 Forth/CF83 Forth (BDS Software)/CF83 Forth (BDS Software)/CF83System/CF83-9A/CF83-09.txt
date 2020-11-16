@@ -1,0 +1,425 @@
+CF83-9: PMODE Graphics Word Set - Page 1 of 25 
+
+
+            CF83-9:  PMODE Graphics Words Set Manual                                       CF83 Forth                                                                                                                 Copyright  (c)  1992                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $15.00 with the User's Guide on disk only, or   for $19.00 with a printed copy of the User's Guide included.                                                                    These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was still $15.00 +3.00 handling for US, Canada, or Mexico       delivery as of April 1992.  California Residents add sales tax.                                                                 The CF83 PMODE Graphics Word Set provides graphics control for  the Color Computer 2 and for the CoCo2 emulation on the CoCo3.  It provides the graphics modes of the CoCo2 on either machine.  There are eight PMODES provided in this word set, the five      implemented in BASIC and three others that are available on the 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 2 of 25 
+
+
+CoCo2 but not implemented in BASIC.                                                                                             As in BASIC, if you are using a CoCo3 with an RGB monitor, the  color sets will be different than described herein.  Each PMODE in this word set includes the equivalent of all the PMODE       graphics commands ( although they are named differently and worksomewhat differently ) and some additional useful CF83 PMODE    Graphics Words.                                                                                                                 Very different from BASIC is the fact that you only have to loadthe PMODE that you want to use.  PMODEs you don't intend to use in a given program don't have to be loaded at all.  This        division into separate PMODEs results in some duplication and   overuse of memory if you need more than one PMODE in a given    program, but the tradeoff is greater graphics speed.                                                                            As with BASIC, the origin of the screen is in the upper left    hand corner, and x-coordinates are positive to the right, while y-coordinates are positive downwards.  In general, you should   make sure you understand your CoCo's PMODE Graphics in BASIC    before proceeding with this manual.                                                                                               PMODE A                                                                                                                       This is the 64 x 64 four-color mode.  It is what Tandy refers toas mode 1C in its technical literature.  It is not implemented  in BASIC.  It's screen is 64 columns wide by 64 rows high, and  each pixel can be one of the four colors of the current color   set.                                                                                                                                 Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Green                       0   Buff                        1   Yellow                      1   Cyan                        2   Blue                        2   Magenta                     3   Red                         3   Orange                                                                               Since the monitor screen is wider than it is high, each pixel isactually wider than it is high.  If you draw a 32 x 32 "square" on the screen, it actually looks like a rectangle, wider than itis high.  In PMODE A, the Aspect Ratio ( = vertical pixel size  divided by horizontal dot size ) is just about 0.87 on the      monitors we have available ( it may vary slightly on yours ).   This means that if you draw a 28 wide by 32 high "rectangle" on the screen, it will look more like a square.                                                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 3 of 25 
+
+
+With Disk 1 in drive 0, use   81 LOAD   to load PMODE A.                                                                        To use PMODE A, the first thing you must do is set the mode.    PMA0 sets the mode with Color Set 0 and PMA1 sets the mode with Color Set 1.                                                                                                                    Next you must set the background color and clear the PMODE A    screen.  PCLSA0 clears the screen to Color 0 ( Green or Buff ). PCLSA1 clears it to Color 1, PCLSA2 to Color 2, and PCLSA3 to   Color 3.  Although you can switch from PMA0 to PMA1 and         vice-versa at any time, once you have set the background color, you cannot do another PCLSA0, PCLSA1, PCLSA2, or PCLSA3 without clearing the screen and destroying your drawing.                                                                                Next you must set the foreground color you wish to draw with.   PFCOLA0 sets the foreground color to Color 0.  PFCOLA1 sets it  to Color 1, PFCOLA2 to Color 2, and PFCOLA3 to Color 3.         Although you will usually leave the mode and background color asoriginally set, you will most likely change the foreground colorfrom time-to-time as you develop your drawing.                                                                                  In preparing your drawing, you will use PSETA to set individual pixels to the previously selected foreground color,  PPOINTA to return the current color of a pixel, PLINEA to draw a line from one point to another, PDLINEA to draw a line from a point in a  given direction for a given distance, PELLIPSEA to draw curves, circles, and ellipses, and PPAINTA to color-in chosen regions onthe drawing.                                                                                                                    To repeat portions of the drawing on other parts of the screen, and/or to implement animation, you will use PMAKEA to create a  variable to store a window of the screen for future use, PPUTA  to store a window of the screen to that variable, PCLRA to clearthe window to a specific color, and PGETA to return the window  to the screen at a specified point.                                                                                             You will use PSTORA to save the graphics screen to disk and     PLOADA to recall it to the screen from disk.                                                                                    Finally, you will use PQUITA to exit from the PMODE A Graphics  screen and return to the normal CF83 text screen.                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 4 of 25 
+
+
+As a simple exercise, try this:                                                                                                  8 10 60 35 1 pmakea sname                                       : test1 pma0 pclsa0 pfcola1 32 32 30 30 0 360 pellipsea 32 32        24 24 0 360 pellipsea pfcola2 32 7 1 ppainta key drop           8 10 sname pputa 8 10 60 35 1 pclra key drop 8 10 sname         pgeta key drop pquita ;                                    test1                                                                                                                          When you execute TEST1, two concentric ellipses will be drawn onthe screen and the space between them will be painted.  After   the drawing is complete, press any key and a window will be     saved and cleared.  Press a key again, and the window will be   returned and the picture restored.  Press a key again, and the  graphics will disappear and the normal CF83 text screen will    return.                                                                                                                         The PMODE A words are:                                                                                                          PCLRA               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul is the x-coordinate of the upper left hand      corner of the window and it can be any integer from 0 to        63 which is exactly divisible by four ( i.e. it must be         0, 4, 8, 12, 16, ... ).  yul is the y-coordinate of the         upper left hand corner of the window and it can be any          integer from 0 through 63 inclusive.  xlr is the                x-coordinate of the lower right hand corner of the window       and it, like xul, must be exactly divisible by four.  ylr       is the y-coordinate of the lower right hand corner of the       window.  color = 0, 1, 2, or 3.                                                                                            PCLSA0              ( -- )                                           Clear the PMODE A screen to background color 0: Green or        Buff.                                                                                                                      PCLSA1              ( -- )                                           Clear the PMODE A screen to background color 1: Yellow or       Cyan.                                                                                                                      PCLSA2              ( -- )                                           Clear the PMODE A screen to background color 2: Blue or         Magenta.                                                                                                                   PCLSA3              ( -- )                                           Clear the PMODE A screen to background color 3: Red or          Orange.                                                                                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 5 of 25 
+
+
+PDLINEA             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0, y0 are the        beginning point's coordinates; each can be any integer          from 0 to 63 inclusive.  r is the length of the line in         terms of screen coordinates and must not result in the          line extending past the borders of the screen.  angle is        the direction in which the line is to be drawn.  Angles         are measured clockwise in degrees from the positive x-axis      direction, i.e. 0 degrees = 360 degrees is to the right,        90 degrees is straight down, 180 degrees is to the left,        and 270 degrees is straight up.   Angles can be any             integer degree value from 0 to 360 inclusive.  xn, yn are       the ending point's coordinates, left on the stack by the        system, in case the user wants to continue with a               different line from the end of the first line.  If not          used, these end coordinates should be dropped.                                                                             PELLIPSEA           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc, yc are       the center coordinates and can be any integer from 0 to         63.  If the curve is completely closed, it is an ellipse.       ea and eb are like the radius of a circle: ea is the            distance in terms of screen coordinates from the center to      the top ( or bottom ) of the curve along the 270 ( or 90 )      degree axis.  eb is the distance from the center to the         right ( or left ) edge of the curve along the 0 ( or 180 )      degree axis.  If the curve is completely closed and ea =        eb, then it is a "circle" (see aspect ratio note above).        ba and qa are the beginning and ending angles of the            curve.  For example, if ba = 0 and qa = 180, the curve is       one half of an ellipse, concave upwards; ba = 90 and qa =       270 is concave to the right.  For a completely closed           curve, use ba = 0 and qa = 360 ( ba = 0 and qa = 0 gives a      single point ).  Unlike other words, the ellipse drawing        words in this set allow their curves to extend beyond the       screen.  They will not be shown, but can be "drawn"             without causing an error as other words ( e.g. PLINEA ) do      if they extend off the screen.  For example, 64 32 60 60 0      360 pellipsea will draw the left portion of the ellipse         that appears on the screen.                                                                                                PFCOLA0             ( -- )                                           Set the foreground color to 0: Green or Buff.                                                                                                                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 6 of 25 
+
+
+PFCOLA1             ( -- )                                           Set the foreground color to 1: Yellow or Cyan.                                                                             PFCOLA2             ( -- )                                           Set the foreground color to 2: Blue or Magenta.                                                                            PFCOLA3             ( -- )                                           Set the foreground color to 3: Red or Orange.                                                                              PGETA               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  Generally used in the form:                                                                                   16 19 sname pgeta                                                                                                          where sname is the name of the storage array the window         was previously PPUTed to.  xul, yul are the coordinates of      the upper left hand corner of the window.  xul must be          exactly divisible by four and in the range 0-63.  yul           must be in the range 0-63.  The window must not extend          beyond the screen area.                                                                                                    PLINEA              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0, y0 are the        beginning point's coordinates; each can be any integer          from 0 to 63 inclusive.  xn, yn are the ending point's          coordinates; each can be any integer from 0 to 63               inclusive.                                                                                                                 PLOADA              ( +n -- )                                        Load a drawing from block +n on disk to the screen.                                                                        PMA0                ( -- )                                           Setup the PMODE A graphics screen using Color Set 0.                                                                       PMA1                ( -- )                                           Setup the PMODE A graphics screen using Color Set 1.                                                                       PMAKEA              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  Generally used in the form:                                                                             16 19 32 27 pmakea sname                                                                                                   where sname is the name of the storage array.  Upon             creation, the first two bytes of the array contain the     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 7 of 25 
+
+
+     number of bytes per window line ( Each byte = 4 pixels ),       and the second two bytes contain the number of window           lines.  The rest of the storage array is empty.  Once           created, the variable array can only be used for the            window specified or for another window with identical           width and height.                                                                                                          PPAINTA             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.  x, y are the coordinates of a seed point           selected by the user to be completely within the region to      be painted.  Limit-color = 0, 1, 2, or 3.  For the              purposes of PPAINTA, the edges of the screen are                equivalent to the limit-color.                                                                                             PPOINTA             ( x y -- c )                                     Return the current color of a pixel.  x, y are the pixel's      coordinates; each can be any integer from 0 to 63               inclusive.  c = the pixel's current color number = 0, 1,        2, or 3.                                                                                                                   PPUTA               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  Generally used in the form:                                                                                   16 19 sname pputa                                                                                                          where sname is the name of the storage array the window         is to be PPUTed to.  sname must have been previously            created with PMAKEA for the exact window size desired.          xul, yul are the coordinates of the upper left hand corner      of the window.  xul must be exactly divisible by four and       in the range 0-63.  yul must be in the range 0-63.  The         window must not extend beyond the screen area.                                                                             PQUITA              ( -- )                                           Leave PMODE A Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETA               ( x y -- )                                       Set a pixel to the previously selected foreground color.        x, y are the coordinates of the pixel;  each can be any         integer from 0 to 63 inclusive.                                                                                            PSTORA              ( +n -- )                                        Store a drawing to block +n on disk from the screen.                                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 8 of 25 
+
+
+                                                                  PMODE B                                                                                                                       This is the 128 x 64 two-color mode.  It is what Tandy refers toas mode 1R in its technical literature.  It is not implemented  in BASIC.  It's screen is 128 columns wide by 64 rows high, and each pixel can be one of the two colors of the current color    set.                                                                                                                                 Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Black                       0   Black                       1   Green                       1   Buff                                                                                 In PMODE B, the Aspect Ratio is about 1.75: if you draw a 32    wide by 18 high "rectangle" on the screen, it will look more    like a square.                                                                                                                  With Disk 1 in drive 0, use   82 LOAD   to load PMODE B.                                                                        The PMODE B words are:                                                                                                          PCLRB               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul is the x-coordinate of the upper left hand      corner of the window and it can be any integer from 0 to        127 which is exactly divisible by eight ( i.e. it must be       0, 8, 16, 24, 32, ... ).  yul is the y-coordinate of the        upper left hand corner of the window and it can be any          integer from 0 through 63 inclusive.  xlr is the                x-coordinate of the lower right hand corner of the window       and it, like xul, must be exactly divisible by eight.  ylr      is the y-coordinate of the lower right hand corner of the       window.  color = 0 or 1.                                                                                                   PCLSB0              ( -- )                                           Clear the PMODE B screen to background color 0: Black.                                                                     PCLSB1              ( -- )                                           Clear the PMODE B screen to background color 1: Green or        Buff.                                                                                                                      PDLINEB             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 can be 0-127       and y0 can be 0-63.                                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 9 of 25 
+
+
+                                                                PELLIPSEB           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc can be        0-127 and yc can be 0-63.                                                                                                  PFCOLB0             ( -- )                                           Set the foreground color to 0: Black.                                                                                      PFCOLB1             ( -- )                                           Set the foreground color to 1: Green or Buff.                                                                              PGETB               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight and in the range 0-127.  yul must be in the range         0-63.                                                                                                                      PLINEB              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 and xn can be      0-127 and y0 and yn can be 0-63.                                                                                           PLOADB              ( +n -- )                                        Load a drawing from block +n on disk to the screen.                                                                        PMB0                ( -- )                                           Setup the PMODE B graphics screen using Color Set 0.                                                                       PMB1                ( -- )                                           Setup the PMODE B graphics screen using Color Set 1.                                                                       PMAKEB              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  xul and xlr must be exactly        divisible by eight.  ( 8 pixels per byte ).                                                                                PPAINTB             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.                                                                                                                PPOINTB             ( x y -- c )                                     Return the current color of a pixel.                                                                                                                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 10 of 25 
+
+
+PPUTB               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight.                                                                                                                     PQUITB              ( -- )                                           Leave PMODE B Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETB               ( x y -- )                                       Set a pixel to the previously selected foreground color.                                                                   PSTORB              ( +n -- )                                        Store a drawing to block +n on disk from the screen.                                                                                                                                         PMODE C                                                                                                                       This is the 128 x 64 four-color mode.  It is what Tandy refers  to as mode 2C in its technical literature.  It is not           implemented in BASIC.  It's screen is 128 columns wide by 64    rows high, and each pixel can be one of the four colors of the  current color set.                                                                                                                   Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Green                       0   Buff                        1   Yellow                      1   Cyan                        2   Blue                        2   Magenta                     3   Red                         3   Orange                                                                               In PMODE C, the Aspect Ratio is about 1.75: if you draw a 32    wide by 18 high "rectangle" on the screen, it will look more    like a square.                                                                                                                  With Disk 2 in drive 0, use   1 LOAD   to load PMODE C.                                                                         The PMODE C words are:                                                                                                          PCLRC               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul and xlr must be exactly divisible by four       and in the range 0-127.  yul and ylr must be in the range       0-63.  color = 0, 1, 2, or 3.                                                                                                                                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 11 of 25 
+
+
+PCLSC0              ( -- )                                           Clear the PMODE C screen to background color 0: Green or        Buff.                                                                                                                      PCLSC1              ( -- )                                           Clear the PMODE C screen to background color 1: Yellow or       Cyan.                                                                                                                      PCLSC2              ( -- )                                           Clear the PMODE C screen to background color 2: Blue or         Magenta.                                                                                                                   PCLSC3              ( -- )                                           Clear the PMODE C screen to background color 3: Red or          Orange.                                                                                                                    PDLINEC             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 can be 0-127       and y0 can be 0-63.                                                                                                        PELLIPSEC           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc can be        0-127 and yc can be 0-63.                                                                                                  PFCOLC0             ( -- )                                           Set the foreground color to 0: Green or Buff.                                                                              PFCOLC1             ( -- )                                           Set the foreground color to 1: Yellow or Cyan.                                                                             PFCOLC2             ( -- )                                           Set the foreground color to 2: Blue or Magenta.                                                                            PFCOLC3             ( -- )                                           Set the foreground color to 3: Red or Orange.                                                                              PGETC               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  xul must be exactly divisible by         four and in the range 0-127.  yul must be in the range          0-63.                                                                                                                      PLINEC              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 and xn can be 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 12 of 25 
+
+
+     0-127 and y0 and yn can be 0-63.                                                                                           PLOADC              ( +n -- )                                        Load a drawing from blocks +n and +n+1 on disk to the           screen.                                                                                                                    PMC0                ( -- )                                           Setup the PMODE C graphics screen using Color Set 0.                                                                       PMC1                ( -- )                                           Setup the PMODE C graphics screen using Color Set 1.                                                                       PMAKEC              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  xul and xlr must be exactly        divisible by four.                                                                                                         PPAINTC             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.                                                                                                                PPOINTC             ( x y -- c )                                     Return the current color of a pixel.                                                                                       PPUTC               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  xul must be exactly divisible by         four.                                                                                                                      PQUITC              ( -- )                                           Leave PMODE C Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETC               ( x y -- )                                       Set a pixel to the previously selected foreground color.                                                                   PSTORC              ( +n -- )                                        Store a drawing to blocks +n and +n+1 on disk from the          screen.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 13 of 25 
+
+
+  PMODE D                                                                                                                       This is the 128 x 96 two-color mode.  It is what Tandy refers toas mode 2R in its technical literature.  It is PMODE 0 in       BASIC.  It's screen is 128 columns wide by 96 rows high, and    each pixel can be one of the two colors of the current color    set.                                                                                                                                 Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Black                       0   Black                       1   Green                       1   Buff                                                                                 In PMODE D, the Aspect Ratio is about 1.16: if you draw a 32    wide by 28 high "rectangle" on the screen, it will look more    like a square.                                                                                                                  With Disk 2 in drive 0, use   2 LOAD   to load PMODE D.                                                                         The PMODE D words are:                                                                                                          PCLRD               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul and xlr must be exactly divisible by eight      and in the range 0-127.  yul and ylr must be in the range       0-95.  color = 0 or 1.                                                                                                     PCLSD0              ( -- )                                           Clear the PMODE D screen to background color 0: Black.                                                                     PCLSD1              ( -- )                                           Clear the PMODE D screen to background color 1: Green or        Buff.                                                                                                                      PDLINED             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 can be 0-127       and y0 can be 0-95.                                                                                                        PELLIPSED           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc can be        0-127 and yc can be 0-95.                                                                                                                                                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 14 of 25 
+
+
+PFCOLD0             ( -- )                                           Set the foreground color to 0: Black.                                                                                      PFCOLD1             ( -- )                                           Set the foreground color to 1: Green or Buff.                                                                              PGETD               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight and in the range 0-127.  yul must be in the range         0-95.                                                                                                                      PLINED              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 and xn can be      0-127 and y0 and yn can be 0-95.                                                                                           PLOADD              ( +n -- )                                        Load a drawing from blocks +n and +n+1 on disk to the           screen.                                                                                                                    PMD0                ( -- )                                           Setup the PMODE D graphics screen using Color Set 0.                                                                       PMD1                ( -- )                                           Setup the PMODE D graphics screen using Color Set 1.                                                                       PMAKED              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  xul and xlr must be exactly        divisible by eight.                                                                                                        PPAINTD             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.                                                                                                                PPOINTD             ( x y -- c )                                     Return the current color of a pixel.                                                                                       PPUTD               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight.                                                                                                                                                                                                                                                     
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 15 of 25 
+
+
+PQUITD              ( -- )                                           Leave PMODE D Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETD               ( x y -- )                                       Set a pixel to the previously selected foreground color.                                                                   PSTORD              ( +n -- )                                        Store a drawing to blocks +n and +n+1 on disk from the          screen.                                                                                                                                                                                      PMODE E                                                                                                                       This is the 128 x 96 four-color mode.  It is what Tandy refers  to as mode 3C in its technical literature.  It is PMODE 1 in    BASIC.  It's screen is 128 columns wide by 96 rows high, and    each pixel can be one of the four colors of the current color   set.                                                                                                                                 Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Green                       0   Buff                        1   Yellow                      1   Cyan                        2   Blue                        2   Magenta                     3   Red                         3   Orange                                                                               In PMODE E, the Aspect Ratio is about 1.16: if you draw a 32    wide by 28 high "rectangle" on the screen, it will look more    like a square.                                                                                                                  With Disk 2 in drive 0, use   3 LOAD   to load PMODE E.                                                                         The PMODE E words are:                                                                                                          PCLRE               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul and xlr must be exactly divisible by four       and in the range 0-127.  yul and ylr must be in the range       0-95.  color = 0, 1, 2, or 3.                                                                                              PCLSE0              ( -- )                                           Clear the PMODE E screen to background color 0: Green or        Buff.                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 16 of 25 
+
+
+PCLSE1              ( -- )                                           Clear the PMODE E screen to background color 1: Yellow or       Cyan.                                                                                                                      PCLSE2              ( -- )                                           Clear the PMODE E screen to background color 2: Blue or         Magenta.                                                                                                                   PCLSE3              ( -- )                                           Clear the PMODE E screen to background color 3: Red or          Orange.                                                                                                                    PDLINEE             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 can be 0-127       and y0 can be 0-95.                                                                                                        PELLIPSEE           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc can be        0-127 and yc can be 0-95.                                                                                                  PFCOLE0             ( -- )                                           Set the foreground color to 0: Green or Buff.                                                                              PFCOLE1             ( -- )                                           Set the foreground color to 1: Yellow or Cyan.                                                                             PFCOLE2             ( -- )                                           Set the foreground color to 2: Blue or Magenta.                                                                            PFCOLE3             ( -- )                                           Set the foreground color to 3: Red or Orange.                                                                              PGETE               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  xul must be exactly divisible by         four and in the range 0-127.  yul must be in the range          0-95.                                                                                                                      PLINEE              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 and xn can be      0-127 and y0 and yn can be 0-95.                                                                                                                                                                                                                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 17 of 25 
+
+
+PLOADE              ( +n -- )                                        Load a drawing from blocks +n thru +n+2 on disk to the          screen.                                                                                                                    PME0                ( -- )                                           Setup the PMODE E graphics screen using Color Set 0.                                                                       PME1                ( -- )                                           Setup the PMODE E graphics screen using Color Set 1.                                                                       PMAKEE              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  xul and xlr must be exactly        divisible by four.                                                                                                         PPAINTE             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.                                                                                                                PPOINTE             ( x y -- c )                                     Return the current color of a pixel.                                                                                       PPUTE               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  xul must be exactly divisible by         four.                                                                                                                      PQUITE              ( -- )                                           Leave PMODE E Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETE               ( x y -- )                                       Set a pixel to the previously selected foreground color.                                                                   PSTORE              ( +n -- )                                        Store a drawing to blocks +n thru +n+2 on disk from the         screen.                                                                                                                                                                                      PMODE F                                                                                                                       This is the 128 x 192 two-color mode.  It is what Tandy refers  to as mode 3R in its technical literature.  It is PMODE 2 in    BASIC.  It's screen is 128 columns wide by 192 rows high, and   each pixel can be one of the two colors of the current color    set.                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 18 of 25 
+
+
+                                                                     Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Black                       0   Black                       1   Green                       1   Buff                                                                                 In PMODE F, the Aspect Ratio is about 0.58: if you draw a 19    wide by 32 high "rectangle" on the screen, it will look more    like a square.                                                                                                                  With Disk 2 in drive 0, use   4 LOAD   to load PMODE F.                                                                         The PMODE F words are:                                                                                                          PCLRF               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul and xlr must be exactly divisible by eight      and in the range 0-127.  yul and ylr must be in the range       0-191  color = 0 or 1.                                                                                                     PCLSF0              ( -- )                                           Clear the PMODE F screen to background color 0: Black.                                                                     PCLSF1              ( -- )                                           Clear the PMODE F screen to background color 1: Green or        Buff.                                                                                                                      PDLINEF             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 can be 0-127       and y0 can be 0-191.                                                                                                       PELLIPSEF           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc can be        0-127 and yc can be 0-191.                                                                                                 PFCOLF0             ( -- )                                           Set the foreground color to 0: Black.                                                                                      PFCOLF1             ( -- )                                           Set the foreground color to 1: Green or Buff.                                                                                                                                                                                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 19 of 25 
+
+
+PGETF               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight and in the range 0-127.  yul must be in the range         0-191.                                                                                                                     PLINEF              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 and xn can be      0-127 and y0 and yn can be 0-191.                                                                                          PLOADF              ( +n -- )                                        Load a drawing from blocks +n thru +n+2 on disk to the          screen.                                                                                                                    PMF0                ( -- )                                           Setup the PMODE F graphics screen using Color Set 0.                                                                       PMF1                ( -- )                                           Setup the PMODE F graphics screen using Color Set 1.                                                                       PMAKEF              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  xul and xlr must be exactly        divisible by eight.                                                                                                        PPAINTF             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.                                                                                                                PPOINTF             ( x y -- c )                                     Return the current color of a pixel.                                                                                       PPUTF               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight.                                                                                                                     PQUITF              ( -- )                                           Leave PMODE F Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETF               ( x y -- )                                       Set a pixel to the previously selected foreground color.                                                                                                                                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 20 of 25 
+
+
+PSTORF              ( +n -- )                                        Store a drawing to blocks +n thru +n+2 on disk from the         screen.                                                                                                                                                                                      PMODE G                                                                                                                       This is the 128 x 192 four-color mode.  It is what Tandy refers to as mode 6C in its technical literature.  It is PMODE 3 in    BASIC.  It's screen is 128 columns wide by 192 rows high, and   each pixel can be one of the four colors of the current color   set.                                                                                                                                 Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Green                       0   Buff                        1   Yellow                      1   Cyan                        2   Blue                        2   Magenta                     3   Red                         3   Orange                                                                               In PMODE G, the Aspect Ratio is about 0.58: if you draw a 19    wide by 32 high "rectangle" on the screen, it will look more    like a square.                                                                                                                  With Disk 2 in drive 0, use   5 LOAD   to load PMODE G.                                                                         The PMODE G words are:                                                                                                          PCLRG               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul and xlr must be exactly divisible by four       and in the range 0-127.  yul and ylr must be in the range       0-191.  color = 0, 1, 2, or 3.                                                                                             PCLSG0              ( -- )                                           Clear the PMODE G screen to background color 0: Green or        Buff.                                                                                                                      PCLSG1              ( -- )                                           Clear the PMODE G screen to background color 1: Yellow or       Cyan.                                                                                                                      PCLSG2              ( -- )                                           Clear the PMODE G screen to background color 2: Blue or         Magenta.                                                                                                                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 21 of 25 
+
+
+PCLSG3              ( -- )                                           Clear the PMODE G screen to background color 3: Red or          Orange.                                                                                                                    PDLINEG             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 can be 0-127       and y0 can be 0-191.                                                                                                       PELLIPSEG           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc can be        0-127 and yc can be 0-191.                                                                                                 PFCOLG0             ( -- )                                           Set the foreground color to 0: Green or Buff.                                                                              PFCOLG1             ( -- )                                           Set the foreground color to 1: Yellow or Cyan.                                                                             PFCOLG2             ( -- )                                           Set the foreground color to 2: Blue or Magenta.                                                                            PFCOLG3             ( -- )                                           Set the foreground color to 3: Red or Orange.                                                                              PGETG               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  xul must be exactly divisible by         four and in the range 0-127.  yul must be in the range          0-191.                                                                                                                     PLINEG              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 and xn can be      0-127 and y0 and yn can be 0-191.                                                                                          PLOADG              ( +n -- )                                        Load a drawing from blocks +n thru +n+5 on disk to the          screen.                                                                                                                    PMG0                ( -- )                                           Setup the PMODE G graphics screen using Color Set 0.                                                                       PMG1                ( -- )                                           Setup the PMODE G graphics screen using Color Set 1.                                                                       
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 22 of 25 
+
+
+PMAKEG              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  xul and xlr must be exactly        divisible by four.                                                                                                         PPAINTG             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.                                                                                                                PPOINTG             ( x y -- c )                                     Return the current color of a pixel.                                                                                       PPUTG               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  xul must be exactly divisible by         four.                                                                                                                      PQUITG              ( -- )                                           Leave PMODE G Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETG               ( x y -- )                                       Set a pixel to the previously selected foreground color.                                                                   PSTORG              ( +n -- )                                        Store a drawing to blocks +n thru +n+5 on disk from the         screen.                                                                                                                                                                                      PMODE H                                                                                                                       This is the 256 x 192 two-color mode.  It is what Tandy refers  to as mode 6R in its technical literature.  It is PMODE 4 in    BASIC.  It's screen is 256 columns wide by 192 rows high, and   each pixel can be one of the two colors of the current color    set.                                                                                                                                 Color Set 0                     Color Set 1                                                                                     Code  Color                     Code  Color                                                                                       0   Black                       0   Black                       1   Green                       1   Buff                                                                                 In PMODE H, the Aspect Ratio is about 1.16: if you draw a 32    wide by 28 high "rectangle" on the screen, it will look more    
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 23 of 25 
+
+
+like a square.                                                                                                                  With Disk 2 in drive 0, use   6 LOAD   to load PMODE H.                                                                         The PMODE H words are:                                                                                                          PCLRH               ( xul yul xlr ylr color -- )                     Clear the rectangular window of the screen to the color         specified.  xul and xlr must be exactly divisible by eight      and in the range 0-255.  yul and ylr must be in the range       0-191  color = 0 or 1.                                                                                                     PCLSH0              ( -- )                                           Clear the PMODE H screen to background color 0: Black.                                                                     PCLSH1              ( -- )                                           Clear the PMODE H screen to background color 1: Green or        Buff.                                                                                                                      PDLINEH             ( x0 y0 r angle -- xn yn )                       Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 can be 0-255       and y0 can be 0-191.                                                                                                       PELLIPSEH           ( xc yc ea eb ba qa -- )                         Draw an elliptical curve centered at xc, yc;  with 1/2          vertical axis = ea and 1/2 horizontal axis = eb; and            beginning at angle ba and ending at angle qa.  xc can be        0-255 and yc can be 0-191.                                                                                                 PFCOLH0             ( -- )                                           Set the foreground color to 0: Black.                                                                                      PFCOLH1             ( -- )                                           Set the foreground color to 1: Green or Buff.                                                                              PGETH               ( xul yul tb -- )                                Get a window from memory at address tb to the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight and in the range 0-255.  yul must be in the range         0-191.                                                                                                                     PLINEH              ( x0 y0 xn yn -- )                               Draw a line on the screen, with the previously set              foreground color, from x0, y0 to xn, yn.  x0 and xn can be      0-255 and y0 and yn can be 0-191.                                                                                                                                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 24 of 25 
+
+
+PLOADH              ( +n -- )                                        Load a drawing from blocks +n thru +n+5 on disk to the          screen.                                                                                                                    PMH0                ( -- )                                           Setup the PMODE H graphics screen using Color Set 0.                                                                       PMH1                ( -- )                                           Setup the PMODE H graphics screen using Color Set 1.                                                                       PMAKEH              ( xul yul xlr ylr -- )                           Create a variable array in memory to store a window of the      screen with upper left hand corner xul, yul; and lower          right hand corner xlr, ylr.  xul and xlr must be exactly        divisible by eight.                                                                                                        PPAINTH             ( x y limit-color -- )                           Paint a totally enclosed region using the previously            selected foreground color until the bordering limit-color       is reached.                                                                                                                PPOINTH             ( x y -- c )                                     Return the current color of a pixel.                                                                                       PPUTH               ( xul yul tb -- )                                Put a window to memory at address tb from the screen at         coordinates xul, yul.  xul must be exactly divisible by         eight.                                                                                                                     PQUITH              ( -- )                                           Leave PMODE H Graphics and return to the normal CF83 text       screen.                                                                                                                    PSETH               ( x y -- )                                       Set a pixel to the previously selected foreground color.                                                                   PSTORH              ( +n -- )                                        Store a drawing to blocks +n thru +n+5 on disk from the         screen.                                                                                                                                                                                      GENERAL MATH ROUTINES                                                                                                         Each PMODE Load Block loads some general math routines before   loading the actual PMODE graphics package desired.  If you are  going to use more than one PMODE in a program, you should alter your load blocks so that the math routines are only loaded once:before the first graphics package.                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-9: PMODE Graphics Word Set - Page 25 of 25 
+
+
+                                                                For your reference, the general math words are:                                                                                 DUM*               ( ud1 ud2 -- u64 )                                u64 is the unsigned 64-bit result of multiplying the two        unsigned double numbers ud1 and ud2.  The 8 bytes of the        result are on the stack with the highest byte on the top        and the lowest byte on the bottom.                                                                                         ISQR                ( ud -- u )                                      u is the integer portion of the positive square root of ud.                                                                MCOS                ( angle -- multiplier modified-cosine )          angle is 0-360 degrees.  multiplier is +1 or -1 depending       on the quadrant the angle is in.  modified-cosine is the        absolute value of round(cos*65535).                                                                                        MSIN                ( angle -- multiplier modified-sine )            analogous to MCOS, but for sine.                                                                                           SM*                 ( w1 w2 -- wd )                                  wd is the 32-bit signed result of multiplying w1 times w2.                                                                                                                                 Note that the paint words PPAINTA through PPAINTH each establishand use a temporary graphics stack starting at address FE00 hex and proceeding downwards in memory.  The user is responsible forassuring that there is sufficient space for this stack.  The    stack only exists while the paint word is executing - the space it uses is free for other uses at all other times.  While the   Assembler Extension Word Set also uses this part of memory for  its temporary symbol table, no conflict results because the     the paint words and the assembler do not use this area at the   same time.                                                                                                                                                                                                                                                                                                                                                                                                                 ** END **                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+

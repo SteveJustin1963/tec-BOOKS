@@ -1,0 +1,51 @@
+CF83-6: System Extension Word Set - Page 1 of 3 
+
+
+            CF83-6: System Extension Word Set Manual                                       CF83 Forth                                                                                                                 Copyright  (c)  1992                                            by  M. David Johnson                                                BDS Software                                                    P.O. Box 485                                              Glenview, IL 60025-0485                                                                                     You may make  as many copies  of this document  as you  wish foryour own use,  but you may not  sell or give away  any copies toanyone else.                                                                                                                                         "Thou shalt not steal"                                               Exodus 20:15                                                                                                                                                          In order to use this product, you must have a copy of BDS       Software's product CF83: Forth-83 Standard Required Words Set.  CF83 is available from BDS Software, P.O. Box 485, Glenview, IL.60025-0485, for $15.00 with the User's Guide on disk only, or   for $19.00 with a printed copy of the User's Guide included.    These prices are complete, including all shipping and handling  charges, but are subject to change without notice.                                                                              This manual you are reading now does not stand alone.  To fully understand the contents of this manual, you will need either a  copy of BDS Software's product CF83-1: Technical Reference      Manual, or a copy of the Forth-83 Standard.                                                                                     CF83-1 is available from BDS Software, P.O. Box 485, Glenview,  IL. 60025-0485, for $10.00 with the manual on disk only, or for $25.00 with a printed copy of the manual included.  These pricesare complete, including all shipping and handling charges, but  are subject to change without notice.                                                                                           If you wish a copy of the Forth-83 Standard, it is available    from the Forth Interest Group (FIG), P.O. Box 8231, San Jose, CA95155, phone (408) 277-0668, fax (408) 286-8988.  Their price   was $15.00 +3.00 handling for US, Canada, or Mexico delivery as of April 1991.  California Residents add sales tax.                                                                             Much of this manual was copied directly from the Forth-83       Standard, and is subject to copyright by the FORTH Standards    Team; used by permission.  In many cases, the copied material   has been modified to specifically describe features of CF83.    Such changes were not incorporated in the original copyrighted  Forth-83 Standard.                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-6: System Extension Word Set - Page 2 of 3 
+
+
+                                                                Use:    9 LOAD    to load the set.                                                                                              The System Extension Word Set has been described by Dr. C. H.   Ting as The Dark Side of the Forth, because it allows the       programmer to deviate from Forth's structured programming style and execute the dreaded "GOTO".                                                                                                 BRANCH and ?BRANCH are CF83's equivalent to BASIC's "GOTO".     They are compiler words and can only be used during the         compilation of a colon definition.                                                                                              When a word containing BRANCH is executed, BRANCH looks at the  16-bit address immediately following its code field address in  the executed word, and performs an unconditional jump to that   address.                                                                                                                        When a word containing ?BRANCH is executed, if the flag on the  stack is false, a BRANCH is performed as above.  If the flag is true, the 16-bit address is skipped and execution continues.                                                                    <MARK, <RESOLVE, >MARK, and >RESOLVE are used to calculate the  16-bit addresses for BRANCH and ?BRANCH.  They are also compilerwords and can only be used during the compilation of a colon    definition.                                                                                                                     <MARK marks the point where a later compiled backward branch    will jump to.                                                                                                                   <RESOLVE is the location where the 16-bit address of a backward branch is compiled, e.g. immediately after BRANCH's code field  address in the word being compiled.                                                                                             >MARK is the location where the 16-bit address of a forward     branch is compiled, e.g. immediately after BRANCH's code field  address in the word being compiled.                                                                                             >RESOLVE marks the point where an earlier compiled forward      branch will jump to.                                                                                                                                                                              **  Branching Operations                                                                                                      After BRANCH or ?BRANCH is compiled, >MARK or <RESOLVE is       executed.  The addr left by >MARK is passed to >RESOLVE .  The  addr left by <MARK is passed to <RESOLVE .  For example:                       : IF     COMPILE ?BRANCH  >MARK  ; IMMEDIATE                    : THEN   >RESOLVE  ; IMMEDIATE                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+CF83-6: System Extension Word Set - Page 3 of 3 
+
+
+                                                                  **  System Extension Word Set                                                                                                                                                                 <MARK               ( -- addr )             "backward-mark"          Used at the destination of a backward branch.  addr is          typically only used by <RESOLVE to compile a branch             address.                                                                                                                   <RESOLVE            ( addr -- )             "backward-resolve"       Used at the source of a backward branch after either            BRANCH or ?BRANCH .  Compiles a branch address using addr       as the destination address.                                                                                                >MARK               ( -- addr )             "forward-mark"           Used at the source of a forward branch.  Typically used         after either BRANCH or ?BRANCH .  Compiles space in the         dictionary for a branch address which will later be             resolved by >RESOLVE .                                                                                                     >RESOLVE            ( addr -- )             "forward-resolve"        Used at the destination of a forward branch.  Calculates        the branch address (to the current location in the              dictionary) using addr and places this branch address           into the space left by >MARK .                                                                                             ?BRANCH             ( flag -- )             "question-branch"        When used in the form:  COMPILE ?BRANCH  a conditional          branch operation is compiled.  See BRANCH for further           details.  When executed, if flag is false the branch is         performed as with BRANCH .  When flag is true execution         continues at the compilation address immediately following      the branch address.                                                                                                        BRANCH              ( -- )                                           When used in the form:  COMPILE BRANCH  an unconditional        branch operation is compiled.  A branch address must be         compiled immediately following this compilation address.        The branch address is typically generated by following          BRANCH with <RESOLVE or >MARK .                                                                                            CONTEXT             ( -- addr )                                      The address of a variable which determines the dictionary       search order.                                                                                                              CURRENT             ( -- addr )                                      The address of a variable specifying the vocabulary in          which new word definitions are appended.         ** END ** 
+
+
+
+
+
+
+
+
+
+
+
+
+

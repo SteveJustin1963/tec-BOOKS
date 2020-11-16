@@ -1,0 +1,182 @@
+RS-DOS DISKS
+
+35 TRACKS (0-34) OF 18 SECTORS (0-17) EACH.
+256 BYTES PER SECTOR.
+
+TRACK		MIN SECTOR	MAX SECTOR	
+-----		----------	----------	
+	 0					  0					 17			    			
+	 1					 18					 35				
+	 2					 36					 53						
+	 3					 54					 71				
+	 4					 72					 89			 
+	 5					 90					107			 
+	 6					108					125			 
+	 7					126					143			 
+	 8					144					161			 
+	 9					162					179			 
+	10					180					197			 
+	11					198					215 		 
+	12					216					233			 
+	13					234					251			 
+	14					252					269			 
+	15					270					287			 
+	16					288					305			 
+	17					306					323			 	DISK DIR + FAT (See Below)
+	18					324					341
+	19					342					359
+	20					360					377
+	21					378					395
+	22					396					413
+	23					414					431
+	24					432					449
+	25					450					467
+	26					468					485
+	27					486					503
+	28					504					521
+	29					522					539
+	30					540					557
+	31					558					575
+	32					576					593
+	33					594					611
+	34					612					629
+	
+	
+	GRANULES
+	
+	GRANULE		MIN SECTOR	MAX SECTOR
+	-------		----------	----------
+			 0						0					  8
+			 1					 10					 17
+			 2					 18					 26
+			 3					 27					 35
+			 4					 36					 44
+			 5					 45					 53
+			 6					 54					 62
+			 7					 63					 71
+			 8					 72					 80
+			 9					 81					 89
+			10					 90					 98
+			11					 99					107
+			12					108					116
+			13					117					125
+			14					126					134
+			15					135					143
+			16					144					152
+			17					153					161
+			18					162					170
+			19					171					179
+			20					180					188
+			21					189					197
+			22					198					206
+			23					207					215
+			24					216					224
+			25					225					233
+			26					234					242
+			27					243					251
+			28					252					260
+			29					261					269
+			30					270					278
+			31					279					287
+			32					288					296
+			33					297					305
+			--					306					306					UNUSED
+			--					307					307					FAT
+			--					308					318					DIRECTORY
+			--					319					323					UNUSED
+			34					324					332
+			35					333					341
+			36					342					350
+			37					351					359
+			38					360					368
+			39					369					377
+			40					378					386
+			41					387					395
+			42					396					404
+			43					405					413
+			44					414					422
+			45					423					431
+			46					432					440
+			47					441					449
+			48					450					458
+			49					459					467
+			50					468					476
+			51					477					485
+			52					486					494
+			53					495					503
+			54					504					512
+			55					513					521
+			56					522					530
+			57					531					539
+			58					540					548
+			59					549					557
+			60					558					566
+			61					567					575
+			62					576					584
+			63					585					593
+			64					594					602
+			65					603					611
+			66					612					620
+			67					621					629
+			
+			
+Disk Directory and FAT (File Allocation Table):
+-----------------------------------------------
+			
+			Both the Directory and the FAT are located in Track 17 of the disk. Track 17 is not used for anything else. Track 17 comprises Sector numbers 306 through 323.
+			
+			As commonly referred to Track 17 itself, the FAT is in Sector 2 and the Directory is in Sectors 3-11.
+			
+			The other 34 tracks are divided into two Granules each, with each Granule constituting 9 Sectors. There are, therefore, a total of 68 Granules on the disk. Since the Granule is the smallest allowable division of a file for storage purposes (to minimize file fragmentation), there can thus be a maximum of 68 separate files on any given disk.
+			
+			The File Allocation Table (FAT) begins at byte number 78592 (&H13300) on the disk. This is the first byte of Sector number 307. [For reference, this would be byte number 768 (&H300) in Block number 76 on a CF83 disk]. The FAT extends for a total of 68 bytes (00-67).
+			
+			The Disk Directory (see below) for a file points to the first Granule Number of that file (i.e. the byte number from &H13300) in the FAT.
+			
+			The contents of each byte in the FAT is as follows:
+			
+					A.	If the Granule byte is between 0 and 67 (&H00 and &H43), that byte points to the next Granule used by that same file.
+					
+					B.	If the Granule byte is between 192 and 201 (&HC0 and &HC9), that Granule is the last Granule used by that file, and the least significant 4 bits tells how many Sectors (0-9) of the Granule are used by that file.
+					
+					C.	If the Granule byte is 255 (&HFF), that Granule is not currently used by any file on the disk.
+					
+			The Directory begins at byte number 78848 (&H13400) on the disk. This is the first byte of Sector number 308. [For reference, this would be the first byte in Block number 77 on a CF83 disk]. The directory extends for a total of 2176 (&H880) bytes, that is, a maximum of 68 Directory entries at 32 bytes per entry. [Thus, for reference, the Directory would use all of Blocks 77 and 78, as well as the first 128 bytes of Block 79 on a CF83 disk].
+			
+			The contents of each 32-byte Directory entry is as follows:
+			
+					A.	8 bytes = Filename (space padded on the right).
+									If first byte = &H00, the file has been removed and the 
+											entire entry is invalid.
+									If first byte = &HFF, the entry has never been used, i.e. 
+											the entry is empty.
+					
+					B.	3 bytes = Extension (space padded on right).
+					
+					C.	1 byte = File Type.
+									&H00 = Basic Program.
+									&H01 = Basic Data.
+									&H02 = Machine Code.
+									&H03 = ASCII Text.
+									
+					D.	1 byte = File Format.
+									&H00 = Binary.
+									&HFF = ASCII.
+									
+					E.	1 byte = The number of the File's first Granule in the FAT.
+					
+					F.	2 bytes = The number of bytes used in the last-used Sector of
+									the file's last Granule.
+									
+					G.	16 bytes = unused.
+					
+			In allocating Granules to files, in order to minimize disk thrashing, RS-DOS generally chooses Granules closer to Track 17 first.
+			
+-----
+
+cf. www.cs.unc.edu/~yakowenk/coco/text/diskbasic.html .
+
+
+
+                                  ** END **
+			
