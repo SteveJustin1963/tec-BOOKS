@@ -1,0 +1,569 @@
+                 BBC BASIC for the Amstrad Colour Computers
+
+                          Preliminary Information
+
+                       (C) Copyright R.T.Russell 1986
+
+1. Introduction
+
+   This preliminary documentation accompanies the evaluation copy of Amstrad 
+   BBC BASIC (Z80). It should be read in conjunction with the manual for the 
+   Torch  version of BBC BASIC (Z80),  as only those features  which  differ 
+   substantially  from the Torch version are documented here.  If you do not 
+   have a manual for the Torch version this can be obtained from M-Tec (UK).
+
+   This  version  of  BBC BASIC will run on the Amstrad CPC664  and  CPC6128 
+   machines,  and also on the CPC464 if fitted with the optional disk drive.  
+   It will not run on the PCW8256 and PCW8512 word processors. It runs under 
+   CP/M 2.2 or CP/M Plus and is supplied on a 3" compact diskette.
+
+   To enter CP/M insert a suitable CP/M System disk and type:
+
+               |CPM<return>
+
+   To run BBC BASIC insert the enclosed disk (or a copy) and type:
+
+               A>BBCBASIC<return>
+
+   After a couple of seconds the system will reply:
+
+               Amstrad BBC BASIC Version 2.30
+               (C) Copyright R.T.Russell 1986
+               >
+
+
+2. Memory utilisation
+
+   BBC  BASIC requires about 17K of code space and 3K of private RAM.   When 
+   run under CP/M 2.2 (e.g.  on the CPC464 or CPC664) PAGE is set by default 
+   to  &5000 and HIMEM is set to &9F00,  giving nearly 20K of user  RAM  for 
+   program,  variables and stack.  If characters 128-255 are neither defined 
+   nor  used by the BASIC program to be run,  PAGE may be lowered  to  &4C00 
+   giving an extra 1K of user RAM; however this is not recommended.
+
+   When  run under CP/M Plus (i.e.  on the CPC6128) PAGE is set to &4800 and 
+   HIMEM to &EE00,  giving 41.5K of user RAM.   PAGE must not be lowered  by 
+   the user.
+
+   Note  that use of *EXEC and *SPOOL irreversibly lowers HIMEM to make room 
+   for  the appropriate file control block.   As this space is not  returned 
+   when the *EXEC or *SPOOL file is finished with,  these facilities  should 
+   be used sparingly if excessive loss of memory space is to be avoided.  If 
+   required,  PAGE  and HIMEM can be re-initialised by restarting the  BASIC 
+   (CALL &100).
+
+
+3. Commands, statements and functions
+
+   The syntax of BASIC commands,  statements and functions is in most  cases 
+   identical  to  that of the Torch version (2.3).  The few differences  are 
+   documented here:
+
+   ADVAL
+   The  Amstrad  machines do not have a true analogue  input,  instead  they 
+   support  simple contact-closure style joysticks.   ADVAL with a  zero  or 
+   positive  argument returns a 16-bit integer corresponding to the state of 
+   these joysticks as follows:
+
+               Bit 13:   Joystick 0 fire button 1
+               Bit 12:   Joystick 0 fire button 2
+               Bit 11:   Joystick 0 right
+               Bit 10:   Joystick 0 left
+               Bit 9:    Joystick 0 down
+               Bit 8:    Joystick 0 up
+               Bit 5:    Joystick 1 fire button 1
+               Bit 4:    Joystick 1 fire button 2
+               Bit 3:    Joystick 1 right
+               Bit 2:    Joystick 1 left
+               Bit 1:    Joystick 1 down
+               Bit 0:    Joystick 1 up
+
+   ADVAL  with a negative argument returns the number of free spaces in  the 
+   sound buffers as follows:
+
+               ADVAL(-6) Sound channel 1
+               ADVAL(-7) Sound channel 2
+               ADVAL(-8) Sound channel 3
+
+   CALL
+   This  command has a special function when addresses in the range &FF00 to 
+   &FFFF  are  used.  See  the section on  Operating  System  Interface  for 
+   details.
+
+   CLG
+   This  does  not  move  the graphics cursor  to  (0,0),  contrary  to  the 
+   information given in the Torch manual.
+
+   EDIT
+   A  single-line  editor is provided.  The following control functions  are 
+   available:
+
+     LEFT       move the cursor one character position to the left
+     RIGHT      move the cursor one character position to the right
+     UP         move the cursor up one line, or to the start of the line
+     DOWN       move the cursor down one line, or to the end of the line
+     CTRL/LEFT  move the cursor to the start of the line
+     CTRL/RIGHT move the cursor to the end of the line
+     CLR        delete the character at the current cursor position
+     DEL        backspace and delete the character to the left of the cursor
+     CTRL/U     delete all characters to the left of the cursor
+     CTRL/X     delete all characters from the cursor to the end of the line
+
+   Note  that the COPY key is active at all times,  as when running  Amstrad 
+   BASIC.  SHIFT with the cursor keys moves the copy (read) cursor.
+
+   ENVELOPE
+   This  statement is implemented as far as possible to be  compatible  with 
+   the BBC Micro.   However, although the hardware sound capabilities of the 
+   machines  are similar the Operating System support is somewhat different.  
+   There are therefore differences in the detailed operation of the ENVELOPE 
+   statement.   In particular there is no "release" section of the amplitude 
+   envelope and the pitch envelope may not give identical results.  The most 
+   important  effect  is  that  no sound is  produced  beyond  the  duration 
+   specified  in  the SOUND statement,  whereas on the BBC Micro  the  sound 
+   continues  indefinitely  depending on the specification  of  the  release 
+   phase of the amplitude envelope.
+
+   Envelope numbers may be in the range 1 to 15.
+
+   INKEY
+   The key codes used in conjunction with the INKEY function with a negative 
+   argument  (test  a  specific  key) are those given in  the  Amstrad  User 
+   Instructions  (e.g.  Chapter  7  Page 23 of  the  CPC6128  manual).   For 
+   example, INKEY(-47) tests whether the SPACE bar is depressed.
+
+   LIST
+   When using the (default) VDU emulator (*OPT 0),  LISTing may be paused by 
+   holding down the CTRL and SHIFT keys together.  "Paged" mode may also  be 
+   entered  by typing CTRL/N (VDU 14) whereupon the screen will wait at  the 
+   end  of each page until a SHIFT key is pressed.  Paged mode is turned off 
+   by typing CTRL/O (VDU 15).
+
+   Beware:  Pressing ESC whilst pausing a listing with CTRL and  SHIFT  will 
+   reset the computer!
+
+   MODE
+   The available display modes are as follows:
+
+          Mode      Graphics       Text      Colours
+
+            0       640 x 200     80 x 25       2
+            1       320 x 200     40 x 25       4
+            2       160 x 200     20 x 25      16
+            3       640 x 200     80 x 25       2
+            4       320 x 200     40 x 25       4
+            5       160 x 200     20 x 25      16
+            6       320 x 200     40 x 25       4
+            7       320 x 200     40 x 25       4 
+
+   Modes 0 & 3 are identical,  as are modes 1, 4, 6 & 7 and modes 2 & 5.  No 
+   attempt  is made to emulate the BBC Micro's Teletext mode (MODE  7).   In 
+   this respect the Amstrad machines behave more like the Acorn Electron.
+
+   A MODE change does not switch off paged mode (VDU 14).
+
+   MOVE
+   The range of coordinates corresponding to positions on the screen is 0 to 
+   1279 in the x-direction and 0 to 799 in the y-direction.
+
+   PLOT
+   The range of coordinates corresponding to positions on the screen is 0 to 
+   1279 in the x-direction and 0 to 799 in the y-direction.
+
+   The following PLOT codes are implemented:
+
+   PLOT 0      Move to a position relative to the last point.
+   PLOT 1      Draw line relative in graphics foreground colour.
+   PLOT 2      Draw line relative in logical inverse colour.
+   PLOT 3      Draw line relative in graphics background colour.
+   PLOT 4      Move to an absolute position.
+   PLOT 5      Draw line absolute in graphics foreground colour.
+   PLOT 6      Draw line absolute in logical inverse colour.
+   PLOT 7      Draw line absolute in graphics background colour.
+
+   PLOT 8-15   As PLOT 0-7 except that the last point is plotted twice.
+
+   PLOT 16-63  These codes are NOT IMPLEMENTED.
+
+   PLOT 64-71  As PLOT 0-7 but only a single point is plotted.
+
+   PLOT 72-79  These codes are NOT IMPLEMENTED.
+
+   PLOT 80-87  Plot  and fill a triangle formed by the specfied position and 
+               the last two points visited.
+
+   PLOT 88-95  These codes are NOT IMPLEMENTED.
+
+   SOUND
+   Although  the sound generator has a "noise" capability,  it has not  been 
+   possible  within  the  constraints  of the Amstrad  Operating  System  to 
+   implement this in a way compatible with the BBC Micro's SOUND  statement.  
+   Consequently the use of channel zero has no effect.
+
+   The four parameters behave as follows:
+
+                    SOUND channel,loudness,pitch,duration
+
+   channel
+   Only bits 0, 1 & 4 have any effect. Bits 0 & 1 are the channel number (1-
+   3).  If  bit 4 is set,  the sound queue is flushed and the new  sound  is 
+   started immediately.
+
+   loudness
+   Values  from  -15 to -1 select a sound of amplitude 15 to 1  respectively 
+   with constant pitch,  zero selects silence and values from 1 to 15 select 
+   an envelope (see ENVELOPE statement).
+
+   pitch
+   This selects the (initial) pitch as with the BBC Micro.  The pitch can be 
+   varied only in semitone increments, i.e. the least significant 2 bits are 
+   ignored; Middle C is 52.
+
+   duration
+   Values  from  0  to 254 select the duration of the  sound,  in  units  of 
+   approximately 1/20 second. The value -1 causes an indefinite sound, which 
+   can  be stopped only by issuing another SOUND statement with the  "flush" 
+   bit set or by pressing the ESCape key.
+
+   USR
+   USR has a special function when addresses in the range &FF00 to &FFFF are 
+   used. See the section on the OS Interface for details.
+
+
+4. The Operating System Interface
+
+   The   following   resident  Operating  System   ("star")   commands   are 
+   implemented.  They may be accessed directly (e.g.  *BYE) or via the OSCLI 
+   statement (OSCLI "BYE"). See the Torch manual for more details.
+    
+   *BYE
+   Returns control to CP/M.
+
+   *CPM
+   This is synonymous with *BYE.
+
+   *. [filespec]
+   *DIR [filespec]
+   List  the  files which match the (optional) ambiguous  filespec.  If  the 
+   filespec  is omitted,  all .BBC files are listed.  "Read only" files  are 
+   marked with an asterisk.
+
+   *DRIVE d:
+   Select drive d as the default drive for subsequent disk operations.
+
+   *ERA filespec
+   *ERASE filespec
+   Delete all files matching the ambiguous filespec.
+
+   *ESC [ON|OFF]
+   *ESC OFF disables the abort action of the ESCape key;  after *ESC OFF the 
+   ESCape  key simply returns the ASCII code ESC (27).  *ESC  ON,  or  *ESC, 
+   restores the normal action of the ESCape key.
+
+   *EXEC filespec
+   Accept  console  input  from  the  specified file  instead  of  from  the 
+   keyboard. If the extension is omitted, .BBC is assumed.
+
+   *KEY n [string]
+   Redefine a function key to return the specified string.  The key number n 
+   is  from  0 to 31;  note that key 10 is the full point (.) in the  cursor 
+   cluster, key 11 is the ENTER key and key 12 is CTRL/ENTER.
+
+   The  string  may contain the "escape" symbol | in order  to  insert  non-
+   printing characters.  For example,  |M indicates CR (carriage return), !? 
+   indicates DEL, || indicates the character | itself and |! causes bit 7 of 
+   the  following character to be set.  If the string is enclosed in  quotes 
+   (which  is  optional)  |" allows the character " to be  included  in  the 
+   string.
+
+   If there is insufficient room for the string, the "Bad string" error will 
+   occur and the key will be loaded with as much of the string as would fit.
+
+   *LOAD filespec aaaa
+   Loads the specfied file into memory at hexadecimal address aaaa. The load 
+   address must be specified. If the extension is omitted, .BBC is assumed.
+
+   *LOCK filespec
+   Set  the  specified  file to "read-only"  status.  If  the  extension  is 
+   omitted, .BBC is assumed.
+
+   *OPT [n]
+   Select  the destination for console output characters.  The value n is in 
+   the range 0 to 3, as follows:
+               
+          0    Send characters to the VDU emulator (see later)
+          1    Send characters to the auxiliary output
+          2    Send characters to the printer output
+          3    Send characters to the standard console output
+
+   *OPT  0  is  the default setting.  Note that all characters sent  to  the 
+   console output are vectored with *OPT,  there is no filtering of graphics 
+   commands etc. For example, the statement COLOUR 3 in a program will cause 
+   the bytes 17 and 3 to be sent to the device selected by *OPT.
+
+   *REN newfile=oldfile
+   *RENAME newfile=oldfile
+   These  commands rename oldfile as newfile.  If the extension is  omitted, 
+   .BBC is assumed.
+
+   *RESET
+   Resets  the disk system.  When used with CP/M 2.2 this command should  be 
+   issued  after a disk is changed.   This need not be done with  CP/M  Plus 
+   (although it will do no harm).
+
+   *SAVE filespec aaaa bbbb
+   *SAVE filespec aaaa +llll
+   This command saves a specified range of memory to disk. The address range 
+   is  specified either as start address (aaaa) and end address +1 (bbbb) or 
+   as start address (aaaa) and length (llll).  If the extension is  omitted, 
+   .BBC is assumed.
+
+   *SPOOL [filespec]
+   Copy all subsequent console output to the specified file. If the filename 
+   is omitted,  any current spool file is closed and spooling is terminated. 
+   If the extension is omitted, .BBC is assumed.
+
+   *TYPE filespec
+   Type  the specified file to the VDU screen.  If the extension is omitted, 
+   .BBC is assumed.
+
+   *UNLOCK filespec
+   Set  the  specified  file to "read/write" status.  If  the  extension  is 
+   omitted, .BBC is assumed.
+
+   *| comment
+   This is a comment line. Anything following the | is ignored.
+
+   In  addition  to  the  commands listed above,  the  OS  Interface  module 
+   provides facilities for reading the character at the current text  cursor 
+   position and for reading the dot pattern of a given font character. These 
+   are accessed by a USR or CALL to addresses &FFF4 and &FFF1 respectively:
+
+   The character at the current text cursor position is returned by:
+
+                    (USR(&FFF4) AND &FF00) DIV 256
+
+   The dot pattern of a character can be read as follows:
+
+                    DIM par 8
+                    X%=par MOD 256:Y%=par DIV 256
+                    ?par=character
+                    CALL &FFF1
+
+   where  the character pattern will be returned in the eight bytes par?1 to 
+   par?8.
+
+   The reason for the rather "obscure" methods of accessing these  functions 
+   is  to maintain maximum compatibility with the similar functions provided 
+   on the BBC Microcomputer.
+
+   A  user's machine code program may access the OSRDCH,  OSWRCH,  OSKEY and 
+   OSCLI routines by using vectors provided in page 1:
+
+          OSRDCH:  call &109    ;Waits for and returns character in A
+          OSWRCH:  call &10C    ;Sends character in A to VDU drivers
+          OSKEY:   call &10F    ;Time limit in HL, returns character
+                                ;in A, carry=0 if timeout occured
+          OSCLI:   call &112    ;HL addresses command, terminated by CR
+
+
+5. The VDU emulator
+
+   In  the default state (*OPT 0) all console output is passed to a software 
+   emulator of the BBC Micro's VDU drivers.  VDU codes perform a function as 
+   similar  as  possible  to those of the BBC  Micro,  consistent  with  the 
+   hardware and Operating System differences, as follows:
+
+   VDU 0
+   Ignored
+
+   VDU 1
+   VDU 1,n
+   The  following byte is sent to the printer,  if enabled (with VDU 2).  If 
+   the printer is not enabled,  the byte is ditched. Any 8-bit value (0-255) 
+   can be sent. This works even when the VDU is disabled with VDU 21.
+
+   VDU 2
+   Enable the printer. Subsequent characters are sent both to the screen and 
+   to  the printer.  The only control characters sent to the printer are  BS 
+   (8),  HT  (9),  LF (10),  VT (11),  FF (12) and CR (13).  Bytes which are 
+   parameters for VDU commands are not sent to the printer,  e.g.  VDU 17,65 
+   does not send "A" to the printer.
+
+   VDU 3
+   Disables the printer. Cancels the effect of VDU 2.
+
+   VDU 4
+   Causes text to be written at the text cursor position in the normal  way. 
+   Characters  are  "opaque" and can be positioned only at text  coordinates 
+   within the text window. The text window scrolls when necessary.
+
+   VDU 5
+   Causes  text to be written at the graphics  cursor  position.  Characters 
+   have  a "transparent" background and are plotted according to the current 
+   foreground  GCOL  rules  and colour (VDU  127,  DEL,  is  an  exception). 
+   Characters  can  be  positioned at any  graphics  coordinate  within  the 
+   graphics  window,  the  top left of the character cell is  the  reference 
+   point;  characters  are  NOT  clipped  to the window limits  (this  is  a 
+   limitation of the Amstrad Operating System). No scrolling takes place.
+
+   VDU 6
+   Enables the VDU screen. Cancels the effect of VDU 21.
+
+   VDU 7
+   Causes a "beep".
+
+   VDU 8
+   Moves the text cursor left one character.  If it was at the left edge  of 
+   the   window,  it is wrapped to the end of the previous line (RH edge  of 
+   window).  If  it was also on the top line of the text window,  the window 
+   scrolls down (except when in VDU 5 mode).
+
+   VDU 9
+   Moves  the text cursor right one character.  If it was at the right  hand 
+   edge of the window,  it is wrapped to the beginning of the next line  (LH 
+   edge  of window).  If it was also on the bottom line of the text  window, 
+   the window scrolls up (except when in VDU 5 mode).
+
+   VDU 10
+   Moves the text cursor down one line.  If it was on the bottom line of the 
+   text window, the window scrolls up (except when in VDU 5 mode). Scrolling 
+   is inhibited if CTRL & SHIFT are both held down.
+
+   VDU 11
+   Moves the text cursor up one line.  If it was on the top line of the text 
+   window, the window scrolls down (except when in VDU 5 mode).
+
+   VDU 12
+   This  is  identical to CLS in BASIC.  It clears the text  window  to  the 
+   current  text background colour and moves the text cursor to the top-left 
+   corner of the text window.
+
+   VDU 13
+   Moves the text cursor to the left-hand edge of the window,  but does  not 
+   move it vertically.
+
+   VDU 14
+   Enter  paged mode.  Scrolling will stop after each page, unless SHIFT  is 
+   pressed.
+
+   VDU 15
+   Stop paging. Cancels the effect of VDU 14.
+
+   VDU 16
+   This  is identical to CLG in BASIC.  It clears the graphics window  using 
+   the  current  background  GCOL action and colour.  It does not  move  the 
+   graphics cursor.
+
+   VDU 17
+   VDU 17,n
+   This is identical to COLOUR n in BASIC. The next byte determines the text 
+   colour, see COLOUR for details.
+
+   VDU 18
+   VDU 18,a,c
+   This is identical to GCOL a,c in BASIC.  The next two bytes determine the 
+   GCOL action and colour respectively.
+
+   VDU 19
+   VDU 19,L,p,0,0,0
+   Change the palette to select logical colour L as physical colour p.  This 
+   command  works  in  a compatible fashion to the BBC Micro  but  has  been 
+   extended to give access to the Amstrad's enhanced facilities as follows:
+
+   VDU 19,-1,p,0,0,0
+   Select physical colour p as the border colour.
+
+   VDU 19,L,x+128,y,0,0
+   Select  logical  colour  L as alternating between Amstrad  colour  x  and 
+   Amstrad colour y.
+
+   VDU 19,-1,x+128,y,0,0
+   Select  the  border  colour  to alternate between Amstrad  colour  x  and 
+   Amstrad colour y.
+
+   The  physical colour p is mapped to the BBC Micro's physical colours  (0-
+   15).  The Amstrad colours x and y correspond to the 27 colours  available 
+   from the Amstrad machines.
+
+   VDU 20
+   Sets text and graphics colours to their default values (background black, 
+   foreground  white)  and resets the palette.   In 4-colour modes  set  the 
+   colours to black, red, yellow and white.
+
+   VDU 21
+   Disable VDU output.  All VDU commands except 1 and 6 are ignored.  If the 
+   printer  is enabled,  VDUs 8,9,10,11,12 and 13 will still be sent to  the 
+   printer.
+
+   VDU 22
+   VDU 22,n
+   This is identical to MODE n in BASIC, except that MODE zeros the value of 
+   COUNT  whereas  VDU 22 does not.  VDU 22 also resets  all  screen  driver 
+   variables (colours,  palette,  windows, cursor positions, graphics origin 
+   etc.).  In particular,  VDU 22 performs the actions of VDU 4, VDU 12, VDU 
+   20 and VDU 26. See MODE for further details.
+
+   VDU 23
+   Program user-defined graphics characters,  enable/disable cursor or write 
+   to 6845 CRT controller registers:
+       VDU 23,n,r1,r2,r3,r4,r5,r6,r7,r8 program character n (32-255)
+       VDU 23,1,0;0;0;0;                disable cursor
+       VDU 23,1,1;0;0;0;                enable cursor
+       VDU 23,0,r,x,0;0;0;              write x to 6845 register r
+
+
+   VDU 24
+   VDU 24,leftx;bottomy;rightx;topy;
+   Define  graphics window.  The coordinates are with respect to the current 
+   graphics origin,  so users are recommended to precede VDU 24 with VDU  26 
+   to  reset  the origin first.   The coordinates are not checked for  valid 
+   range.
+
+   VDU 25
+   VDU 25,n,x;y;
+   This is identical to PLOT n,x;y; in BASIC. See PLOT for more details.
+
+   VDU 26
+   Reset  text and graphics windows to their default positions (filling  the 
+   whole screen),  home text cursor,  move graphics cursor to 0,0 and  reset 
+   the graphics origin to 0,0.
+
+   VDU 27
+   VDU 27,n
+   Send  the  next byte to the screen without interpreting it as  a  control 
+   code. Allows graphics characters corresponding to VDU 0-31 and VDU 127 to 
+   be displayed. Acts in a similar way to VDU 1 for the printer.
+
+   VDU 28
+   VDU 28,leftx,bottomy,rightx,topy
+   Set a text window. The text cursor is moved to the new home position. 
+
+   VDU 29
+   VDU 29,x;y;
+   Move the graphics origin to the specified coordinates.
+
+   VDU 30
+   Home the text cursor,  to the top-left hand corner of the text window (or 
+   the graphics window, when in VDU 5 mode).
+
+   VDU 31
+   VDU 31,x,y
+   Identical  to  PRINT  TAB(x,y);  in  BASIC.  Positions  the  text  cursor 
+   according to the next two bytes.  The coordinates are with respect to the 
+   edges of the current text window.
+
+   VDU 127
+   Backspace the cursor by one position and delete the character there.   In 
+   VDU  5 mode the character is "deleted" by writing character 143 (a  solid 
+   block) in the current graphics background colour and action.
+
+
+6. Finally,  a  reminder that the ~ character (used with PRINT and  STR$  to 
+   give hexadecimal numbers) can be obtained by pressing CTRL/2.
+
+
+
+   R. T. Russell.
+   2nd April 1986.
+
