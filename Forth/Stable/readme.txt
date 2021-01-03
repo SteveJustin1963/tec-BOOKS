@@ -1,5 +1,5 @@
 Backup of site
-some extra files contributed by Sandor, thanks.
+files contributed by Author, Sandor, thanks.
 
 
 http://www.w3group.de/stable.html
