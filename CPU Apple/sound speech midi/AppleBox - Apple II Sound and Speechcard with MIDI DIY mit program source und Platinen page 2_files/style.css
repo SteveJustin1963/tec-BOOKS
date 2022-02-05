@@ -1,0 +1,100 @@
+/* General purpose WSX5's required classes */
+.imClear { visibility: hidden; clear: both; border: 0; margin: 0; padding: 0; }
+.imHidden { display: none; }
+.imCaptFrame { vertical-align: middle; }
+.imAlertMsg { padding: 10px; font: 10pt "Trebuchet MS"; text-align: center; color: #000; background-color: #fff; border: 1px solid; }
+.alert { padding: 5px 7px; margin: 5px 0 10px 0; border-radius: 5px; border: 1px solid; font: inherit; }
+.alert-red { color: #ff6565; border-color: #ff6565; background-color: #fcc; }
+.alert-green { color: #46543b; border-color: #8da876; background-color: #d5ffb3; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.vertical-middle, tr.vertical-middle td { vertical-align: middle; }
+
+
+/* Page default */
+#imContent {font: normal normal normal 10pt Tahoma; color: #000000; background-color: transparent; text-align: left; text-decoration: none; ; }
+
+
+/* Page Title */
+#imPgTitle, #imPgTitle a, .imPgTitle, .imPgTitle a { padding-top: 2px; padding-bottom: 2px; margin: 5px 0; font: normal normal bold 12pt TechnicBold; color: #FFFFFF; background-color: #400030; text-align: left; text-decoration: none; }
+#imPgTitle, .imPgTitle { border-width: 1px; border-style: solid; border-color: transparent transparent transparent transparent; }
+#imPgTitle.imTitleMargin, .imPgTitle.imTitleMargin { margin-left: 6px; margin-right: 6px; }
+
+
+/* Breadcrumb */
+.imBreadcrumb, #imBreadcrumb { display: none; }
+.imBreadcrumb, .imBreadcrumb a, #imBreadcrumb, #imBreadcrumb a { padding-top: 2px; padding-bottom: 2px; font: normal normal normal 7pt Tahoma; color: #A9A9A9; background-color: transparent; text-align: left; text-decoration: none;  border-width: 1px; border-style: solid; border-color: transparent transparent transparent transparent}
+.imBreadcrumb a, .imBreadcrumb a:link, .imBreadcrumb a:hover, .imBreadcrumb a:visited, .imBreadcrumb a:active { color: #A9A9A9; }
+
+
+/* Links */
+.imCssLink:link, .imCssLink { background-color: transparent; color: #91B2D1; text-decoration: underline; }
+.imCssLink:visited { background-color: transparent; color: #4C80B0; text-decoration: underline; }
+.imCssLink:hover, .imCssLink:active, .imCssLink:hover, .imCssLink:active { background-color: transparent; color: #6291BB; text-decoration: underline; }
+.imAbbr:link { background-color: transparent; color: #91B2D1; border-bottom: 1px dotted #91B2D1; text-decoration: none; }
+.imAbbr:visited { background-color: transparent; color: #4C80B0; border-bottom: 1px dotted #4C80B0; text-decoration: none; }
+.imAbbr:hover, .imAbbr:active { background-color: transparent; color: #6291BB; border-bottom: 1px dotted #6291BB; text-decoration: none; }
+
+
+/* Bottom Menu */
+#imBtMn { margin-left: 6px; margin-right: 6px; padding: 2px 0; position: relative; clear: both;  border-width: 1px; border-style: solid; border-color: #91B2D1 transparent #91B2D1 transparent}
+#imBtMn, #imBtMn a, #imBtMn a:visited, #imBtMn a:hover, #imBtMn a:active {font: normal normal normal 9pt Tahoma; color: #91B2D1; background-color: transparent; text-align: center; text-decoration: none; }
+#imBtMn a:hover { text-decoration: underline; }
+#imBtMn a { border: none; }
+input[type=text], input[type=password], textarea, #imCartContainer .userForm select { font: inherit; border: 1px solid #91B2D1; background-color: #FFFFFF; color: #4C80B0; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-left-radius: 0px; border-bottom-right-radius: 0px; padding-left: 0px; padding-right: 0px; }
+textarea { resize: none; }
+input[type=button], input[type=submit], input[type=reset] {padding: 4px 8px; cursor: pointer; font: inherit; border: 1px solid #91B2D1; background-color: #91B2D1; color: #4C80B0; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-left-radius: 0px; border-bottom-right-radius: 0px; box-sizing: content-box; }
+.search_form input { border-radius: 0; }
+.imNoScript { position: absolute; top: 5px; left: 5%; width: 90%; font: normal normal normal 10pt Tahoma; text-align: left; text-decoration: none; }
+
+/* Tip */
+.imTip { z-index: 100201; background-color: #FFDF80; border-top: 1px solid #000000; border-right: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; font: normal normal normal 9pt TechnicBold; color: #0030BF; background-color: #FFDF80; text-align: center; text-decoration: none;  margin: 0 auto; padding: 10px; position: absolute; border-radius: 5px 5px 5px 5px; box-shadow: 1px 1px 5px 0px #808080;}
+.imTipArrowBorder { border-color: #000000; border-style: solid; border-width: 10px; height: 0; width: 0; position: absolute; }
+.imTipArrow { border-color: #FFDF80; border-style: solid; border-width: 10px; height: 0; width: 0; position: absolute; }
+.imReverseArrow { border-color: #000000; border-style: solid; border-width: 10px; height: 0; width: 0; position: absolute; top: -20px; left: 30px; }
+.imTip img { margin-bottom: 6px; }
+
+
+/* Date Picker */
+.imDatePickerIcon { margin-left: 2px; margin-right: 8px; }
+#imDatePicker { position: absolute; width: 230px; padding: 5px; background-color: white; font-family: Arial; border: 1px solid #888;}
+#imDatePicker table { border-collapse: collapse; margin-left: auto; margin-right: auto; }
+#imDatePicker #imDPHead { padding: 10px; line-height: 20px; height: 20px; display: block; text-align: center; border: 1px solid #aaaaaa; background-color: #c1cbd5; }
+#imDatePicker #imDPMonth { text-align: center; padding: 3px 30px 3px 30px; font-size: 12px; font-weight: bold; }
+#imDatePicker .day { background-color: #fff; text-align: center; border: 1px solid #aaa; vertical-align: middle; width: 30px; height: 20px; font-size: 10px; cursor: pointer; }
+#imDatePicker .selDay { background-color: rgb(255,240,128); }
+#imDatePicker .day:hover { background: #fff; }
+#imDatePicker .imDPhead { cursor: default; font-size: 12px; text-align: center; height: 25px; vertical-align: middle; }
+#imDatePicker #imDPleft, #imDatePicker #imDPright { display: inline; cursor: pointer; font-weight: bold; }
+
+
+/* Popup */
+#imGuiPopUp { padding: 10px; position: fixed; background-color: #000000; border-top: 1px solid #000000; border-right: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; font: normal normal normal 9pt TechnicBold; color: #000000; background-color: #FFBF00; text-align: left; text-decoration: none; ;}
+.imGuiButton { margin-top: 20px; margin-left: auto; margin-right: auto; text-align: center;  width: 80px; cursor: pointer; background-color: #444; color: white; padding: 5px; font-size: 14px; font-family: Arial; }
+#imGuiPopUpBg { position: fixed; top: 0px; left: 0px; background-color: #000000; }
+#imWebSiteX5Adv {position: absolute; top: 0; right: 0; z-index: 1500; overflow: hidden; }
+#imWebSiteX5AdvObj {position: relative; }
+#welcome-flags { margin: 0 auto; text-align: center; }
+#welcome-flags div { display: inline; margin: 10px; }
+#welcome-mediaplayertarget { overflow: hidden; }
+.imSiteMap li { padding: 5px 0 5px 20px; }
+.imSiteMap img { vertical-align: text-bottom; }
+.prt_field { display: none; }
+.topic-summary { margin: 10px auto 20px auto; text-align: center; }
+.topic-form { text-align: left; margin-bottom: 30px; }
+.topic-comment { margin: 0 0 10px 0; padding: 5px 0; border-bottom: 1px dotted #000000; }
+.topic-comments-count { font-weight: bold; margin: 10px 0 7px;}
+.topic-comments-user { margin-bottom: 5px; margin-right: 5px; font-weight: bold;}
+.topic-comments-abuse { margin: 5px 0 0 0; border: none; padding: 3px 0 0 0; text-align: right; }
+.topic-comments-abuse img { margin-left: 3px; vertical-align: middle; }
+.topic-comments-date { margin-bottom: 5px; }
+.imCaptFrame { position: absolute; float: right; margin: 0; padding: 0; top: 5px;}
+.topic-form-row { position: relative; clear: both; padding-top: 5px; }
+.topic-star-container-big, .topic-star-container-small { display: inline-block; position: relative; background-repeat: repeat-x; background-position: left top; }
+.topic-star-container-big { width: 160px; height: 34px; }
+.topic-star-container-small { width: 80px; height: 16px; }
+.topic-star-fixer-big, .topic-star-fixer-small { display: block; position: absolute; top: 0; left: 0; background-repeat: repeat-x; background-position: left top; }
+.topic-star-fixer-big { height: 34px; }
+.topic-star-fixer-small { height: 16px; }
+.topic-pagination { text-align: center; margin: 7px 0; }
+.variable-star-rating { cursor: pointer; }
